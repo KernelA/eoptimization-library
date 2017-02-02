@@ -479,10 +479,12 @@
 
             int indexMin = -1;
 
-            // Find best position with minimum value of target function among: xcur, xrnd, xosd.
-            min = points.Min(a => a[dimension]);
-
-            indexMin = points.FindIndex(a => a[dimension] == min);
+            if(points.Count != 0)
+            {
+                // Find best position with minimum value of target function among: xcur, xrnd, xosd.
+                min = points.Min(a => a[dimension]);
+                indexMin = points.FindIndex(a => a[dimension] == min);
+            }
 
             // If exist best position then move grenade.
             if (indexMin != -1)
