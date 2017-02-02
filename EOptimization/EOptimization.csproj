@@ -40,6 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Math\Combinatorics\Сombinatorics.cs" />
+    <Compile Include="Math\Random\ContUniformDistribution.cs" />
+    <Compile Include="Math\Random\IContUniformGenerator.cs" />
+    <Compile Include="Math\Random\INormalGenerator.cs" />
+    <Compile Include="Math\Random\IRandomGeneartor.cs" />
+    <Compile Include="Math\Random\NormalDistribution.cs" />
     <Compile Include="Math\Random\SyncRandom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
