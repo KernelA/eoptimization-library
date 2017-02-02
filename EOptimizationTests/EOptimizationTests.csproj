@@ -51,6 +51,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Math\Random\ContUniformDistributionTests.cs" />
+    <Compile Include="Math\Random\NormalDistributionTests.cs" />
     <Compile Include="Math\Random\SyncRandomTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
