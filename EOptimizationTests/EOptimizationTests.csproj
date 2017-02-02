@@ -51,6 +51,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Math\Optimization\BBBCOptimizerTests.cs" />
+    <Compile Include="Math\Optimization\FireworksOptimizerTests.cs" />
+    <Compile Include="Math\Optimization\GEMOptimizerTests.cs" />
+    <Compile Include="Math\PointNDTests.cs" />
     <Compile Include="Math\Random\ContUniformDistributionTests.cs" />
     <Compile Include="Math\Random\NormalDistributionTests.cs" />
     <Compile Include="Math\Random\SyncRandomTests.cs" />
