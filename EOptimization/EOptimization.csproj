@@ -45,7 +45,7 @@
     <Compile Include="Math\Optimization\BBBCParams.cs" />
     <Compile Include="Math\Optimization\FireWorksOptimization.cs" />
     <Compile Include="Math\Optimization\FireworksParams.cs" />
-    <Compile Include="Math\Optimization\GEMOptimizationWithImprove.cs" />
+    <Compile Include="Math\Optimization\GEMOptimization.cs" />
     <Compile Include="Math\Optimization\GEMParams.cs" />
     <Compile Include="Math\Optimization\GeneralParams.cs" />
     <Compile Include="Math\Optimization\IOptimizer.cs" />

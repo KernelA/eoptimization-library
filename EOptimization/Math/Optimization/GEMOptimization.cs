@@ -67,24 +67,43 @@
         }
 
         /// <summary>
-        /// 
+        /// Create object which use default implementation for random generators.
+        /// </summary>
+        public GEMOptimizer() : this(new ContUniformDistribution(), new NormalDistribution())
+        {
+
+        }
+
+        /// <summary>
+        /// Create object which use custom implementation for random generators.
         /// </summary>
         /// <param name="uniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface, 
-        /// for generating uniform random value. If it equal null then use the default implementation.</param>
+        /// for generating uniform random value.</param>
         /// <param name="normalGen">Object, which implements <see cref="INormalGenerator"/> interface, 
-        /// for generating uniform random value. If it equal null then use the default implementation.</param>
-        public GEMOptimizer(IContUniformGenerator uniformGen = null, INormalGenerator normalGen = null)
+        /// for generating uniform random value.</param>
+        public GEMOptimizer(IContUniformGenerator uniformGen, INormalGenerator normalGen)
         {
+
             if (uniformGen == null)
-                uniformRand = new ContUniformDistribution();
+            {
+                throw new ArgumentNullException(nameof(uniformGen));
+            }
 
             if (normalGen == null)
-                normalRand = new NormalDistribution();
+            {
+                throw new ArgumentNullException(nameof(normalGen));
+            }
+
+            uniformRand = uniformGen;
+
+            normalRand = normalGen;
 
             xrnd = xosd = xcur = dosd = dgrs = null;
 
             initParams = false;
         }
+
+
 
 
         private double EuclideanDistance(PointND a, PointND b)

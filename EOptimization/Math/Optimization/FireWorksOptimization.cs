@@ -87,20 +87,39 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// 
+        /// Create object which use default implementation for random generators.
         /// </summary>
-        /// <param name="uniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface, for generating uniform random value. If it equal null then use the default implementation.</param>
-        /// <param name="normalGen">Object, which implements <see cref="INormalGenerator"/> interface, for generating uniform random value. If it equal null then use the default implementation.</param>
-        public FireworksOptimizer(IContUniformGenerator uniformGen = null, INormalGenerator normalGen = null)
+        public FireworksOptimizer() : this(new ContUniformDistribution(), new NormalDistribution())
+        {
+
+        }
+
+        /// <summary>
+        /// Create object which use custom implementation for random generators.
+        /// </summary>
+        /// <param name="uniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface, for generating uniform random value.</param>
+        /// <param name="normalGen">Object, which implements <see cref="INormalGenerator"/> interface, for generating uniform random value.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public FireworksOptimizer(IContUniformGenerator uniformGen, INormalGenerator normalGen)
         {
             if (uniformGen == null)
-                uniformRand = new ContUniformDistribution();
+            {
+                throw new ArgumentNullException(nameof(uniformGen));
+            }
 
             if (normalGen == null)
-                normalRand = new NormalDistribution();
+            {
+                throw new ArgumentNullException(nameof(normalGen));
+            }
+
+            uniformRand = uniformGen;
+
+            normalRand = normalGen;
 
             error = true;
         }
+
+
 
         private void InitializePopulation(double[] a, double[] b)
         {
