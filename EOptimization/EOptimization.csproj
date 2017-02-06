@@ -56,6 +56,7 @@
     <Compile Include="Math\Random\IRandomGeneartor.cs" />
     <Compile Include="Math\Random\NormalDistribution.cs" />
     <Compile Include="Math\Random\SyncRandom.cs" />
+    <Compile Include="Math\LA\SymmetricMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
