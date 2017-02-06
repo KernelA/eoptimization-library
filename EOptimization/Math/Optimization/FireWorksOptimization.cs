@@ -6,6 +6,7 @@ namespace EOpt.Math.Optimization
     using System.Threading.Tasks;
 
     using Math.Random;
+    using Math.LA;
 
     /// <summary>
     /// Optimization method Fireworks.
@@ -146,6 +147,8 @@ namespace EOpt.Math.Optimization
 
                 this.chargePoints.Add(temp.Clone());
             }
+
+           
         }
 
 
@@ -459,16 +462,14 @@ namespace EOpt.Math.Optimization
 
             double denumeratorForP = 0;
 
+            SymmetricMatrix matrixOfDistances = new SymmetricMatrix(allPoints.Length, 0);
+
+
             // Calculate distance between all points.
             for (int i = 0; i < allPoints.Length; i++)
             {
-                double dist = 0;
-
-                for (int j = 0; j < allPoints.Length; j++)
+                for (int j = i + 1; j < allPoints.Length; j++)
                 {
-                    if (i == j)
-                        continue;
-
                     // Last coordinate of point for storing the value of target function in this point.
                     // Do not need take last coordinate.
                     for (int l = 0; l < Dimension; l++)
@@ -477,25 +478,28 @@ namespace EOpt.Math.Optimization
                         point2[l] = allPoints[j][l];
                     }
 
-                    dist += distanceFunction(point1, point2);
+                    matrixOfDistances[i, j] = distanceFunction(point1, point2);
+                }           
+            }
+
+            for (int ii = 0; ii < allPoints.Length; ii++)
+            {
+                double dist = 0;
+
+                for (int j = 0; j < matrixOfDistances.ColumnCount; j++)
+                {
+                    dist += matrixOfDistances[ii, j];
                 }
 
-                weightes[i] = new WeightOfPoint(i, dist);
+                weightes[ii] = new WeightOfPoint(ii, dist);
 
                 denumeratorForP += dist;
             }
-    
-            
-            //for (int ii = 0; ii < allPoints.Length; ii++)
-            //{
-            //    denumeratorForP += weightes[ii].Distance;
-            //}
 
             // Probability of explosion.
             for (int jj = 0; jj < allPoints.Length; jj++)
             {
                 weightes[jj].Distance /= denumeratorForP;
-
             }
 
             // Sort by descending probability of explosion.

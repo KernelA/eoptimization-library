@@ -1,18 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EOptimization.Math.LA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EOptimization.Math.LA.Tests
+﻿namespace EOpt.Math.LA.Tests
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using EOpt.Math.LA;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     [TestClass()]
     public class SymmetricMatrixTests
     {
         [TestMethod()]
-        public void SymmetricMatrixConstrTest()
+        public void SymmetricMatrixTestConstr()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(4);
 
@@ -20,7 +20,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void SymmetricMatrixConstrTest1()
+        public void SymmetricMatrixTestConstr1()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(3, 5);
 
@@ -39,7 +39,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void SymmetricMatrixConstrTest2()
+        public void SymmetricMatrixTestConstr2()
         {
             double[,] array = { { 1, 2, 4 }, { 2, 7, 8 }, { 4, 8, 9 } };
 
@@ -60,7 +60,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void ToArrayTest()
+        public void SymmetricMatrixTestToArray()
         {
             double[,] array = { { 1, 2 }, { 2, 8 } };
 
@@ -84,7 +84,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void SymmetricMatrixWrongParamConstrTest1()
+        public void SymmetricMatrixTestWrongParamConstr()
         {
             // Not symmetrix matrix.
             double[,] array = { { 1, 2, 4 }, { 89, 7, 8 }, { 4, 8, 9 } };
@@ -104,7 +104,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void IndexatorTest()
+        public void SymmetricMatrixTestIndexator()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(5, 9);
 
@@ -114,7 +114,7 @@ namespace EOptimization.Math.LA.Tests
         }
 
         [TestMethod()]
-        public void IndexatorTest1()
+        public void SymmetricMatrixTestIndexator1()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(5, 0);
 

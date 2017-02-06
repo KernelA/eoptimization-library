@@ -1,4 +1,4 @@
-﻿namespace EOptimization.Math.LA
+﻿namespace EOpt.Math.LA
 {
     using System;
     using System.Collections.Generic;
