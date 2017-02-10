@@ -11,8 +11,11 @@ The library for solving constrained optimization problems. Implemented three alg
 
 ![Example 1](/Docs/Images/example1.png)
 
+## Assembly
 
-Library for .Net framework 4.6.1.
+Library for .Net framework 4.5.
+
+Assembly location with xml documentation: `EOptimization\bin\Release\`
 
 ## Description of methods
 
@@ -27,9 +30,8 @@ You can read about methods in next articles.
 ## Requirements
 
 1. Minimal version of Visual studio - Visual studio 2010 SP1.
-2. .Net framework 4.6.1.
+2. .Net framework 4.5.
 
 ## License
 
 The library distributed under [MIT license](https://mit-license.org/).
-
