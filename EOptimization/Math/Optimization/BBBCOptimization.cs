@@ -12,9 +12,9 @@ namespace EOpt.Math.Optimization
     public class BBBCOptimizer : IOptimizer
     {
         /// <summary>
-        /// If error = true, then not set parameters.
+        /// If initParamsQ = true, then not set parameters.
         /// </summary>
-        private bool error;
+        private bool initParamsQ;
         
         private int indexBestSolution;
 
@@ -22,11 +22,6 @@ namespace EOpt.Math.Optimization
         /// Dimension of space.
         /// </summary>
         private int dimension;
-
-        /// <summary>
-        /// Number, which add for avoiding division by zero.
-        /// </summary>
-        private const double psi = 1E-10;
 
         private PointND centerOfMass;
 
@@ -94,7 +89,7 @@ namespace EOpt.Math.Optimization
 
             normalRand = normalGen;
 
-            error = true;
+            initParamsQ = true;
         }
 
 
@@ -140,18 +135,9 @@ namespace EOpt.Math.Optimization
 
         private void FindBestSolution()
         {
-            double min = points[0][dimension];
+            double min = points.Min(point => point[point.Dimension - 1]);
 
-            indexBestSolution = 0;
-
-            for (int i = 1; i < points.Count; i++)
-            {
-                if(points[i][dimension] < min)
-                {
-                    min = points[i][dimension];
-                    indexBestSolution = i;
-                }
-            }
+            indexBestSolution = points.FindIndex(point => point[point.Dimension - 1] == min);
         }
 
 
@@ -165,7 +151,7 @@ namespace EOpt.Math.Optimization
 
             for (int i = 0; i < parametrs.NP; i++)
             {
-                temp = 1 / (points[i][dimension] + psi);
+                temp = 1 / (points[i][dimension] + Constants.Psi);
 
                 denominator += temp;
 
@@ -194,11 +180,11 @@ namespace EOpt.Math.Optimization
                     tempPoint[j] = parametrs.Beta * centerOfMass[j] + (1 - parametrs.Beta) * tempBestSol[j] + normalRand.NRandVal(0,1)
                         * parametrs.Alpha * (b[j] - a[j]) / iterNum;
 
-                    // If point leave region that she return to neighborhood bound.
+                    // If point leave region that she return to random point.
                     if (tempPoint[j] < a[j])
-                        tempPoint[j] = tempPoint[j] + Math.Abs(tempPoint[j] - a[j]) + 0.1;
+                        tempPoint[j] = uniformRand.URandVal(a[j], (a[j] + b[j]) / 2);
                     if (tempPoint[j] > b[j])
-                        tempPoint[j] = tempPoint[j] - Math.Abs(tempPoint[j] - b[j]) - 0.1;
+                        tempPoint[j] = uniformRand.URandVal((a[j] + b[j]) / 2, b[j]);
                 }
 
                 points.Add(tempPoint.Clone());
@@ -218,20 +204,20 @@ namespace EOpt.Math.Optimization
             if (this.parametrs == null)
                 throw new ArgumentException(nameof(parameters) + " type must be as " + nameof(BBBCParams), nameof(parameters));
 
-            error = false;
+            initParamsQ = false;
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface <see cref="IProgress{Tuple{int,int,int}}"/>, where first item in tuple is the initial progress value, 
+        /// <param name="reporter">Object which implement interface <see cref="IProgress{T}"/>, where first item in tuple is the initial progress value, 
         /// second item is the end progress value, third item is the current progress value. <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>.
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         public void Optimize(GeneralParams genParams, IProgress<Tuple<int,int,int>> reporter = null)
         {
-            if (error)
+            if (initParamsQ)
                 throw new InvalidOperationException($"Before you need invoke {nameof(InitializeParameters)}.");
 
             reporter?.Report(new Tuple<int,int,int>(1, this.parametrs.Imax, 1));

@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Math\Combinatorics\Сombinatorics.cs" />
+    <Compile Include="Math\Constants.cs" />
     <Compile Include="Math\Optimization\BBBCOptimization.cs" />
     <Compile Include="Math\Optimization\BBBCParams.cs" />
     <Compile Include="Math\Optimization\FireWorksOptimization.cs" />

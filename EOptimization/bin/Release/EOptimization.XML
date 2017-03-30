@@ -17,24 +17,29 @@
             <param name="array"></param>
             <param name="rand"></param>
         </member>
+        <member name="T:EOpt.Math.Constants">
+            <summary>
+            Class for global constants.
+            </summary>
+        </member>
+        <member name="F:EOpt.Math.Constants.Psi">
+            <summary>
+            Number, which add for avoiding division by zero.
+            </summary>
+        </member>
         <member name="T:EOpt.Math.Optimization.BBBCOptimizer">
             <summary>
             Optimization method BBBC.
             </summary>
         </member>
-        <member name="F:EOpt.Math.Optimization.BBBCOptimizer.error">
+        <member name="F:EOpt.Math.Optimization.BBBCOptimizer.initParamsQ">
             <summary>
-            If error = true, then not set parameters.
+            If initParamsQ = true, then not set parameters.
             </summary>
         </member>
         <member name="F:EOpt.Math.Optimization.BBBCOptimizer.dimension">
             <summary>
             Dimension of space.
-            </summary>
-        </member>
-        <member name="F:EOpt.Math.Optimization.BBBCOptimizer.psi">
-            <summary>
-            Number, which add for avoiding division by zero.
             </summary>
         </member>
         <member name="P:EOpt.Math.Optimization.BBBCOptimizer.Parameters">
@@ -72,10 +77,10 @@
         </member>
         <member name="M:EOpt.Math.Optimization.BBBCOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="!:IOptimizer.Optimize(GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
-            <param name="reporter">Object which implement interface <see cref="!:IProgress&lt;Tuple&lt;int,int,int&gt;&gt;"/>, where first item in tuple is the initial progress value, 
+            <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>, where first item in tuple is the initial progress value, 
             second item is the end progress value, third item is the current progress value. <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>.
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
@@ -109,8 +114,8 @@
             <summary>
             Parameters for BBBC method.
             </summary>
-            <param name="NP">Number of points for searching on each iteration.</param>
-            <param name="Imax">Max iteration.</param>
+            <param name="NP">Number of points for searching on each iteration. <paramref name="NP"/> > 0.</param>
+            <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
             <param name="alpha">Restricts the search area for each points. <paramref name="alpha"/> > 0.</param>
             <param name="beta">Parameter that determines the effect of  "center of mass" and best current solution. <paramref name="beta"/> in [0;1]</param>
             <exception cref="T:System.ArgumentException"></exception>
@@ -120,14 +125,9 @@
             Optimization method Fireworks.
             </summary>
         </member>
-        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.error">
+        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.initParamsQ">
             <summary>
-            If error = true, then not set parameters.
-            </summary>
-        </member>
-        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.psi">
-            <summary>
-            Number, which add for avoiding division by zero.
+            If initParamsQ = true, then not set parameters.
             </summary>
         </member>
         <member name="F:EOpt.Math.Optimization.FireworksOptimizer.chargePoints">
@@ -228,10 +228,10 @@
         </member>
         <member name="M:EOpt.Math.Optimization.FireworksOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="!:IOptimizer.Optimize(GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
-            <param name="reporter">Object which implement interface <see cref="!:IProgress&lt;Tuple&lt;int,int,int&gt;&gt;"/>,
+            <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>,
             where first item in tuple is the initial value, second item is the end value, third item is the current progress value. 
             <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>. 
             </param>
@@ -248,7 +248,7 @@
         </member>
         <member name="P:EOpt.Math.Optimization.FireWorksParams.M">
             <summary>
-            Number of debris for each charge.
+            Parameter affecting the number of debris.
             </summary>
         </member>
         <member name="P:EOpt.Math.Optimization.FireWorksParams.Imax">
@@ -276,7 +276,20 @@
             Function for measurement distance between points.
             </summary>
         </member>
-        <!-- Проигнорирован некорректный комментарий XML для члена "M:EOpt.Math.Optimization.FireWorksParams.#ctor(System.Int32,System.Int32,System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double},System.Int32,System.Double,System.Double,System.Double)" -->
+        <member name="M:EOpt.Math.Optimization.FireWorksParams.#ctor(System.Int32,System.Int32,System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double},System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Parameters for Fireworks method.
+            </summary>
+            <param name="NP">Number of charges on each iteration. <paramref name="NP"/> > 0.</param>
+            <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
+            <param name="distanceFunction">Function for measurement distance between points.</param>
+            <param name="m">Number of debris for each charge. <typeparamref name="m"/> > 0.</param>
+            <param name="alpha">Parameter, which restricts the number of debris  from below. <paramref name="alpha"/> in (0;1),  <paramref name="alpha"/> &lt; <paramref name="beta"/>.</param>
+            <param name="beta">Parameter, which restricts the number of debris  from above. <paramref name="beta"/> in (0;1), <paramref name="beta"/> &gt; <paramref name="alpha"/>.</param>
+            <param name="Amax">Maximum amplitude of explosion. <paramref name="Amax"/> > 0.</param>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="T:EOpt.Math.Optimization.GEMOptimizer">
             <summary>
             Optimization method GEM. 
@@ -398,10 +411,10 @@
         </member>
         <member name="M:EOpt.Math.Optimization.GEMOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="!:IOptimizer.Optimize(GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
-            <param name="reporter">Object which implement interface <see cref="!:IProgress&lt;Tuple&lt;int,int,int&gt;&gt;"/>,
+            <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>,
             where first item in tuple is the initial value, second item is the end value, 
             third item is the current progress value. 
             <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Int32,System.Int32,System.Int32}})"/>. </param>
@@ -465,16 +478,25 @@
             <summary>
             Parameters for GEM. <see cref="T:EOpt.Math.Optimization.GEMOptimizer"/>.
             </summary>
-            <param name="NGrenade">Number of grenades on each iteration.</param>
-            <param name="NShrapnel">Number of shrapnel for each grenade.</param>
-            <param name="IMax">Max iteration.</param>
-            <param name="InitRadiusGrenade">The initial radius of the grenade territory. Maximum value is equal  2 * sqrt(n), where n - dimension space.</param>
-            <param name="RadiusReduct">The coefficient of radius reduction.</param>
-            <param name="ProbabilityCollision">Probability of collision.</param>
-            <param name="Mmax">Maximum value of exponent for reduce the radius of explosion.</param>
-            <param name="Mmin">Minimum value of exponent for reduce the radius of explosion.</param>
-            <param name="DesiredMinimum">The number of desired minimums.</param>
-            <param name="Psin">The exponent for determine weight optimal search direction m_osd.</param>
+            <param name="NGrenade">Number of grenades on each iteration. <paramref name="NGrenade"/> >= 1.</param>
+            <param name="NShrapnel">Number of shrapnel for each grenade. <paramref name="NShrapnel"/> >= 1.</param>
+            <param name="IMax">Max iteration. <paramref name="NGrenade"/> >= 1.</param>
+            <param name="InitRadiusGrenade">The initial radius of the grenade territory.
+            Maximum value is equal  2 * sqrt(n), where n - dimension space. 
+            <paramref name="InitRadiusGrenade"/> > 0.
+            </param>
+            <param name="RadiusReduct">The coefficient of radius reduction. <paramref name="RadiusReduct"/> > 1.</param>
+            <param name="ProbabilityCollision">Probability of collision. <paramref name="NGrenade"/> in (0;1).</param>
+            <param name="Mmax">
+            <para>Maximum value of exponent for reduce the radius of explosion. <paramref name="Mmax"/> in (0;1].</para>
+            <para><paramref name="Mmax"/> &gt; <paramref name="Mmin"/>.</para>
+            </param>
+            <param name="Mmin">
+            <para>Minimum value of exponent for reduce the radius of explosion. <paramref name="Mmin"/> in [0;1).</para>
+            <para><paramref name="Mmin"/> &lt; <paramref name="Mmax"/>.</para>
+            </param>
+            <param name="DesiredMinimum">The number of desired minimums. <paramref name="DesiredMinimum"/> >= 1.</param>
+            <param name="Psin">The exponent for determine weight optimal search direction m_osd. <paramref name="Psin"/> > 0.</param>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="T:EOpt.Math.Optimization.GeneralParams">
@@ -583,7 +605,7 @@
         </member>
         <member name="M:EOpt.Math.PointND.Clone">
             <summary>
-            Copy point.
+            Create deep copy.
             </summary>
             <returns></returns>
         </member>

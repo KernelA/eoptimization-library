@@ -8,9 +8,9 @@
     /// </summary>
     public class FireWorksParams
     {
-        private int np, m, nmax;
+        private int np, nmax;
 
-        private double alpha, beta, amax;
+        private double alpha, beta, amax, m;
 
         private Func<PointND, PointND, double> distFunc;
 
@@ -26,9 +26,9 @@
         }
 
         /// <summary>
-        /// Number of debris for each charge.
+        /// Parameter affecting the number of debris.
         /// </summary>
-        public int M
+        public double M
         {
             get
             {
@@ -95,19 +95,21 @@
         /// <summary>
         /// Parameters for Fireworks method.
         /// </summary>
-        /// <param name="NP">Number of charges on each iteration.</param>
-        /// <param name="Imax">Max iteration.</param>
+        /// <param name="NP">Number of charges on each iteration. <paramref name="NP"/> > 0.</param>
+        /// <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
         /// <param name="distanceFunction">Function for measurement distance between points.</param>
-        /// <param name="m">Number of debris for each charge.</param>
-        /// <param name="alpha">Parameter, which restricts the number of debris  from below. <paramref name="alpha"/> int (0;1),  <paramref name="alpha"/> &lt; <paramref name="beta"/>.</param>
-        /// <param name="beta">Parameter, which restricts the number of debris  from above. <paramref name="beta"/> in (0;1), <paramref name="beta"/> &gt <paramref name="alpha"/>.</param>
-        /// <param name="Amax">Maximum amplitude of explosion.</param>
+        /// <param name="m">Number of debris for each charge. <typeparamref name="m"/> > 0.</param>
+        /// <param name="alpha">Parameter, which restricts the number of debris  from below. <paramref name="alpha"/> in (0;1),  <paramref name="alpha"/> &lt; <paramref name="beta"/>.</param>
+        /// <param name="beta">Parameter, which restricts the number of debris  from above. <paramref name="beta"/> in (0;1), <paramref name="beta"/> &gt; <paramref name="alpha"/>.</param>
+        /// <param name="Amax">Maximum amplitude of explosion. <paramref name="Amax"/> > 0.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public FireWorksParams(int NP, int Imax, Func<PointND, PointND, double> distanceFunction, int m, double alpha = 0.1, double beta = 0.9, double Amax = 40)
+        public FireWorksParams(int NP, int Imax, Func<PointND, PointND, double> distanceFunction, double m, double alpha = 0.1, double beta = 0.9, double Amax = 40)
         {
-            if (NP < 1 || m < 1 || Imax < 1)
-                throw new ArgumentException($"{nameof(Imax)}, {nameof(m)}, {nameof(Imax)} must be > 0.");
+            if (NP < 1 || Imax < 1)
+                throw new ArgumentException($"{nameof(Imax)}, {nameof(Imax)} must be > 0.");
+            if (m <= 0)
+                throw new ArgumentException($"{nameof(m)} must be > 0.");
             if (alpha <= 0 || beta >= 1 || alpha >= beta)
                 throw new ArgumentException($"{nameof(alpha)} and {nameof(beta)} must be in (0;1), {nameof(alpha)} < {nameof(beta)}.");
             if (Amax <= 0)

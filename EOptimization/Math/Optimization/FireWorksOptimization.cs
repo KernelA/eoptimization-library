@@ -14,15 +14,9 @@ namespace EOpt.Math.Optimization
     public class FireworksOptimizer : IOptimizer
     {
         /// <summary>
-        /// If error = true, then not set parameters.
+        /// If initParamsQ = true, then not set parameters.
         /// </summary>
-        private bool error;
-
-
-        /// <summary>
-        /// Number, which add for avoiding division by zero.
-        /// </summary>
-        private const double psi = 1E-10;
+        private bool initParamsQ;
 
         private int Dimension;
 
@@ -117,7 +111,7 @@ namespace EOpt.Math.Optimization
 
             normalRand = normalGen;
 
-            error = true;
+            initParamsQ = true;
         }
 
 
@@ -191,12 +185,12 @@ namespace EOpt.Math.Optimization
                 denumerator += fmax - this.chargePoints[i][Dimension];
             }
 
-            denumerator += psi;
+            denumerator += Constants.Psi;
 
 
             for (int i = 0; i < this.parametrs.NP; i++)
             {
-                s = parametrs.M * (fmax - this.chargePoints[i][Dimension] + psi) / denumerator;
+                s = parametrs.M * (fmax - this.chargePoints[i][Dimension] + Constants.Psi) / denumerator;
 
                 if (s < parametrs.Alpha * parametrs.M)
                     s = Math.Round(parametrs.Alpha * parametrs.M);
@@ -262,9 +256,6 @@ namespace EOpt.Math.Optimization
         /// <returns></returns>
         private int[] GenerateIndexesOfAxes(int CountOfDimension)
         {
-            // Number of axis directions.
-            int[] numOfAxis = new int[CountOfDimension];
-
             // Coordinate numbers.
             int[] coordNumbers = new int[Dimension];
 
@@ -276,14 +267,10 @@ namespace EOpt.Math.Optimization
 
             ML.Math.Сombinatorics.RandomPermutation(coordNumbers, SyncRandom.Get());
 
+           
             // Randomly choose indices's.
             // Select first CountOfDimension indexes.
-            for (int i = 0; i < numOfAxis.Length; i++)
-            {
-                numOfAxis[i] = coordNumbers[i];
-            }
-
-            return numOfAxis;
+            return coordNumbers.Take(CountOfDimension).ToArray();
         }
 
         /// <summary>
@@ -335,7 +322,7 @@ namespace EOpt.Math.Optimization
                 denumerator += chargePoints[j][Dimension] - fmin;
             }
 
-            denumerator += psi;
+            denumerator += Constants.Psi;
 
             PointND temp;
 
@@ -346,7 +333,7 @@ namespace EOpt.Math.Optimization
                 double amplitude = 0;
 
                 // Amplitude of explosion.
-                amplitude = parametrs.Amax * (chargePoints[i][Dimension] - fmin + psi) / denumerator;
+                amplitude = parametrs.Amax * (chargePoints[i][Dimension] - fmin + Constants.Psi) / denumerator;
 
 
                 // For each debris.
@@ -355,17 +342,16 @@ namespace EOpt.Math.Optimization
                     this.debris[i].Add(this.chargePoints[i].Clone());
 
                     double ksi = uniformRand.URandVal(0, 1);
-                    //double ksi = this.rand.ContinuosUniformDistribution();
 
-                    int n = (int)Math.Round(Dimension * ksi);
+                    int CountOfDimension = (int)Math.Round(Dimension * ksi);
 
                     if (ksi < 0.5)
                     {
-                        FirstMethodDeterminationOfPosition(n, amplitude, i, k, a, b);
+                        FirstMethodDeterminationOfPosition(CountOfDimension, amplitude, i, k, a, b);
                     }
                     else
                     {
-                        SecondMethodDeterminationOfPosition(n, i, k, a, b);
+                        SecondMethodDeterminationOfPosition(CountOfDimension, i, k, a, b);
                     }
                 }
 
@@ -533,20 +519,20 @@ namespace EOpt.Math.Optimization
             this.chargePoints = null;
             this.debris = null;
 
-            error = false;
+            initParamsQ = false;
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface <see cref="IProgress{Tuple{int,int,int}}"/>,
+        /// <param name="reporter">Object which implement interface <see cref="IProgress{Tuple}"/>,
         /// where first item in tuple is the initial value, second item is the end value, third item is the current progress value. 
         /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>. 
         /// </param>
         public void Optimize(GeneralParams genParams, IProgress<Tuple<int,int,int>> reporter = null)
         {
-            if (error)
+            if (initParamsQ)
                 throw new InvalidOperationException($"First you need invoke {nameof(InitializeParameters)}.");
 
             reporter?.Report(new Tuple<int, int, int>(0, this.parametrs.Imax - 1, 0));

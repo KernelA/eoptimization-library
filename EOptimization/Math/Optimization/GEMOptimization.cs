@@ -11,19 +11,18 @@
     /// </summary>
     public class GEMOptimizer : IOptimizer
     {
-        const double eps = 1E-10;
-
-        private double radius_grenade,
-            radius_length,
-            radius_initial,
+        private double radiusGrenade,
+            radiusExplosion,
+            radiusInitial,
             mosd;
+
         private int dimension;
 
         private IContUniformGenerator uniformRand;
 
         private INormalGenerator normalRand;
 
-        private bool initParams;
+        private bool initParamsQ;
 
         PointND xrnd, xcur, xosd, dosd, dgrs;
 
@@ -100,7 +99,7 @@
 
             xrnd = xosd = xcur = dosd = dgrs = null;
 
-            initParams = false;
+            initParamsQ = false;
         }
 
 
@@ -271,7 +270,7 @@
                     if (j == WhichGrenade)
                         continue;
 
-                    if (EuclideanDistance(temp, grenades[WhichGrenade]) <= radius_grenade)
+                    if (EuclideanDistance(temp, grenades[WhichGrenade]) <= radiusGrenade)
                     {
                         addToArray = false;
                         break;
@@ -282,24 +281,16 @@
                     ortogonalArray.Add(temp.Clone());
             }
 
-            double min =  0;
+            double min = 0; 
 
-            int indexmin = -1;
+            int indexmin = -1; 
 
             if(ortogonalArray.Count != 0)
             {
-                min = ortogonalArray[0][dimension];
-                indexmin = 0;
+                min = ortogonalArray.Min(point => point[dimension]); 
+                indexmin = ortogonalArray.FindIndex(point => point[dimension] == min);
             }
 
-            for (int i = 1; i < ortogonalArray.Count; i++)
-            {
-                if(ortogonalArray[i][dimension] < min)
-                {
-                    min = ortogonalArray[i][dimension];
-                    indexmin = i;
-                }
-            }
 
             // Determine position Xosd.
             xosd = indexmin == -1 ? null : ortogonalArray[indexmin];
@@ -313,7 +304,7 @@
                 if (j == WhichGrenade)
                     continue;
 
-                if (EuclideanDistance(grenades[j], grenades[WhichGrenade]) <= radius_grenade)
+                if (EuclideanDistance(grenades[j], grenades[WhichGrenade]) <= radiusGrenade)
                 {
                     xcur = null;
                     break;
@@ -343,7 +334,7 @@
         {
 
             double p = Math.Max(1.0 / dimension,
-                 Math.Log10(radius_grenade / radius_length) / Math.Log10(parametrs.Pts));
+                 Math.Log10(radiusGrenade / radiusExplosion) / Math.Log10(parametrs.Pts));
 
             PointND temp = new PointND(0, dimension + 1);
 
@@ -376,13 +367,13 @@
                     r2 = uniformRand.URandVal(0, 1);
                     dgrs = mosd * r1 * dosd + (1 - mosd) * r2 * drnd;
                     dgrs *= (1 / EuclideanNorm(dgrs));
-                    r1 = Math.Pow(r1, p) * this.radius_length;
+                    r1 = Math.Pow(r1, p) * this.radiusExplosion;
                     temp = grenades[WhichGrenade] + r1 * dgrs;
 
                 }
                 else
                 {
-                    r1 = Math.Pow(r1, p) * this.radius_length;
+                    r1 = Math.Pow(r1, p) * this.radiusExplosion;
                     temp = grenades[WhichGrenade] + r1 * drnd;
                 }
 
@@ -413,7 +404,7 @@
 
                     double s = EuclideanDistance(shrapnels[WhichGrenade][i], grenades[l]);
 
-                    if (s <= radius_grenade)
+                    if (s <= radiusGrenade)
                     {
                         // Shrapnel do not accept (she in  a neighborhood other grenades).
                         this.shrapnels[WhichGrenade][i] = null;
@@ -429,11 +420,11 @@
         /// <param name="iter">Current iteration.</param>
         private void UpdateParams(int iter)
         {
-            radius_grenade = radius_initial / Math.Pow(parametrs.RadiusReduct, (double)iter / parametrs.Imax);
+            radiusGrenade = radiusInitial / Math.Pow(parametrs.RadiusReduct, (double)iter / parametrs.Imax);
 
             double m = this.parametrs.Mmax - (double)iter / parametrs.Imax * (this.parametrs.Mmax - this.parametrs.Mmin);
 
-            radius_length = Math.Pow(2 * Math.Sqrt(dimension), m) * Math.Pow(radius_grenade, 1 - m);
+            radiusExplosion = Math.Pow(2 * Math.Sqrt(dimension), m) * Math.Pow(radiusGrenade, 1 - m);
 
             mosd = Math.Sin(Math.PI / 2 * Math.Pow(Math.Abs((iter - 0.1 * parametrs.Imax)) / (0.9 * parametrs.Imax), this.parametrs.Psin));
         }
@@ -483,6 +474,8 @@
 
             xrnd = index_best == -1 ? null : shrapnels[WhichGrenade][index_best];
 
+
+
             List<PointND> points = new List<PointND>(3);
 
             if (xcur != null)
@@ -528,18 +521,9 @@
         /// <param name="b"></param>
         private void FindBestSolution(double[] a, double[] b)
         {
-            double f_best = grenades[0][dimension];
+            double f_best = grenades.Min(point => point[dimension]);
 
-            int index_best = 0;
-
-            for (int i = 1; i < parametrs.NGrenade; i++)
-            {
-                if (grenades[i][dimension] < f_best)
-                {
-                    f_best = grenades[i][dimension];
-                    index_best = i;
-                }
-            }
+            int index_best = grenades.FindIndex(point => point[dimension] == f_best);
 
             double[] x = this.grenades[index_best].Coordinates.ToArray();
 
@@ -554,34 +538,34 @@
         /// <see cref="IOptimizer.InitializeParameters(object)"/>
         /// </summary>
         /// <param name="parameters">Parameters for method. Must be type <see cref="GEMParams"/>.</param>
-        public void InitializeParameters(object parametrs)
+        public void InitializeParameters(object parameters)
         {
-            this.parametrs = parametrs as GEMParams;
+            this.parametrs = parameters as GEMParams;
 
             if (this.parametrs == null)
-                throw new ArgumentException($"{nameof(parametrs)} must be type as {nameof(GEMParams)}.", nameof(parametrs));
+                throw new ArgumentException($"{nameof(parameters)} must be type as {nameof(GEMParams)}.", nameof(parameters));
 
 
-            this.radius_length = 2 * Math.Sqrt(dimension);
-            this.radius_grenade = this.parametrs.InitRadiusGrenade;
-            this.radius_initial = this.parametrs.InitRadiusGrenade;
+            this.radiusExplosion = 2 * Math.Sqrt(dimension);
+            this.radiusGrenade = this.parametrs.InitRadiusGrenade;
+            this.radiusInitial = this.parametrs.InitRadiusGrenade;
 
             mosd = 0;
 
-            initParams = true;
+            initParamsQ = true;
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface <see cref="IProgress{Tuple{int,int,int}}"/>,
+        /// <param name="reporter">Object which implement interface <see cref="IProgress{T}"/>,
         /// where first item in tuple is the initial value, second item is the end value, 
         /// third item is the current progress value. 
         /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{int, int, int}})"/>. </param>
         public void Optimize(GeneralParams genParams, IProgress<Tuple<int,int,int>> reporter = null)
         {
-            if (!initParams)
+            if (!initParamsQ)
                 throw new InvalidOperationException($"Before you need invoke {nameof(InitializeParameters)}.");
 
             dimension = genParams.LeftBound.Length;

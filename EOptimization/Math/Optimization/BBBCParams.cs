@@ -36,8 +36,8 @@
         /// <summary>
         /// Parameters for BBBC method.
         /// </summary>
-        /// <param name="NP">Number of points for searching on each iteration.</param>
-        /// <param name="Imax">Max iteration.</param>
+        /// <param name="NP">Number of points for searching on each iteration. <paramref name="NP"/> > 0.</param>
+        /// <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
         /// <param name="alpha">Restricts the search area for each points. <paramref name="alpha"/> > 0.</param>
         /// <param name="beta">Parameter that determines the effect of  "center of mass" and best current solution. <paramref name="beta"/> in [0;1]</param>
         /// <exception cref="ArgumentException"></exception>

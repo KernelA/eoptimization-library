@@ -61,19 +61,28 @@
         /// <summary>
         /// Parameters for GEM. <see cref="GEMOptimizer"/>.
         /// </summary>
-        /// <param name="NGrenade">Number of grenades on each iteration.</param>
-        /// <param name="NShrapnel">Number of shrapnel for each grenade.</param>
-        /// <param name="IMax">Max iteration.</param>
-        /// <param name="InitRadiusGrenade">The initial radius of the grenade territory. Maximum value is equal  2 * sqrt(n), where n - dimension space.</param>
-        /// <param name="RadiusReduct">The coefficient of radius reduction.</param>
-        /// <param name="ProbabilityCollision">Probability of collision.</param>
-        /// <param name="Mmax">Maximum value of exponent for reduce the radius of explosion.</param>
-        /// <param name="Mmin">Minimum value of exponent for reduce the radius of explosion.</param>
-        /// <param name="DesiredMinimum">The number of desired minimums.</param>
-        /// <param name="Psin">The exponent for determine weight optimal search direction m_osd.</param>
+        /// <param name="NGrenade">Number of grenades on each iteration. <paramref name="NGrenade"/> >= 1.</param>
+        /// <param name="NShrapnel">Number of shrapnel for each grenade. <paramref name="NShrapnel"/> >= 1.</param>
+        /// <param name="IMax">Max iteration. <paramref name="NGrenade"/> >= 1.</param>
+        /// <param name="InitRadiusGrenade">The initial radius of the grenade territory.
+        /// Maximum value is equal  2 * sqrt(n), where n - dimension space. 
+        /// <paramref name="InitRadiusGrenade"/> > 0.
+        /// </param>
+        /// <param name="RadiusReduct">The coefficient of radius reduction. <paramref name="RadiusReduct"/> > 1.</param>
+        /// <param name="ProbabilityCollision">Probability of collision. <paramref name="NGrenade"/> in (0;1).</param>
+        /// <param name="Mmax">
+        /// <para>Maximum value of exponent for reduce the radius of explosion. <paramref name="Mmax"/> in (0;1].</para>
+        /// <para><paramref name="Mmax"/> &gt; <paramref name="Mmin"/>.</para>
+        /// </param>
+        /// <param name="Mmin">
+        /// <para>Minimum value of exponent for reduce the radius of explosion. <paramref name="Mmin"/> in [0;1).</para>
+        /// <para><paramref name="Mmin"/> &lt; <paramref name="Mmax"/>.</para>
+        /// </param>
+        /// <param name="DesiredMinimum">The number of desired minimums. <paramref name="DesiredMinimum"/> >= 1.</param>
+        /// <param name="Psin">The exponent for determine weight optimal search direction m_osd. <paramref name="Psin"/> > 0.</param>
         /// <exception cref="ArgumentException"></exception>
         public GEMParams(int NGrenade, int NShrapnel, int IMax, double InitRadiusGrenade,
-            double RadiusReduct, double ProbabilityCollision = 0.8, double Psin = 5, double Mmin = 0.1, double Mmax = 0.9, int DesiredMinimum = 1)
+            double RadiusReduct = 100, double ProbabilityCollision = 0.8, double Psin = 5, double Mmin = 0.1, double Mmax = 0.9, int DesiredMinimum = 1)
         {
             if (NGrenade < 1)
                 throw new ArgumentException($"{nameof(NGrenade)} must be > 0.", nameof(NGrenade));
@@ -84,8 +93,8 @@
             if (DesiredMinimum < 1)
                 throw new ArgumentException($"{nameof(DesiredMinimum)} must be > 0.", nameof(DesiredMinimum));
 
-            if (Math.Abs(RadiusReduct) < 1E-8)
-                throw new ArgumentException($"{nameof(RadiusReduct)} too small.", nameof(RadiusReduct));
+            if (RadiusReduct < 1)
+                throw new ArgumentException($"{nameof(RadiusReduct)} must be > 1.", nameof(RadiusReduct));
 
             if (Math.Abs(ProbabilityCollision) < 1E-6 || ProbabilityCollision < 0)
                 throw new ArgumentException($"{nameof(ProbabilityCollision)} too small or less than 0.", nameof(ProbabilityCollision));
@@ -94,10 +103,10 @@
                 throw new ArgumentException($"{nameof(ProbabilityCollision)} must be < 1.", nameof(ProbabilityCollision));
 
             if (Mmax < 0 || Mmax > 1 || Mmax < Mmin)
-                throw new ArgumentException($"{nameof(Mmax)} must be in [0;1] and {nameof(Mmax)} > {nameof(Mmin)}.", nameof(Mmax));
+                throw new ArgumentException($"{nameof(Mmax)} must be in (0;1] and {nameof(Mmax)} > {nameof(Mmin)}.", nameof(Mmax));
 
             if (Mmin < 0 || Mmin > 1)
-                throw new ArgumentException($"{nameof(Mmin)}  must be in [0;1]", nameof(Mmin));
+                throw new ArgumentException($"{nameof(Mmin)}  must be in [0;1)", nameof(Mmin));
 
 
             this.DesiredMin = DesiredMinimum;

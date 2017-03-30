@@ -56,65 +56,6 @@
             }
         }
 
-
-        ///// <summary>
-        ///// Create point in one dimension space.
-        ///// </summary>
-        ///// <param name="x">The value of coordinate.</param>
-        //public PointND(double x)
-        //{
-        //    coordinates = new double[] { x };
-        //}
-
-        ///// <summary>
-        ///// Create point in two dimension space.
-        ///// </summary>
-        ///// <param name="x">The value of first coordinate.</param>
-        ///// <param name="y">The value of second coordinate.</param>
-        //public PointND(double x, double y)
-        //{
-        //    coordinates = new double[] { x, y };
-        //}
-
-        ///// <summary>
-        ///// Create point in three dimension space.
-        ///// </summary>
-        ///// <param name="x">The value of first coordinate.</param>
-        ///// <param name="y">The value of second coordinate.</param>
-        ///// <param name="z">The value of third coordinate.</param>
-        //public PointND(double x, double y, double z)
-        //{
-        //    coordinates = new double[] { x, y, z };
-        //}
-
-
-        ///// <summary>
-        ///// Create point in N dimension space.
-        ///// </summary>
-        ///// <param name="x">The value of first coordinate.</param>
-        ///// <param name="y">The value of second coordinate.</param>
-        ///// <param name="z">The value of third coordinate.</param>
-        ///// <param name="u">The value of fourth coordinate.</param>
-        ///// <param name="coords">The values of other coordinates.</param>
-        //public PointND(double x, double y, double z, double u, params double[] coords)
-        //{
-        //    if(coords == null)
-        //        coordinates = new double[4];
-        //    else
-        //    {
-        //        coordinates = new double[coords.Length + 4];
-
-        //        for (int i = 0; i < coords.Length; i++)
-        //        {
-        //            coordinates[i + 4] = coords[i];
-        //        }
-        //    }              
-        //    coordinates[0] = x;
-        //    coordinates[1] = y;
-        //    coordinates[2] = z;
-        //    coordinates[3] = u;  
-        //}
-
         /// <summary>
         /// Create point from array <paramref name="x"/>.
         /// </summary>
@@ -177,7 +118,7 @@
         }
 
         /// <summary>
-        /// Copy point.
+        /// Create deep copy.
         /// </summary>
         /// <returns></returns>
         public PointND Clone()
