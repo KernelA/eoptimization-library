@@ -104,9 +104,6 @@
         /// Random value from normal distribution where mean and standard deviation specified in class.
         /// </summary>
         /// <remarks>Using Box–Muller transform.</remarks>
-        /// <param name="Mean">Mean.</param>
-        /// <param name="StdDev">Standard deviation.</param>
-        /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         public double RandVal()
         {

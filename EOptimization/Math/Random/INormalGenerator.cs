@@ -8,7 +8,7 @@
     public interface INormalGenerator : IRandomGeneartor<double>
     {
         /// <summary>
-        /// Get random value which has normal distribution with mean equal <paramref name="mean"/> and standart deviation equal <paramref name="strddev"/>.
+        /// Get random value which has normal distribution with mean equal <paramref name="Mean"/> and standart deviation equal <paramref name="StdDev"/>.
         /// </summary>
         /// <param name="Mean"></param>
         /// <param name="StdDev"></param>

@@ -24,6 +24,7 @@
             Assert.IsTrue(bb.Solution != null && bb.Solution.Dimension == 3);
         }
 
+
         [TestMethod()]
         public void BBBCTestWrongParams()
         {

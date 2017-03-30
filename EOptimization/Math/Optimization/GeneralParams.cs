@@ -8,9 +8,14 @@
     /// </summary>
     public class GeneralParams
     {
-
+        /// <summary>
+        /// Coordinates of first vertex.
+        /// </summary>
         public double[] LeftBound { get; private set; }
 
+        /// <summary>
+        /// Coordinates of second vertex.
+        /// </summary>
         public double[] RightBound { get; private set; }
 
         /// <summary>
@@ -29,7 +34,7 @@
         /// </summary>
         /// <param name="objFunction">Target function.</param>
         /// <param name="leftBound">Coordinates of first vertex.</param>
-        /// <param name="rightBound">Coordinates of second vertex</param>
+        /// <param name="rightBound">Coordinates of second vertex.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         public GeneralParams(Func<double[], double> objFunction, double[] leftBound, double[] rightBound)

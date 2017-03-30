@@ -98,7 +98,7 @@
         /// <param name="NP">Number of charges on each iteration. <paramref name="NP"/> > 0.</param>
         /// <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
         /// <param name="distanceFunction">Function for measurement distance between points.</param>
-        /// <param name="m">Number of debris for each charge. <typeparamref name="m"/> > 0.</param>
+        /// <param name="m">Number of debris for each charge. <paramref name="m"/> > 0.</param>
         /// <param name="alpha">Parameter, which restricts the number of debris  from below. <paramref name="alpha"/> in (0;1),  <paramref name="alpha"/> &lt; <paramref name="beta"/>.</param>
         /// <param name="beta">Parameter, which restricts the number of debris  from above. <paramref name="beta"/> in (0;1), <paramref name="beta"/> &gt; <paramref name="alpha"/>.</param>
         /// <param name="Amax">Maximum amplitude of explosion. <paramref name="Amax"/> > 0.</param>
