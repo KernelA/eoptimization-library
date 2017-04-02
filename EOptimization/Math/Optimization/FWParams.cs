@@ -4,9 +4,9 @@
 
 
     /// <summary>
-    /// Parameters for Fireworks method. <see cref="FireworksOptimizer"/>
+    /// Parameters for Fireworks method. <see cref="FWOptimizer"/>
     /// </summary>
-    public class FireWorksParams
+    public class FWParams
     {
         private int np, nmax;
 
@@ -104,7 +104,7 @@
         /// <param name="Amax">Maximum amplitude of explosion. <paramref name="Amax"/> > 0.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public FireWorksParams(int NP, int Imax, Func<PointND, PointND, double> distanceFunction, double m, double alpha = 0.1, double beta = 0.9, double Amax = 40)
+        public FWParams(int NP, int Imax, Func<PointND, PointND, double> distanceFunction, double m, double alpha = 0.1, double beta = 0.9, double Amax = 40)
         {
             if (NP < 1 || Imax < 1)
                 throw new ArgumentException($"{nameof(Imax)}, {nameof(Imax)} must be > 0.");

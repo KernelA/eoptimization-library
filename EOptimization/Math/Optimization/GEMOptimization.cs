@@ -638,13 +638,13 @@
 
             FirstStep(genParams);
 
-            reporter.Report(new Tuple<object, int, int, int>(this, 0, this.parametrs.Imax, 0));
+            reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, 1));
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
                 CurrentStep(genParams, i);
 
-                reporter.Report(new Tuple<object, int, int, int>(this, 0, this.parametrs.Imax, i));
+                reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }
         }
 
@@ -668,7 +668,7 @@
 
             FirstStep(genParams);
 
-            reporter.Report(new Tuple<object, int, int, int>(this, 0, this.parametrs.Imax, 0));
+            reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, 1));
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
@@ -676,7 +676,7 @@
 
                 CurrentStep(genParams, i);
 
-                reporter.Report(new Tuple<object, int, int, int>(this, 0, this.parametrs.Imax, i));
+                reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }
         }
     }

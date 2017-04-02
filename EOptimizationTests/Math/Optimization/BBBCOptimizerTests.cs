@@ -5,6 +5,7 @@
     using System.Diagnostics;
 
     using EOpt.Math.Optimization;
+    using EOpt.Math.Optimization.Tests;
 
     [TestClass]
     public class BBBCTest
@@ -14,14 +15,11 @@
         {
             BBBCOptimizer bb = new BBBCOptimizer();
 
-            BBBCParams param = new BBBCParams(10, 10, 0.4, 0.3);
+            BBBCParams param = new BBBCParams(10, GeneralOptimizerTests.IterMax, 0.4, 0.3);
 
-            bb.InitializeParameters(param);
+            bool error = GeneralOptimizerTests.TestOptimizer(bb, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
-            bb.Optimize(new GeneralParams(x => x[0] * x[0] + x[1] * x[1], new double[] { -10, -10 }, new double[] { 10, 10 }));
-
-            Assert.IsTrue(bb.Solution != null && bb.Solution.Dimension == 3);
+            Assert.IsFalse(error);
         }
 
 
@@ -30,18 +28,7 @@
         {
             BBBCOptimizer bb = new BBBCOptimizer();
 
-            bool error = true;
-
-            try
-            {
-                bb.InitializeParameters(new object());
-            }
-            catch(ArgumentException exc)
-            {
-                error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
-            }
+            bool error = GeneralOptimizerTests.TestWrongParams(bb);
 
             Assert.IsFalse(error);
         }
@@ -51,21 +38,42 @@
         {
             BBBCOptimizer bb = new BBBCOptimizer();
 
-            bool error = true;
+            bool error = GeneralOptimizerTests.TestWrongInvoke(bb);
 
-            try
-            {
-                bb.Optimize(new GeneralParams(x => x[0] * x[0] + x[1] * x[1], new double[] { -10, -10 }, new double[] { 10, 10 }));
-            }
-            catch (InvalidOperationException exc)
-            {
-                error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
-            }
+            Assert.IsFalse(error);           
+        }
+
+        [TestMethod()]
+        public void BBBCTestReporter()
+        {
+            BBBCOptimizer bb = new BBBCOptimizer();
+
+            BBBCParams param = new BBBCParams(10, GeneralOptimizerTests.IterMax, 0.4, 0.3);
+
+            bb.InitializeParameters(param);
+
+            var reporter = new TestReporter(typeof(BBBCOptimizer), 1, GeneralOptimizerTests.IterMax);
+
+            // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
+            bb.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
+
+            Assert.IsFalse(reporter.Error);
+        }
+
+        [TestMethod()]
+        public void BBBCTestCancel()
+        {
+            BBBCOptimizer bb = new BBBCOptimizer();
+
+            BBBCParams param = new BBBCParams(10, 1000 * 1000, 0.4, 0.3);
+
+            bb.InitializeParameters(param);
+
+            bool error = GeneralOptimizerTests.TestCancel(bb, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
             Assert.IsFalse(error);
-            
+
         }
+
     }
 }

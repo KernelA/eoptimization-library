@@ -150,47 +150,47 @@
             <param name="beta">Parameter that determines the effect of  "center of mass" and best current solution. <paramref name="beta"/> in [0;1]</param>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="T:EOpt.Math.Optimization.FireworksOptimizer">
+        <member name="T:EOpt.Math.Optimization.FWOptimizer">
             <summary>
             Optimization method Fireworks.
             </summary>
         </member>
-        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.initParamsQ">
+        <member name="F:EOpt.Math.Optimization.FWOptimizer.initParamsQ">
             <summary>
             If initParamsQ = true, then not set parameters.
             </summary>
         </member>
-        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.chargePoints">
+        <member name="F:EOpt.Math.Optimization.FWOptimizer.chargePoints">
             <summary>
             Charges.
             </summary>
         </member>
-        <member name="F:EOpt.Math.Optimization.FireworksOptimizer.debris">
+        <member name="F:EOpt.Math.Optimization.FWOptimizer.debris">
             <summary>
             Debris for charges. Index
             </summary>
         </member>
-        <member name="T:EOpt.Math.Optimization.FireworksOptimizer.WeightOfPoint">
+        <member name="T:EOpt.Math.Optimization.FWOptimizer.WeightOfPoint">
             <summary>
             Structure for internal computation.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireworksOptimizer.Solution">
+        <member name="P:EOpt.Math.Optimization.FWOptimizer.Solution">
             <summary>
             The solution of the constrained optimization problem.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireworksOptimizer.Parameters">
+        <member name="P:EOpt.Math.Optimization.FWOptimizer.Parameters">
             <summary>
-            Parameters for Fireworks method. <see cref="T:EOpt.Math.Optimization.FireWorksParams"/>.
+            Parameters for Fireworks method. <see cref="T:EOpt.Math.Optimization.FWParams"/>.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.#ctor">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.#ctor">
             <summary>
             Create object which use default implementation for random generators.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.#ctor(EOpt.Math.Random.IContUniformGenerator,EOpt.Math.Random.INormalGenerator)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.#ctor(EOpt.Math.Random.IContUniformGenerator,EOpt.Math.Random.INormalGenerator)">
             <summary>
             Create object which use custom implementation for random generators.
             </summary>
@@ -198,12 +198,12 @@
             <param name="normalGen">Object, which implements <see cref="T:EOpt.Math.Random.INormalGenerator"/> interface, for generating uniform random value.</param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.FindAmountDebris">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.FindAmountDebris">
             <summary>
             Find amount debris for each point of charge.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.FirstMethodDeterminationOfPosition(System.Int32,System.Double,System.Int32,System.Int32,System.Double[],System.Double[])">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.FirstMethodDeterminationOfPosition(System.Int32,System.Double,System.Int32,System.Int32,System.Double[],System.Double[])">
             <summary>
             First method for determination of position debris.
             </summary>
@@ -214,14 +214,14 @@
             <param name="a"></param>
             <param name="b"></param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.GenerateIndexesOfAxes(System.Int32)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.GenerateIndexesOfAxes(System.Int32)">
             <summary>
             Generate randomly <paramref name="CountOfDimension"/> indexes of axes for choosing.
             </summary>
             <param name="CountOfDimension"></param>
             <returns></returns>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.SecondMethodDeterminationOfPosition(System.Int32,System.Int32,System.Int32,System.Double[],System.Double[])">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.SecondMethodDeterminationOfPosition(System.Int32,System.Int32,System.Int32,System.Double[],System.Double[])">
             <summary>
             Second method for determination of position debris.
             </summary>
@@ -231,7 +231,7 @@
             <param name="a"></param>
             <param name="b"></param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.GenerateDebris(System.Double[],System.Double[],System.Func{System.Double[],System.Double})">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.GenerateDebris(System.Double[],System.Double[],System.Func{System.Double[],System.Double})">
             <summary>
             Determine debris position.
             </summary>
@@ -239,31 +239,31 @@
             <param name="b"></param>
             <param name="function"></param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.FindBestSolution">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.FindBestSolution">
             <summary>
             Find best solution among debris and charges.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.GenerateCurrentPopulation(System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double})">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.GenerateCurrentPopulation(System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double})">
             <summary>
             Generate current population.
             </summary>
             <param name="distanceFunction">Function for compute distance between points.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.InitializeParameters(System.Object)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.InitializeParameters(System.Object)">
             <summary>
             <see cref="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)"/>
             </summary>
-            <param name="parameters">Parameters for method. Must be type <see cref="T:EOpt.Math.Optimization.FireWorksParams"/>.</param>
+            <param name="parameters">Parameters for method. Must be type <see cref="T:EOpt.Math.Optimization.FWParams"/>.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
             <summary>
             <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
             <summary>
             <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
             </summary>
@@ -271,7 +271,7 @@
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
             <summary>
             <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
@@ -283,7 +283,7 @@
             <exception cref="T:System.InvalidOperationException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireworksOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
             <summary>
             <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
@@ -296,47 +296,47 @@
             <exception cref="T:System.InvalidOperationException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="T:EOpt.Math.Optimization.FireWorksParams">
+        <member name="T:EOpt.Math.Optimization.FWParams">
             <summary>
-            Parameters for Fireworks method. <see cref="T:EOpt.Math.Optimization.FireworksOptimizer"/>
+            Parameters for Fireworks method. <see cref="T:EOpt.Math.Optimization.FWOptimizer"/>
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.NP">
+        <member name="P:EOpt.Math.Optimization.FWParams.NP">
             <summary>
             Number of charges on each iteration.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.M">
+        <member name="P:EOpt.Math.Optimization.FWParams.M">
             <summary>
             Parameter affecting the number of debris.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.Imax">
+        <member name="P:EOpt.Math.Optimization.FWParams.Imax">
             <summary>
             Max iteration.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.Alpha">
+        <member name="P:EOpt.Math.Optimization.FWParams.Alpha">
             <summary>
             Parameter, which restricts the number of debris  from below.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.Beta">
+        <member name="P:EOpt.Math.Optimization.FWParams.Beta">
             <summary>
             Parameter, which restricts the number of debris  from above.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.Amax">
+        <member name="P:EOpt.Math.Optimization.FWParams.Amax">
             <summary>
             Maximum amplitude of explosion.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.FireWorksParams.DistanceFunction">
+        <member name="P:EOpt.Math.Optimization.FWParams.DistanceFunction">
             <summary>
             Function for measurement distance between points.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.FireWorksParams.#ctor(System.Int32,System.Int32,System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double},System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:EOpt.Math.Optimization.FWParams.#ctor(System.Int32,System.Int32,System.Func{EOpt.Math.PointND,EOpt.Math.PointND,System.Double},System.Double,System.Double,System.Double,System.Double)">
             <summary>
             Parameters for Fireworks method.
             </summary>

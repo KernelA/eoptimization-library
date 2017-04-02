@@ -18,14 +18,13 @@
         {
             GEMOptimizer gem = new GEMOptimizer();
 
-            GEMParams param = new GEMParams(1, 5, 10, 0.6, 10);
+            GEMParams param = new GEMParams(1, 5, GeneralOptimizerTests.IterMax, 0.6, 10);
 
             gem.InitializeParameters(param);
 
-            // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
-            gem.Optimize(new GeneralParams(x => x[0] * x[0] + x[1] * x[1], new double[] { -10, -10 }, new double[] { 10, 10 }));
+            bool error = GeneralOptimizerTests.TestOptimizer(gem, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            Assert.IsTrue(gem.Solution != null && gem.Solution.Dimension == 3);
+            Assert.IsFalse(error);
         }
 
         [TestMethod()]
@@ -33,18 +32,7 @@
         {
             GEMOptimizer gem = new GEMOptimizer();
 
-            bool error = true;
-
-            try
-            {
-                gem.InitializeParameters(new object());
-            }
-            catch (ArgumentException exc)
-            {
-                error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
-            }
+            bool error = GeneralOptimizerTests.TestWrongParams(gem);
 
             Assert.IsFalse(error);
         }
@@ -52,20 +40,41 @@
         [TestMethod()]
         public void GEMOptimizerTestWrongInvoke()
         {
-            BBBCOptimizer gem = new BBBCOptimizer();
+            GEMOptimizer gem = new GEMOptimizer();
 
-            bool error = true;
+            bool error = GeneralOptimizerTests.TestWrongInvoke(gem);
 
-            try
-            {
-                gem.Optimize(new GeneralParams(x => x[0] * x[0] + x[1] * x[1], new double[] { -10, -10 }, new double[] { 10, 10 }));
-            }
-            catch (InvalidOperationException exc)
-            {
-                error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
-            }
+            Assert.IsFalse(error);
+
+        }
+
+        [TestMethod()]
+        public void GEMOptimizerTestReporter()
+        {
+            GEMOptimizer gem = new GEMOptimizer();
+
+            GEMParams param = new GEMParams(1, 5, GeneralOptimizerTests.IterMax, 0.6, 10);
+
+            gem.InitializeParameters(param);
+
+            var reporter = new TestReporter(typeof(BBBCOptimizer), 1, GeneralOptimizerTests.IterMax);
+
+            // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
+            gem.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
+
+            Assert.IsFalse(reporter.Error);
+        }
+
+        [TestMethod()]
+        public void GEMOptimizerCancel()
+        {
+            GEMOptimizer gem = new GEMOptimizer();
+
+            GEMParams param = new GEMParams(1, 5, 1000 * 1000, 0.6, 10);
+
+            gem.InitializeParameters(param);
+
+            bool error = GeneralOptimizerTests.TestCancel(gem, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
             Assert.IsFalse(error);
 

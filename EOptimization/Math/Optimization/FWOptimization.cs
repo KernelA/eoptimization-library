@@ -12,7 +12,7 @@ namespace EOpt.Math.Optimization
     /// <summary>
     /// Optimization method Fireworks.
     /// </summary>
-    public class FireworksOptimizer : IOptimizer
+    public class FWOptimizer : IOptimizer
     {
         /// <summary>
         /// If initParamsQ = true, then not set parameters.
@@ -23,7 +23,7 @@ namespace EOpt.Math.Optimization
 
         private double fmax, fmin;
 
-        private FireWorksParams parametrs;
+        private FWParams parametrs;
         
         /// <summary>
         /// Charges.
@@ -72,9 +72,9 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Parameters for Fireworks method. <see cref="FireWorksParams"/>.
+        /// Parameters for Fireworks method. <see cref="FWParams"/>.
         /// </summary>
-        public FireWorksParams Parameters
+        public FWParams Parameters
         {
             get
             {
@@ -85,7 +85,7 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Create object which use default implementation for random generators.
         /// </summary>
-        public FireworksOptimizer() : this(new ContUniformDistribution(), new NormalDistribution())
+        public FWOptimizer() : this(new ContUniformDistribution(), new NormalDistribution())
         {
 
         }
@@ -96,7 +96,7 @@ namespace EOpt.Math.Optimization
         /// <param name="uniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface, for generating uniform random value.</param>
         /// <param name="normalGen">Object, which implements <see cref="INormalGenerator"/> interface, for generating uniform random value.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public FireworksOptimizer(IContUniformGenerator uniformGen, INormalGenerator normalGen)
+        public FWOptimizer(IContUniformGenerator uniformGen, INormalGenerator normalGen)
         {
             if (uniformGen == null)
             {
@@ -541,14 +541,14 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// <see cref="IOptimizer.InitializeParameters(object)"/>
         /// </summary>
-        /// <param name="parameters">Parameters for method. Must be type <see cref="FireWorksParams"/>.</param>
+        /// <param name="parameters">Parameters for method. Must be type <see cref="FWParams"/>.</param>
         public void InitializeParameters(object parameters)
         {
-            parametrs = parameters as FireWorksParams;
+            parametrs = parameters as FWParams;
 
             if (parametrs == null)
             {
-                throw new ArgumentException($"{nameof(parameters)} type must be as {nameof(FireWorksParams)}.", nameof(parameters));
+                throw new ArgumentException($"{nameof(parameters)} type must be as {nameof(FWParams)}.", nameof(parameters));
             }
 
             this.chargePoints = null;
