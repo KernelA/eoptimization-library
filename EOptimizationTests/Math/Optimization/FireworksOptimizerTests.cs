@@ -73,7 +73,6 @@
             // Distance it is Manhattan distance.
             FWParams param = new FWParams(10, 1000 * 1000, (a, b) => (a - b).Coordinates.Sum(item => Math.Abs(item)), 3);
 
-            fw.InitializeParameters(param);
 
             bool error = GeneralOptimizerTests.TestCancel(fw, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 

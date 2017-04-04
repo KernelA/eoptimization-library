@@ -72,8 +72,6 @@
 
             GEMParams param = new GEMParams(1, 5, 1000 * 1000, 0.6, 10);
 
-            gem.InitializeParameters(param);
-
             bool error = GeneralOptimizerTests.TestCancel(gem, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
             Assert.IsFalse(error);

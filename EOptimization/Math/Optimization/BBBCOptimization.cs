@@ -10,7 +10,7 @@ namespace EOpt.Math.Optimization
     /// <summary>
     /// Optimization method BBBC.
     /// </summary>
-    public class BBBCOptimizer : IOptimizer
+    public class BBBCOptimizer : IOptimizer<BBBCParams>
     {
         /// <summary>
         /// If initParamsQ = true, then not set parameters.
@@ -205,7 +205,7 @@ namespace EOpt.Math.Optimization
             FindBestSolution();
         }
 
-        private void CurrentStep(GeneralParams genParams, int iter)
+        private void NextStep(GeneralParams genParams, int iter)
         {
             FindCenterOfMass();
 
@@ -217,23 +217,25 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.InitializeParameters(object)"/>
+        /// <see cref="IOptimizer{T}.InitializeParameters(T)"/>
         /// </summary>
-        /// <param name="parameters">Parameters for method. Parameters must be type <see cref="BBBCParams"/>.</param>
+        /// <param name="Parameters">Parameters for method. Parameters must be type <see cref="BBBCParams"/>.</param>
         /// <exception cref="ArgumentException"></exception>
-        public void InitializeParameters(object parameters)
+        public void InitializeParameters(BBBCParams Parameters)
         {
-            this.parametrs = parameters as BBBCParams;
+            if (Parameters == null)
+            {
+                throw new ArgumentNullException(nameof(Parameters));
+            }
 
-            if (this.parametrs == null)
-                throw new ArgumentException(nameof(parameters) + " type must be as " + nameof(BBBCParams), nameof(parameters));
+            this.parametrs = Parameters;
 
             initParamsQ = false;
         }
 
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -243,12 +245,12 @@ namespace EOpt.Math.Optimization
 
             for (int i = 2; i <= this.parametrs.Imax; i++)
             {
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, CancellationToken)"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, CancellationToken)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
@@ -260,17 +262,17 @@ namespace EOpt.Math.Optimization
             for (int i = 2; i <= this.parametrs.Imax; i++)
             {
                 cancelToken.ThrowIfCancellationRequested();             
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface <see cref="IProgress{T}"/>, 
-        /// where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
@@ -287,19 +289,19 @@ namespace EOpt.Math.Optimization
 
             for (int i = 2; i <= this.parametrs.Imax; i++)
             {
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
 
                 reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface <see cref="IProgress{T}"/>, 
-        /// where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -319,7 +321,7 @@ namespace EOpt.Math.Optimization
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
 
                 reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }

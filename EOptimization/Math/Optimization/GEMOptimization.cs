@@ -10,7 +10,7 @@
     /// <summary>
     /// Optimization method GEM. 
     /// </summary>
-    public class GEMOptimizer : IOptimizer
+    public class GEMOptimizer : IOptimizer<GEMParams>
     {
         private double radiusGrenade,
             radiusExplosion,
@@ -547,7 +547,7 @@
         }
 
 
-        private void CurrentStep(GeneralParams genParams, int iter)
+        private void NextStep(GeneralParams genParams, int iter)
         {
             ArrangeGrenades();
 
@@ -566,16 +566,18 @@
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.InitializeParameters(object)"/>
+        /// <see cref="IOptimizer{T}.InitializeParameters(T)"/>
         /// </summary>
-        /// <param name="parameters">Parameters for method. Must be type <see cref="GEMParams"/>.</param>
-        public void InitializeParameters(object parameters)
+        /// <param name="Parameters"></param>
+        public void InitializeParameters(GEMParams Parameters)
         {
-            this.parametrs = parameters as GEMParams;
 
-            if (this.parametrs == null)
-                throw new ArgumentException($"{nameof(parameters)} must be type as {nameof(GEMParams)}.", nameof(parameters));
+            if (Parameters == null)
+            {
+                throw new ArgumentNullException(nameof(Parameters));
+            }
 
+            this.parametrs = Parameters;
 
             this.radiusExplosion = 2 * Math.Sqrt(dimension);
             this.radiusGrenade = this.parametrs.InitRadiusGrenade;
@@ -588,7 +590,7 @@
 
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -598,12 +600,12 @@
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, CancellationToken)"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, CancellationToken)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
@@ -615,17 +617,17 @@
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
                 cancelToken.ThrowIfCancellationRequested();
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}}, 
-        /// where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
@@ -642,19 +644,19 @@
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
 
                 reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}} 
-        /// where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -674,7 +676,7 @@
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                CurrentStep(genParams, i);
+                NextStep(genParams, i);
 
                 reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
             }

@@ -67,8 +67,6 @@
 
             BBBCParams param = new BBBCParams(10, 1000 * 1000, 0.4, 0.3);
 
-            bb.InitializeParameters(param);
-
             bool error = GeneralOptimizerTests.TestCancel(bb, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
             Assert.IsFalse(error);

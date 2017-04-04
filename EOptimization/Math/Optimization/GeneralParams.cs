@@ -4,7 +4,7 @@
     using System;
 
     /// <summary>
-    /// General parameters for  <see cref="IOptimizer.Optimize(GeneralParams)"/>. See interface <see cref="IOptimizer"/>.
+    /// General parameters for  <see cref="IOptimizer{T}.Optimize(GeneralParams)"/>. See interface <see cref="IOptimizer{T}"/>.
     /// </summary>
     public class GeneralParams
     {
@@ -25,7 +25,7 @@
 
         /// <summary>
         /// <para>
-        /// Parameters for <see cref="IOptimizer.InitializeParameters(object)"/>.
+        /// General parameters for methods. <see cref="IOptimizer{T}.Optimize(GeneralParams)"/>.
         /// </para>
         /// <para>
         /// Constraints is rectangular parallelepiped. First vertex of rectangular parallelepiped has coordinates <paramref name="leftBound[i]"/>, where i from 1 to dimension of space.

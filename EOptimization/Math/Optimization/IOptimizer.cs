@@ -7,7 +7,7 @@
     /// <summary>
     /// Interface for optimization methods.
     /// </summary>
-    public interface IOptimizer
+    public interface IOptimizer<T>
     {
         /// <summary>
         /// The solution of the constrained optimization problem.
@@ -17,8 +17,8 @@
         /// <summary>
         /// Initializing parameters of methods.
         /// </summary>
-        /// <param name="parametrs"></param>
-        void InitializeParameters(object parametrs);
+        /// <param name="parametrs">Parameters for method.</param>
+        void InitializeParameters(T parametrs);
 
         
 

@@ -68,23 +68,23 @@
             <param name="normalGen">Object, which implements <see cref="T:EOpt.Math.Random.INormalGenerator"/> interface, for generating uniform random value.</param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:EOpt.Math.Optimization.BBBCOptimizer.InitializeParameters(System.Object)">
+        <member name="M:EOpt.Math.Optimization.BBBCOptimizer.InitializeParameters(EOpt.Math.Optimization.BBBCParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.InitializeParameters(`0)"/>
             </summary>
-            <param name="parameters">Parameters for method. Parameters must be type <see cref="T:EOpt.Math.Optimization.BBBCParams"/>.</param>
+            <param name="Parameters">Parameters for method. Parameters must be type <see cref="T:EOpt.Math.Optimization.BBBCParams"/>.</param>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.BBBCOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.BBBCOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
@@ -92,24 +92,24 @@
         </member>
         <member name="M:EOpt.Math.Optimization.BBBCOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>, 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.BBBCOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>, 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
@@ -250,22 +250,22 @@
             </summary>
             <param name="distanceFunction">Function for compute distance between points.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.FWOptimizer.InitializeParameters(System.Object)">
+        <member name="M:EOpt.Math.Optimization.FWOptimizer.InitializeParameters(EOpt.Math.Optimization.FWParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.InitializeParameters(`0)"/>
             </summary>
-            <param name="parameters">Parameters for method. Must be type <see cref="T:EOpt.Math.Optimization.FWParams"/>.</param>
+            <param name="Parameters">Parameters for method. Must be type <see cref="T:EOpt.Math.Optimization.FWParams"/>.</param>
         </member>
         <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
@@ -273,24 +273,24 @@
         </member>
         <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>, 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.FWOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface <see cref="T:System.IProgress`1"/>, 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
@@ -463,22 +463,22 @@
             <param name="a"></param>
             <param name="b"></param>
         </member>
-        <member name="M:EOpt.Math.Optimization.GEMOptimizer.InitializeParameters(System.Object)">
+        <member name="M:EOpt.Math.Optimization.GEMOptimizer.InitializeParameters(EOpt.Math.Optimization.GEMParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.InitializeParameters(`0)"/>
             </summary>
-            <param name="parameters">Parameters for method. Must be type <see cref="T:EOpt.Math.Optimization.GEMParams"/>.</param>
+            <param name="Parameters"></param>
         </member>
         <member name="M:EOpt.Math.Optimization.GEMOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.GEMOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
@@ -486,24 +486,24 @@
         </member>
         <member name="M:EOpt.Math.Optimization.GEMOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}}, 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:EOpt.Math.Optimization.GEMOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
             <summary>
-            <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             </summary>
             <param name="genParams">General parameters. <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}} 
-            where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-            <seealso cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
+            where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
+            <seealso cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})"/>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
             </param>
             <exception cref="T:System.InvalidOperationException"></exception>
@@ -591,7 +591,7 @@
         </member>
         <member name="T:EOpt.Math.Optimization.GeneralParams">
             <summary>
-            General parameters for  <see cref="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)"/>. See interface <see cref="T:EOpt.Math.Optimization.IOptimizer"/>.
+            General parameters for  <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)"/>. See interface <see cref="T:EOpt.Math.Optimization.IOptimizer`1"/>.
             </summary>
         </member>
         <member name="P:EOpt.Math.Optimization.GeneralParams.LeftBound">
@@ -612,7 +612,7 @@
         <member name="M:EOpt.Math.Optimization.GeneralParams.#ctor(System.Func{System.Double[],System.Double},System.Double[],System.Double[])">
             <summary>
             <para>
-            Parameters for <see cref="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)"/>.
+            General parameters for methods. <see cref="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)"/>.
             </para>
             <para>
             Constraints is rectangular parallelepiped. First vertex of rectangular parallelepiped has coordinates <paramref name="leftBound[i][i]"/>, where i from 1 to dimension of space.
@@ -625,36 +625,36 @@
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="T:EOpt.Math.Optimization.IOptimizer">
+        <member name="T:EOpt.Math.Optimization.IOptimizer`1">
             <summary>
             Interface for optimization methods.
             </summary>
         </member>
-        <member name="P:EOpt.Math.Optimization.IOptimizer.Solution">
+        <member name="P:EOpt.Math.Optimization.IOptimizer`1.Solution">
             <summary>
             The solution of the constrained optimization problem.
             </summary>
         </member>
-        <member name="M:EOpt.Math.Optimization.IOptimizer.InitializeParameters(System.Object)">
+        <member name="M:EOpt.Math.Optimization.IOptimizer`1.InitializeParameters(`0)">
             <summary>
             Initializing parameters of methods.
             </summary>
-            <param name="parametrs"></param>
+            <param name="parametrs">Parameters for method.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams)">
+        <member name="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams)">
             <summary>
             Finding solution of the constrained optimization problem.
             </summary>
             <param name="parametrs">General parameters <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
+        <member name="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.Threading.CancellationToken)">
             <summary>
             Finding solution of the constrained optimization problem.
             </summary>
             <param name="parametrs">General parameters <see cref="T:EOpt.Math.Optimization.GeneralParams"/>.</param>
             <param name="cancelToken"><see cref="T:System.Threading.CancellationToken"/></param>
         </member>
-        <member name="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
+        <member name="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}})">
             <summary>
             Finding solution of the constrained optimization problem. If you want see progress, then you need set <paramref name="reporter"/>.
             </summary>
@@ -662,7 +662,7 @@
             <param name="reporter">Object which implement interface IProgress&lt;Tuple&lt;object, int, int, int&gt;&gt;, 
             where first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value.</param>
         </member>
-        <member name="M:EOpt.Math.Optimization.IOptimizer.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
+        <member name="M:EOpt.Math.Optimization.IOptimizer`1.Optimize(EOpt.Math.Optimization.GeneralParams,System.IProgress{System.Tuple{System.Object,System.Int32,System.Int32,System.Int32}},System.Threading.CancellationToken)">
             <summary>
             Finding solution of the constrained optimization problem. If you want see progress, then you need set <paramref name="reporter"/>.
             </summary>
