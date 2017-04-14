@@ -194,11 +194,11 @@ namespace EOpt.Math.Optimization
                 s = parametrs.M * (fmax - this.chargePoints[i][Dimension] + Constants.Psi) / denumerator;
 
                 if (s < parametrs.Alpha * parametrs.M)
-                    s = Math.Round(parametrs.Alpha * parametrs.M);
+                    s = Math.Truncate(parametrs.Alpha * parametrs.M);
                 else if (s > parametrs.Beta * parametrs.M)
-                    s = Math.Round(parametrs.Beta * parametrs.M);
+                    s = Math.Truncate(parametrs.Beta * parametrs.M);
                 else
-                    s = Math.Round(s);
+                    s = Math.Truncate(s);
 
                 if ((int)s == 0 && i == 0)
                     s = 1;
