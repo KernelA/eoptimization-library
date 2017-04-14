@@ -22,7 +22,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 
-*Tests/
+*Tests/[Bb]in/
+#*Tests/
 
 
 # Visual Studio 2015 cache/options directory
