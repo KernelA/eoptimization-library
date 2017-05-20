@@ -150,7 +150,7 @@
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    temp[i] = uniformRand.URandVal(-1, 1);
+                    temp[j] = uniformRand.URandVal(-1, 1);
                 }
 
                 grenades.Add(temp.Clone());
@@ -242,7 +242,7 @@
 
             bool addToArray = true;
 
-            for (int i = 0; i < ortogonalArray.Count; i++)
+            for (int i = 0; i < ortogonalArray.Capacity; i++)
             {
                 addToArray = true;
 
@@ -541,6 +541,8 @@
 
             dimension = genParams.LeftBound.Length;
 
+            this.radiusExplosion = 2 * Math.Sqrt(dimension);
+
             InitializePopulation();
 
             CalculateFunctionForGrenade(genParams.ObjectiveFunction, genParams.LeftBound, genParams.RightBound);
@@ -578,8 +580,6 @@
             }
 
             this.parametrs = Parameters;
-
-            this.radiusExplosion = 2 * Math.Sqrt(dimension);
             this.radiusGrenade = this.parametrs.InitRadiusGrenade;
             this.radiusInitial = this.parametrs.InitRadiusGrenade;
 

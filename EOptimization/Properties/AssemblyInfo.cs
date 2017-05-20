@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle("EOptimization")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The library for constrained optimization.  Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("EOptimization")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номера сборки и редакции по умолчанию 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.3.2")]
-[assembly: AssemblyFileVersion("1.0.3.2")]
+[assembly: AssemblyVersion("1.0.3.3")]
+[assembly: AssemblyFileVersion("1.0.3.3")]
