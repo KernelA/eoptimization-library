@@ -399,15 +399,17 @@ namespace EOpt.Math.Optimization
             {
                 for (int k = 0; k < this.debris[j].Count; k++)
                 {
-                    if (this.debris[j][k][Dimension] < fmin)
+                    if (this.debris[j][k][Dimension] < min2)
                     {
-                        fmin = this.debris[j][k][Dimension];
+                        min2 = this.debris[j][k][Dimension];
 
                         indexmin2 = j;
                         indexmin3 = k;
                     }
                 }
             }
+
+
 
             // Select best solution among debris and charges.
             if (min1 < min2)
