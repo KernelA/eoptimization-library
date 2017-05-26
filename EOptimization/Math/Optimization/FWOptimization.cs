@@ -344,7 +344,7 @@ namespace EOpt.Math.Optimization
 
                     double ksi = uniformRand.URandVal(0, 1);
 
-                    int CountOfDimension = (int)Math.Round(Dimension * ksi);
+                    int CountOfDimension = (int)Math.Ceiling(Dimension * ksi);
 
                     if (ksi < 0.5)
                     {
