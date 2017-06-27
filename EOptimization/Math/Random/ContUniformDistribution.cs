@@ -74,14 +74,6 @@
             rand = SyncRandom.Get();
         }
 
-        /// <summary>
-        /// Random value from continuous uniform distribution, where distribution range specified in class.
-        /// </summary>
-        /// <returns></returns>
-        public double RandVal()
-        {
-            return URandVal(LeftBound, RightBound);
-        }
 
         /// <summary>
         /// Random value from continuous uniform distribution on [<paramref name="LeftBound"/>; <paramref name="RightBound"/>].

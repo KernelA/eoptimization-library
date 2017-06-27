@@ -5,7 +5,7 @@
     /// <summary>
     ///  Interface for random generator normal distribution.
     /// </summary>
-    public interface INormalGenerator : IRandomGeneartor<double>
+    public interface INormalGenerator
     {
         /// <summary>
         /// Get random value which has normal distribution with mean equal <paramref name="Mean"/> and standart deviation equal <paramref name="StdDev"/>.

@@ -1,10 +1,6 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     class TestReporter : IProgress<Tuple<object, int, int, int>>
     {
@@ -14,16 +10,16 @@
 
         private Type optimizerType;
 
-        public TestReporter(Type OptimizaerType, int IterMin, int IterMax)
+        public TestReporter(Type OptimizerType, int IterMin, int IterMax)
         {
             iterMin = IterMin;
             iterMax = IterMax;
-            optimizerType = OptimizaerType;
+            optimizerType = OptimizerType;
         }
 
         public void Report(Tuple<object, int, int, int> Progress)
         {
-            if (!typeof(object).IsInstanceOfType(optimizerType) || iterMin != Progress.Item2 || iterMax != Progress.Item3)
+            if (typeof(object).Equals(optimizerType) || iterMin != Progress.Item2 || iterMax != Progress.Item3)
                 Error = true;
             if (Progress.Item4 < iterMin || Progress.Item4 > iterMax)
                 Error = true;             

@@ -100,14 +100,5 @@
         }
 
 
-        /// <summary>
-        /// Random value from normal distribution where mean and standard deviation specified in class.
-        /// </summary>
-        /// <remarks>Using Box–Muller transform.</remarks>
-        /// <exception cref="ArgumentException"></exception>
-        public double RandVal()
-        {
-            return NRandVal(Mean, StdDev);
-        }
     }
 }

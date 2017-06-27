@@ -1,26 +1,21 @@
 ﻿namespace EOpt.Math.Random.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using EOpt.Math.Random;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
 
-    [TestClass()]
     public class NormalDistributionTests
     {
-        [TestMethod()]
+        [Fact]
         public void NormalDistributionConstrTest()
         {
             NormalDistribution dist = new NormalDistribution();
 
-            Assert.IsTrue(dist.Mean == 0 && dist.StdDev == 1);
+            Assert.True(dist.Mean == 0 && dist.StdDev == 1);
         }
 
-        [TestMethod()]
+        [Fact]
         public void NormalDistributionConstrTest1()
         {
             bool error = true;
@@ -34,19 +29,19 @@
                 error = false;
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
             
         }
 
-        [TestMethod()]
+        [Fact]
         public void NormalDistributionConstrTest3()
         {
             NormalDistribution dist = new NormalDistribution(2, 5);
 
-            Assert.IsTrue(dist.Mean == 2 && dist.StdDev == 5);
+            Assert.True(dist.Mean == 2 && dist.StdDev == 5);
         }
 
-        [TestMethod()]
+        [Fact]
         public void NRandValTest()
         {
             NormalDistribution dist = new NormalDistribution(0, 2);
@@ -62,9 +57,7 @@
                 error = false;
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
-
-   
     }
 }
