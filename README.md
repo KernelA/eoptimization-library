@@ -1,4 +1,4 @@
-# EOptimization library
+# EOptimization library .Net Core
 
 ## Summary
 The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net Core.
@@ -11,11 +11,18 @@ The library for solving constrained optimization problems. Implemented three alg
 
 ![Example 1](/Docs/Images/example1.png)
 
+## Branches
+
+Exist two branches:
+
+1. `master` library for .Net framework 4.5.
+2. `dotnet_core` library for .Net Core.
+
 ## Building
 
 1. Use Visual Studio 2017.
 2. CLI interface:
-    * Only once, run in command promt `dotnet restore`.
+    * Only once, run in command prompt `dotnet restore`.
     * Run `dotnet build -c Release`.
     * If necessary, run tests `dotnet test ./EOptimizationTests/EOptimizationTest.csproj`.
 
