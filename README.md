@@ -21,7 +21,7 @@ Exist two branches:
 ## Building
 
 1. Use Visual Studio 2017.
-2. CLI interface:
+2. CLI:
     * Only once, run in command prompt `dotnet restore`.
     * Run `dotnet build -c Release`.
     * If necessary, run tests `dotnet test ./EOptimizationTests/EOptimizationTest.csproj`.
