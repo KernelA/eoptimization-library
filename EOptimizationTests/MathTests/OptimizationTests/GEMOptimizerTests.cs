@@ -1,19 +1,13 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using EOpt.Math.Optimization;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    using System.Diagnostics;
 
-    [TestClass()]
     public class GEMOptimizerTests
     {
-        [TestMethod]
+        [Fact]
         public void GEMOptimizerTestOptimization()
         {
             GEMOptimizer gem = new GEMOptimizer();
@@ -24,31 +18,31 @@
 
             bool error = GeneralOptimizerTests.TestOptimizer(gem, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void GEMOptimizerTestWrongParams()
         {
             GEMOptimizer gem = new GEMOptimizer();
 
             bool error = GeneralOptimizerTests.TestWrongParams(gem);
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void GEMOptimizerTestWrongInvoke()
         {
             GEMOptimizer gem = new GEMOptimizer();
 
             bool error = GeneralOptimizerTests.TestWrongInvoke(gem);
 
-            Assert.IsFalse(error);
+            Assert.False(error);
 
         }
 
-        [TestMethod()]
+        [Fact]
         public void GEMOptimizerTestReporter()
         {
             GEMOptimizer gem = new GEMOptimizer();
@@ -62,10 +56,10 @@
             // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
             gem.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
 
-            Assert.IsFalse(reporter.Error);
+            Assert.False(reporter.Error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void GEMOptimizerCancel()
         {
             GEMOptimizer gem = new GEMOptimizer();
@@ -74,7 +68,7 @@
 
             bool error = GeneralOptimizerTests.TestCancel(gem, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            Assert.IsFalse(error);
+            Assert.False(error);
 
         }
     }

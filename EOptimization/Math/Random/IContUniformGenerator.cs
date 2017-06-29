@@ -5,7 +5,7 @@
     /// <summary>
     /// Interface for random generator uniform distribution.
     /// </summary>
-    public interface IContUniformGenerator :IRandomGeneartor<double>
+    public interface IContUniformGenerator
     {
         /// <summary>
         /// Get random value from continuous uniform distribution on [a;b].

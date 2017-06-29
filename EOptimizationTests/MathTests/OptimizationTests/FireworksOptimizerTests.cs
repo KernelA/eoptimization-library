@@ -1,19 +1,15 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using EOpt.Math.Optimization;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    using System.Diagnostics;
-
-    [TestClass()]
     public class FireworksOptimizerTests
     {
-        [TestMethod]
+        [Fact]
         public void FWOptimizerTestOptimization()
         {
             FWOptimizer fw = new FWOptimizer();
@@ -23,31 +19,31 @@
 
             bool error = GeneralOptimizerTests.TestOptimizer(fw, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void FWOptimizerTestWrongParams()
         {
             FWOptimizer fw = new FWOptimizer();
 
             bool error = GeneralOptimizerTests.TestWrongParams(fw);
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void FWOptimizerTestWrongInvoke()
         {
             FWOptimizer fw = new FWOptimizer();
 
             bool error = GeneralOptimizerTests.TestWrongInvoke(fw);
 
-            Assert.IsFalse(error);
+            Assert.False(error);
 
         }
 
-        [TestMethod]
+        [Fact]
         public void FWOptimizerTestReporter()
         {
             FWOptimizer fw = new FWOptimizer();
@@ -62,10 +58,10 @@
             // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
             fw.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
 
-            Assert.IsFalse(reporter.Error);
+            Assert.False(reporter.Error);
         }
 
-        [TestMethod]
+        [Fact]
         public void FWOptimizerTestCancel()
         {
             FWOptimizer fw = new FWOptimizer();
@@ -76,7 +72,7 @@
 
             bool error = GeneralOptimizerTests.TestCancel(fw, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
 
-            Assert.IsFalse(error);
+            Assert.False(error);
 
         }
 

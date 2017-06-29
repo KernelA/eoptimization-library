@@ -1,18 +1,16 @@
 ﻿namespace EOpt.Math.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using EOpt.Math;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    [TestClass()]
     public class PointNDTests
     {
 
-        [TestMethod()]
+        [Fact]
         public void PointNDConstrTest4()
         {
             PointND point = new PointND(12, 5);
@@ -25,20 +23,20 @@
                     error = true;
             }
 
-            Assert.IsTrue(!error && point.Dimension == 5);
+            Assert.True(!error && point.Dimension == 5);
         }
 
-        [TestMethod()]
+        [Fact]
         public void PointNDConstrTest5()
         {
             double[] x = new double[4] { 45, 56, 8, 10 };
 
             PointND point = new PointND(x);
 
-            Assert.IsTrue(point.Coordinates.SequenceEqual(x) && point.Dimension == 4);
+            Assert.True(point.Coordinates.SequenceEqual(x) && point.Dimension == 4);
         }
 
-        [TestMethod()]
+        [Fact]
         public void EqualsTest()
         {
             PointND a = new PointND(2, 3);
@@ -47,11 +45,11 @@
 
             PointND c = a.Clone();
 
-            Assert.IsTrue(a.Equals(c) && !a.Equals(b));
+            Assert.True(a.Equals(c) && !a.Equals(b));
         }
 
 
-        [TestMethod()]
+        [Fact]
         public void CloneTest()
         {
             PointND p1, p2;
@@ -60,15 +58,15 @@
 
             p2 = p1.Clone();
 
-            Assert.IsTrue(p1.Equals(p2));
+            Assert.True(p1.Equals(p2));
         }
 
-        [TestMethod()]
+        [Fact]
         public void ToStringTest()
         {
             PointND p1 = new PointND(90, 2);
 
-            Assert.IsNotNull(p1.ToString());
+            Assert.NotNull(p1.ToString());
         }
     }
 }

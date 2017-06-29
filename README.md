@@ -1,7 +1,7 @@
-# EOptimization library .Net framework
+# EOptimization library 
 
 ## Summary
-The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net framework 4.5.
+The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net Core.
 
 **Problem formulation**
 
@@ -11,18 +11,13 @@ The library for solving constrained optimization problems. Implemented three alg
 
 ![Example 1](/Docs/Images/example1.png)
 
-## Branches
+## Building
 
-Exist two branches:
-
-1. `master` library for .Net framework 4.5.
-2. `dotnet_core` library for .Net Core.
-
-## Assembly
-
-Library for .Net framework 4.5.
-
-Assembly location with xml documentation: `EOptimization\bin\Release\`
+1. Use Visual Studio 2017.
+2. CLI:
+    * Only once, run in command prompt `dotnet restore`.
+    * Run `dotnet build -c Release`.
+    * If necessary, run tests `dotnet test ./EOptimizationTests/EOptimizationTest.csproj`.
 
 ## Description of methods
 
@@ -37,11 +32,6 @@ You can read about methods in next articles.
 ## How use?
 
 See [wiki.](https://github.com/KernelA/EOptimization-library/wiki)
-
-## Requirements
-
-1. Minimal version of Visual studio - Visual studio 2010 SP1.
-2. .Net framework 4.5.
 
 ## License
 

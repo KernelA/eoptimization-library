@@ -1,25 +1,21 @@
 ﻿namespace EOpt.Math.LA.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using EOpt.Math.LA;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    [TestClass()]
+
     public class SymmetricMatrixTests
     {
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestConstr()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(4);
 
-            Assert.IsTrue(matrix.RowCount == matrix.ColumnCount && matrix.RowCount == 4);
+            Assert.True(matrix.RowCount == matrix.ColumnCount && matrix.RowCount == 4);
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestConstr1()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(3, 5);
@@ -35,10 +31,10 @@
                 }
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestConstr2()
         {
             double[,] array = { { 1, 2, 4 }, { 2, 7, 8 }, { 4, 8, 9 } };
@@ -56,10 +52,10 @@
                 }
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestToArray()
         {
             double[,] array = { { 1, 2 }, { 2, 8 } };
@@ -79,11 +75,11 @@
                 }
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
 
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestWrongParamConstr()
         {
             // Not symmetrix matrix.
@@ -100,27 +96,27 @@
                 error = false;
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestIndexator()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(5, 9);
 
             matrix[3, 4] = 10;
 
-            Assert.IsTrue(matrix[4, 3] == matrix[3, 4]);
+            Assert.True(matrix[4, 3] == matrix[3, 4]);
         }
 
-        [TestMethod()]
+        [Fact]
         public void SymmetricMatrixTestIndexator1()
         {
             SymmetricMatrix matrix = new SymmetricMatrix(5, 0);
 
             matrix[1, 1] = 2;
 
-            Assert.IsTrue(matrix[1, 1] == 2);
+            Assert.True(matrix[1, 1] == 2);
         }
     }
 }

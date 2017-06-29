@@ -1,25 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EOpt.Math.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EOpt.Math.Random.Tests
+﻿namespace EOpt.Math.Random.Tests
 {
-    [TestClass()]
+	using Xunit;
+	using EOpt.Math.Random;
+	using System;
+
     public class ContUniformDistributionTests
     {
-        [TestMethod()]
+        [Fact]
         public void ContUniformDistributionConstrTest()
         {
             ContUniformDistribution dist = new ContUniformDistribution();
 
-            Assert.IsTrue(dist.LeftBound == 0 && dist.RightBound == 1);
+            Assert.True(dist.LeftBound == 0 && dist.RightBound == 1);
         }
 
-        [TestMethod()]
+        [Fact]
         public void ContUniformDistributionConstrTest1()
         {
             bool error = true;
@@ -33,11 +28,11 @@ namespace EOpt.Math.Random.Tests
                 error = false;
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
 
 
-        [TestMethod()]
+        [Fact]
         public void URandValTest()
         {
             bool error = true;
@@ -53,7 +48,7 @@ namespace EOpt.Math.Random.Tests
                 error = false;
             }
 
-            Assert.IsFalse(error);
+            Assert.False(error);
         }
     }
 }

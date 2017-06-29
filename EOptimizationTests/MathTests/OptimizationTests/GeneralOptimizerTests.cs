@@ -1,13 +1,12 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Threading;
+    using System.Threading.Tasks;
+    using System.Linq;
 
-    using System.Diagnostics;
 
     static class GeneralOptimizerTests
     {
@@ -33,8 +32,8 @@
             catch (InvalidOperationException exc)
             {
                 error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
+                //Debug.Indent();
+                //Debug.WriteLine(exc.Message);
             }
 
             return error;
@@ -51,8 +50,8 @@
             catch (ArgumentNullException exc)
             {
                 error = false;
-                Debug.Indent();
-                Debug.WriteLine(exc.Message);
+                //Debug.Indent();
+                //Debug.WriteLine(exc.Message);
             }
 
             return error;
