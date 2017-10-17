@@ -1,4 +1,4 @@
-﻿namespace EOpt.Math.Optimization
+namespace EOpt.Math.Optimization
 {
     using System;
     using System.Collections.Generic;
@@ -6,6 +6,7 @@
     using System.Threading;
 
     using Math.Random;
+    using Math;
 
     /// <summary>
     /// Optimization method GEM. 
@@ -622,16 +623,15 @@
         }
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}}, 
-        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <param name="reporter">Object which implement interface IProgress{Progress}.
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public void Optimize(GeneralParams genParams, IProgress<Tuple<object, int, int, int>> reporter)
+        public void Optimize(GeneralParams genParams, IProgress<Progress> reporter)
         {
             if (reporter == null)
             {
@@ -640,28 +640,29 @@
 
             FirstStep(genParams);
 
-            reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, 1));
+            Progress progress = new Progress(this, 1, this.parametrs.Imax, 1);
+
+            reporter.Report(progress);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
                 NextStep(genParams, i);
-
-                reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
+                progress.Current = i;
+                reporter.Report(progress);
             }
         }
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress{Tuple{object, int, int, int}} 
-        /// where T is tuple, first item in tuple is the self object, second item initial value, third item is the end value, fourth item is the current progress value. 
-        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Tuple{object, int, int, int}})"/>
+        /// <param name="reporter">Object which implement interface IProgress{Progress}. 
+        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public void Optimize(GeneralParams genParams, IProgress<Tuple<object, int, int, int>> reporter, CancellationToken cancelToken)
+        public void Optimize(GeneralParams genParams, IProgress<Progress> reporter, CancellationToken cancelToken)
         {
             if (reporter == null)
             {
@@ -670,15 +671,17 @@
 
             FirstStep(genParams);
 
-            reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, 1));
+            Progress progress = new Progress(this, 1, this.parametrs.Imax, 1);
+
+            reporter.Report(progress);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
                 cancelToken.ThrowIfCancellationRequested();
 
                 NextStep(genParams, i);
-
-                reporter.Report(new Tuple<object, int, int, int>(this, 1, this.parametrs.Imax, i));
+                progress.Current = i;
+                reporter.Report(progress);
             }
         }
     }

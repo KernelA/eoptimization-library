@@ -2,7 +2,7 @@
 {
     using System;
 
-    class TestReporter : IProgress<Tuple<object, int, int, int>>
+    class TestReporter : IProgress<Progress>
     {
         public bool Error { get; private set; } = false;
 
@@ -17,11 +17,11 @@
             optimizerType = OptimizerType;
         }
 
-        public void Report(Tuple<object, int, int, int> Progress)
+        public void Report(Progress Progress)
         {
-            if (typeof(object).Equals(optimizerType) || iterMin != Progress.Item2 || iterMax != Progress.Item3)
+            if (typeof(object).Equals(optimizerType) || iterMin != Progress.Start || iterMax != Progress.End)
                 Error = true;
-            if (Progress.Item4 < iterMin || Progress.Item4 > iterMax)
+            if (Progress.Current < iterMin || Progress.Current > iterMax)
                 Error = true;             
         }
 

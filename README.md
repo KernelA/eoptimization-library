@@ -1,7 +1,7 @@
 # EOptimization library 
 
 ## Summary
-The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net Core.
+The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net Core. Supported version .NET Standard is 1.0.
 
 **Problem formulation**
 
