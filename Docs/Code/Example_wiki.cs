@@ -4,7 +4,7 @@ using System;
 using EOpt.Math.Optimization;
 using EOpt.Math;
 
-namespace Test
+namespace ConsoleApp1
 {
     class Program
     {
@@ -56,21 +56,21 @@ namespace Test
 
             for (int i = 0; i < 10; i++)
             {
-                Opt.Optimize(GenParam);
+                Opt.Minimize(GenParam);
 
                 if (bestSolution == null)
                 {
                     bestSolution = Opt.Solution;
                     min = bestSolution[2];
                 }
-                    
-                else if(Opt.Solution[2] < min)
+
+                else if (Opt.Solution[2] < min)
                 {
                     bestSolution = Opt.Solution;
                     min = bestSolution[2];
                 }
             }
-            
+
 
             Console.WriteLine($"Method: {Method}.");
             Console.WriteLine($"Solution: f(x) = {bestSolution[2]}, x = ({bestSolution[0]}, {bestSolution[1]}).");

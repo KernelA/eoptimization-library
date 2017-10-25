@@ -21,13 +21,47 @@
             return point.Sum(coord => coord * coord);
         }
 
+        public static double FunctionNaN(double[] point)
+        {
+            return Math.Sqrt(-1);
+        }
+
+        public static double FunctionPosInf(double[] point)
+        {
+            return Double.PositiveInfinity;
+        }
+
+        public static double FunctionNegInf(double[] points)
+        {
+            return Double.NegativeInfinity;
+        }
+
+
+        public static bool TestInavlidFunction<T>(IOptimizer<T> opt, T parameters, Func<double[], double> function)
+        {
+            bool error = true;
+
+            opt.InitializeParameters(parameters);
+
+            try
+            {
+                opt.Minimize(new GeneralParams(function, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
+            }
+            catch (ArithmeticException exc)
+            {
+                error = false;
+            }
+
+            return error;
+        }
+
         public static bool TestWrongInvoke<T>(IOptimizer<T> opt)
         {
             bool error = true;
 
             try
             {
-                opt.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
+                opt.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
             }
             catch (InvalidOperationException exc)
             {
@@ -61,7 +95,7 @@
         {
             Opt.InitializeParameters(Parameters);
                       
-            Opt.Optimize(GenParams);
+            Opt.Minimize(GenParams);
 
             return Opt.Solution == null && Opt.Solution.Dimension != 3;
         }
@@ -74,7 +108,7 @@
 
             Opt.InitializeParameters(Parameters);
 
-            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Optimize(GenParams, token); }, token);
+            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Minimize(GenParams, token); }, token);
 
             tokenSource.Cancel();
 

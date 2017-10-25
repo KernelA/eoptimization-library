@@ -53,7 +53,7 @@
             var reporter = new TestReporter(typeof(BBBCOptimizer), 1, GeneralOptimizerTests.IterMax);
 
             // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
-            bb.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
+            bb.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
 
             Assert.False(reporter.Error);
         }
@@ -69,6 +69,22 @@
 
             Assert.False(error);
 
+        }
+
+        [Fact]
+        public void BBBCTestArithmeticException()
+        {
+            BBBCOptimizer bb = new BBBCOptimizer();
+
+            BBBCParams param = new BBBCParams(10, GeneralOptimizerTests.IterMax, 0.4, 0.3);
+
+            bool error = GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionNaN);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionNegInf);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionPosInf);
+
+            Assert.False(error);
         }
 
     }

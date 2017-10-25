@@ -54,7 +54,7 @@
             var reporter = new TestReporter(typeof(BBBCOptimizer), 1, GeneralOptimizerTests.IterMax);
 
             // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
-            gem.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
+            gem.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
 
             Assert.False(reporter.Error);
         }
@@ -70,6 +70,22 @@
 
             Assert.False(error);
 
+        }
+
+        [Fact]
+        public void GEMOptimizerTestArithmeticException()
+        {
+            GEMOptimizer fw = new GEMOptimizer();
+
+            GEMParams param = new GEMParams(1, 5, 1000 * 1000, 0.6, 10);
+
+            bool error = GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNaN);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNegInf);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionPosInf);
+
+            Assert.False(error);
         }
     }
 }
