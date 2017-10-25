@@ -29,7 +29,7 @@ You can read about methods in next articles.
 2. [Fireworks method.](http://link.springer.com/chapter/10.1007/978-3-642-13495-1_44)
 3. [GEM method.](http://www.sciencedirect.com/science/article/pii/S0096300309000058)
 
-## How use?
+## How to use?
 
 See [wiki.](https://github.com/KernelA/EOptimization-library/wiki)
 
