@@ -71,5 +71,21 @@
             Assert.False(error);
 
         }
+
+        [Fact]
+        public void GEMOptimizerTestArithmeticException()
+        {
+            GEMOptimizer fw = new GEMOptimizer();
+
+            GEMParams param = new GEMParams(1, 5, 1000 * 1000, 0.6, 10);
+
+            bool error = GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNaN);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNegInf);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionPosInf);
+
+            Assert.False(error);
+        }
     }
 }

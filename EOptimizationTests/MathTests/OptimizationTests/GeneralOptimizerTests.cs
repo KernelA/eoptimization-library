@@ -21,6 +21,40 @@
             return point.Sum(coord => coord * coord);
         }
 
+        public static double FunctionNaN(double[] point)
+        {
+            return Math.Sqrt(-1);
+        }
+
+        public static double FunctionPosInf(double[] point)
+        {
+            return Double.PositiveInfinity;
+        }
+
+        public static double FunctionNegInf(double[] points)
+        {
+            return Double.NegativeInfinity;
+        }
+
+
+        public static bool TestInavlidFunction<T>(IOptimizer<T> opt, T parameters, Func<double[], double> function)
+        {
+            bool error = true;
+
+            opt.InitializeParameters(parameters);
+
+            try
+            {
+                opt.Minimize(new GeneralParams(function, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
+            }
+            catch (ArithmeticException exc)
+            {
+                error = false;
+            }
+
+            return error;
+        }
+
         public static bool TestWrongInvoke<T>(IOptimizer<T> opt)
         {
             bool error = true;

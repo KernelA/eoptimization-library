@@ -71,5 +71,21 @@
 
         }
 
+        [Fact]
+        public void BBBCTestArithmeticException()
+        {
+            BBBCOptimizer bb = new BBBCOptimizer();
+
+            BBBCParams param = new BBBCParams(10, GeneralOptimizerTests.IterMax, 0.4, 0.3);
+
+            bool error = GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionNaN);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionNegInf);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(bb, param, GeneralOptimizerTests.FunctionPosInf);
+
+            Assert.False(error);
+        }
+
     }
 }

@@ -123,6 +123,8 @@ namespace EOpt.Math.Optimization
             // We need copy coordinates. 
             double[] temp = new double[dimension];
 
+            double value = 0;
+
             for (int i = 0; i < points.Count; i++)
             {
                 for (int j = 0; j < dimension; j++)
@@ -130,7 +132,18 @@ namespace EOpt.Math.Optimization
                     temp[j] = points[i][j];
                 }
 
-                points[i][dimension] = func(temp);
+                value = func(temp);
+
+                try
+                {
+                    CheckDouble.CheckInvalidValue(value);
+                }
+                catch(ArithmeticException exc)
+                {
+                    throw new ArithmeticException($"Function has a invalid value at point {temp}." + $"\n{exc.Message}");
+                }
+                
+                points[i][dimension] = value;
             }
         }
 
@@ -237,10 +250,10 @@ namespace EOpt.Math.Optimization
 
         /// <summary>
         /// <see cref="IOptimizer{T}.Minimize(GeneralParams)"/>
-
-            /// </summary>
+        /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
         public void Minimize(GeneralParams genParams)
         {
             FirstStep(genParams);
@@ -257,6 +270,7 @@ namespace EOpt.Math.Optimization
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
         public void Minimize(GeneralParams genParams, CancellationToken cancelToken)
         {
             FirstStep(genParams);     
@@ -278,6 +292,7 @@ namespace EOpt.Math.Optimization
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
         public void Minimize(GeneralParams genParams, IProgress<Progress> reporter)
         {
             if (reporter == null)
@@ -310,6 +325,7 @@ namespace EOpt.Math.Optimization
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
         public void Minimize(GeneralParams genParams, IProgress<Progress> reporter, CancellationToken cancelToken)
         {
             if (reporter == null)

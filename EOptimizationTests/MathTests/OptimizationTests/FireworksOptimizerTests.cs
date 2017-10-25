@@ -14,7 +14,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            // Distance it is Manhattan distance.
+            // Distance  is Manhattan distance.
             FWParams param = new FWParams(10, GeneralOptimizerTests.IterMax, (a, b) => (a - b).Coordinates.Sum(item => Math.Abs(item)), 3);
 
             bool error = GeneralOptimizerTests.TestOptimizer(fw, param, new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
@@ -48,7 +48,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            // Distance it is Manhattan distance.
+            // Distance is Manhattan distance.
             FWParams param = new FWParams(10, GeneralOptimizerTests.IterMax, (a, b) => (a - b).Coordinates.Sum(item => Math.Abs(item)), 3);
 
             fw.InitializeParameters(param);
@@ -67,7 +67,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            // Distance it is Manhattan distance.
+            // Distance  is Manhattan distance.
             FWParams param = new FWParams(10, 1000 * 1000, (a, b) => (a - b).Coordinates.Sum(item => Math.Abs(item)), 3);
 
 
@@ -77,6 +77,22 @@
 
         }
 
+
+        [Fact]
+        public void FWOptimizerTestArithmeticException()
+        {
+            FWOptimizer fw = new FWOptimizer();
+
+            FWParams param = new FWParams(10, 1000 * 1000, (a, b) => (a - b).Coordinates.Sum(item => Math.Abs(item)), 3);
+
+            bool error = GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNaN);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionNegInf);
+
+            error |= GeneralOptimizerTests.TestInavlidFunction(fw, param, GeneralOptimizerTests.FunctionPosInf);
+
+            Assert.False(error);
+        }
 
     }
 }
