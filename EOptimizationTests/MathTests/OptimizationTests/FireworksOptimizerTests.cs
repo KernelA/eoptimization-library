@@ -56,7 +56,8 @@
             var reporter = new TestReporter(typeof(BBBCOptimizer), 0, GeneralOptimizerTests.IterMax - 1);
 
             // Optimization f(x,y)=x^2 + y^2 on [-10;10]x[-10;10].
-            fw.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
+
+            fw.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound), reporter);
 
             Assert.False(reporter.Error);
         }

@@ -27,7 +27,7 @@
 
             try
             {
-                opt.Optimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
+                opt.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
             }
             catch (InvalidOperationException exc)
             {
@@ -61,7 +61,7 @@
         {
             Opt.InitializeParameters(Parameters);
                       
-            Opt.Optimize(GenParams);
+            Opt.Minimize(GenParams);
 
             return Opt.Solution == null && Opt.Solution.Dimension != 3;
         }
@@ -74,7 +74,7 @@
 
             Opt.InitializeParameters(Parameters);
 
-            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Optimize(GenParams, token); }, token);
+            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Minimize(GenParams, token); }, token);
 
             tokenSource.Cancel();
 

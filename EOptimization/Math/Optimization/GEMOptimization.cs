@@ -591,11 +591,11 @@ namespace EOpt.Math.Optimization
 
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams)"/>
+        /// <see cref="IOptimizer{T}.Minimize(GeneralParams)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void Optimize(GeneralParams genParams)
+        public void Minimize(GeneralParams genParams)
         {
             FirstStep(genParams);
 
@@ -606,12 +606,12 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, CancellationToken)"/>
+        /// <see cref="IOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void Optimize(GeneralParams genParams, CancellationToken cancelToken)
+        public void Minimize(GeneralParams genParams, CancellationToken cancelToken)
         {
             FirstStep(genParams);
 
@@ -623,15 +623,15 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface IProgress{Progress}.
-        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
+        /// <seealso cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public void Optimize(GeneralParams genParams, IProgress<Progress> reporter)
+        public void Minimize(GeneralParams genParams, IProgress<Progress> reporter)
         {
             if (reporter == null)
             {
@@ -653,16 +653,16 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// <see cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
         /// <param name="reporter">Object which implement interface IProgress{Progress}. 
-        /// <seealso cref="IOptimizer{T}.Optimize(GeneralParams, IProgress{Progress})"/>
+        /// <seealso cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public void Optimize(GeneralParams genParams, IProgress<Progress> reporter, CancellationToken cancelToken)
+        public void Minimize(GeneralParams genParams, IProgress<Progress> reporter, CancellationToken cancelToken)
         {
             if (reporter == null)
             {
