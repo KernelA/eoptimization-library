@@ -1,6 +1,7 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
+    using Help;
 
     class TestReporter : IProgress<Progress>
     {

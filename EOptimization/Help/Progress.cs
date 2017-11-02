@@ -1,4 +1,4 @@
-namespace EOpt.Math
+namespace EOpt.Help
 {
 	using System;
 

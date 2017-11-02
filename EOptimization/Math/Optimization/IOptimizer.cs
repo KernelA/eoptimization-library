@@ -6,6 +6,8 @@
 
     using EOpt.Math;
 
+    using Help;
+
     /// <summary>
     /// Interface for optimization methods.
     /// </summary>

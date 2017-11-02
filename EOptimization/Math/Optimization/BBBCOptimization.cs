@@ -7,6 +7,7 @@ namespace EOpt.Math.Optimization
 
     using Math.Random;
     using Math;
+    using Help;
 
     /// <summary>
     /// Optimization method BBBC.
@@ -56,7 +57,7 @@ namespace EOpt.Math.Optimization
         {
             get
             {
-                return points[indexBestSolution].Clone();
+                return points[indexBestSolution];
             }
         }
 
@@ -140,7 +141,8 @@ namespace EOpt.Math.Optimization
                 }
                 catch(ArithmeticException exc)
                 {
-                    throw new ArithmeticException($"Function has a invalid value at point {temp}." + $"\n{exc.Message}");
+                    throw new InvalidValueFunctionException($"Function has an invalid value at point {temp}." + $"\n{exc.Message}", new PointND(temp),
+                        value);
                 }
                 
                 points[i][dimension] = value;

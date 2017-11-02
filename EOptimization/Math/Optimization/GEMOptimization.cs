@@ -8,6 +8,8 @@ namespace EOpt.Math.Optimization
     using Math.Random;
     using Math;
 
+    using Help;
+
     /// <summary>
     /// Optimization method GEM. 
     /// </summary>
@@ -203,7 +205,8 @@ namespace EOpt.Math.Optimization
                 }
                 catch (ArithmeticException exc)
                 {
-                    throw new ArithmeticException($"Function has a invalid value at point {x}." + $"\n{exc.Message}");
+                    throw new InvalidValueFunctionException($"Function has an invalid value at point {x}." + $"\n{exc.Message}", new PointND(x),
+                       value);
                 }
 
                 grenades[i][dimension] = function(x);
@@ -242,7 +245,8 @@ namespace EOpt.Math.Optimization
                     }
                     catch (ArithmeticException exc)
                     {
-                        throw new ArithmeticException($"Function has a invalid value at point {x}." + $"\n{exc.Message}");
+                        throw new InvalidValueFunctionException($"Function has an invalid value at point {x}." + $"\n{exc.Message}", new PointND(x),
+                       value);
                     }
 
                     shrapnels[WhichGrenade][i][dimension] = value;

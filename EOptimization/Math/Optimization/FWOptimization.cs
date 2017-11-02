@@ -10,6 +10,8 @@ namespace EOpt.Math.Optimization
     using Math.LA;
     using Math;
 
+    using Help;
+
     /// <summary>
     /// Optimization method Fireworks.
     /// </summary>
@@ -169,7 +171,8 @@ namespace EOpt.Math.Optimization
                 }
                 catch (ArithmeticException exc)
                 {
-                    throw new ArithmeticException($"Function has a invalid value at point {temp}." + $"\n{exc.Message}");
+                    throw new InvalidValueFunctionException($"Function has an invalid value at point {temp}." + $"\n{exc.Message}", new PointND(temp),
+                        value);
                 }
 
                 chargePoints[i][Dimension] = value;
