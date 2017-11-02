@@ -21,7 +21,7 @@ The library for solving constrained optimization problems. Implemented three alg
 
 ## Description of methods
 
-You can read about methods in next articles.
+You can read about methods in the next articles.
 
 **References to atricle**
 
