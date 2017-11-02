@@ -8,7 +8,9 @@
     public class NormalDistribution : INormalGenerator
     {
 
-        private double mean, stdDev;
+        private double mean, stdDev, uniformRand1, uniformRand2, r, cachedValue;
+
+        private bool cachedValueQ;
 
         private Random rand;
 
@@ -65,6 +67,11 @@
         {
             rand = SyncRandom.Get();
 
+            uniformRand1 = 0;
+            cachedValue = 0;
+            r = 0;
+            uniformRand2 = 0;
+            cachedValueQ = false;
             this.Mean = Mean;
             this.StdDev = StdDev;
 
@@ -73,7 +80,7 @@
         /// <summary>
         /// Random value from normal distribution with mean equal <paramref name="Mean"/> and standard deviation equal <paramref name="StdDev"/>.
         /// </summary>
-        /// <remarks>Using Box–Muller transform.</remarks>
+        /// <remarks>Using Marsaglia polar method.</remarks>
         /// <param name="Mean">Mean.</param>
         /// <param name="StdDev">Standard deviation.</param>
         /// <returns></returns>
@@ -83,20 +90,29 @@
             if (StdDev <= 0)
                 throw new ArgumentException($"{nameof(StdDev)} must be > 0.", nameof(StdDev));
 
-            double u = 0.0;
-            double v = 0.0;
-
-            double s = 0.0;
-
-            do
+            if(cachedValueQ)
             {
-                u = 2.0 * rand.NextDouble() - 1.0;
-                v = 2.0 * rand.NextDouble() - 1.0;
-                s = u * u + v * v;
+                uniformRand1 = cachedValue;
+                cachedValueQ = false;
             }
-            while (s > 1.0 || s < 1E-10);
+            else
+            {
+                do
+                {
+                    uniformRand1 = 2.0 * rand.NextDouble() - 1.0;
+                    uniformRand2 = 2.0 * rand.NextDouble() - 1.0;
+                    r = uniformRand1 * uniformRand1 + uniformRand2 * uniformRand2;
+                }
+                while (r >= 1.0 || r == 0);
 
-            return Mean + StdDev * (u * Math.Sqrt(-2 * Math.Log(s) / s));
+                cachedValueQ = true;
+
+                cachedValue = uniformRand2;
+
+            }
+
+
+            return Mean + StdDev * (uniformRand1 * Math.Sqrt(-2 * Math.Log(r) / r));
         }
 
 
