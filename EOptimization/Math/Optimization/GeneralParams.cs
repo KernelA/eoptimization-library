@@ -1,62 +1,71 @@
-﻿namespace EOpt.Math.Optimization
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Optimization
 {
 
     using System;
 
     /// <summary>
-    /// General parameters for  <see cref="IOptimizer{T}.Minimize(GeneralParams)"/>.
+    /// General parameters for the optimization methods.
+    /// <seealso cref="IOptimizer{T}"/>
     /// </summary>
     public class GeneralParams
     {
         /// <summary>
         /// Coordinates of first vertex.
         /// </summary>
-        public double[] LeftBound { get; private set; }
+        public double[] LowerBound { get; private set; }
 
         /// <summary>
         /// Coordinates of second vertex.
         /// </summary>
-        public double[] RightBound { get; private set; }
+        public double[] UpperBound { get; private set; }
 
         /// <summary>
         /// Target function.
         /// </summary>
-        public Func<double[], double> ObjectiveFunction { get; private set; }
+        public Func<double[], double> TargetFunction { get; private set; }
 
         /// <summary>
         /// <para>
-        /// General parameters for methods. <see cref="IOptimizer{T}.Minimize(GeneralParams)"/>.
+        /// General parameters for methods.
         /// </para>
         /// <para>
-        /// Constraints is rectangular parallelepiped. First vertex of rectangular parallelepiped has coordinates <paramref name="leftBound[i]"/>, where i from 1 to dimension of space.
-        /// Second vertex of rectangular parallelepiped has coordinates <paramref name="rightBound[i]"/>, where i from 1 to dimension of space.
+        /// Constraints is rectangular parallelepiped. The target function is f(x1, ...,xn). Each xi in [<paramref name="LowerBound"/>[i], <paramref name="UpperBound"/>[i]], i = 1,...,n.
         /// </para>
         /// </summary>
-        /// <param name="objFunction">Target function.</param>
-        /// <param name="leftBound">Coordinates of first vertex.</param>
-        /// <param name="rightBound">Coordinates of second vertex.</param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public GeneralParams(Func<double[], double> objFunction, double[] leftBound, double[] rightBound)
+        /// <param name="TargetFunction">Target function.</param>
+        /// <param name="LowerBound">An array of lower boundaries.</param>
+        /// <param name="UpperBound">An array of upper boundaries.</param>
+        /// <exception cref="ArgumentException">
+        /// <para>
+        /// If lengths of <paramref name="LowerBound"/> and <paramref name="UpperBound"/> are not equal.
+        /// </para>
+        /// <para>
+        /// If exist j  such as <paramref name="LowerBound"/>[j] >= <paramref name="UpperBound"/>[j].
+        /// </para>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="TargetFunction"/> or  <paramref name="LowerBound"/> or <paramref name="UpperBound"/> are null.</exception>
+        public GeneralParams(Func<double[], double> TargetFunction, double[] LowerBound, double[] UpperBound)
         {
-            if (leftBound == null)
-                throw new ArgumentNullException(nameof(leftBound));
-            if (rightBound == null)
-                throw new ArgumentNullException(nameof(rightBound));
-            if (objFunction == null)
-                throw new ArgumentNullException(nameof(objFunction));
-            if (leftBound.Length != rightBound.Length)
-                throw new ArgumentException("Length " + nameof(leftBound) + " and " + nameof(rightBound) + " must be equal.");
+            if (LowerBound == null)
+                throw new ArgumentNullException(nameof(LowerBound));
+            if (UpperBound == null)
+                throw new ArgumentNullException(nameof(UpperBound));
+            if (TargetFunction == null)
+                throw new ArgumentNullException(nameof(TargetFunction));
+            if (LowerBound.Length != UpperBound.Length)
+                throw new ArgumentException($"Length {nameof(LowerBound)} ({LowerBound.Length}) and  {nameof(UpperBound)} ({UpperBound.Length}) must be equal.");
 
-            for (int i = 0; i < leftBound.Length; i++)
+            for (int i = 0; i < LowerBound.Length; i++)
             {
-                if (leftBound[i] > rightBound[i])
-                    throw new ArgumentException(nameof(leftBound) + $"[{i}]" + " greater than " + nameof(rightBound) + $"[{i}].");
+                if (LowerBound[i] >= UpperBound[i])
+                    throw new ArgumentException($"{nameof(LowerBound)}[{i}]  greater than {nameof(UpperBound)}[{i}].");
             }
 
-            LeftBound = leftBound;
-            RightBound = rightBound;
-            ObjectiveFunction = objFunction;
+            this.LowerBound = LowerBound;
+            this.UpperBound = UpperBound;
+            this.TargetFunction = TargetFunction;
         }
     }
 }

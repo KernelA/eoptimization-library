@@ -1,14 +1,19 @@
-﻿namespace EOpt.Math
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math
 {
     using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
     /// <summary>
-    /// Point in N dimension space.
+    /// Class is representing a point in N dimension space.
     /// </summary>
     public class PointND : IEquatable<PointND>
     {
-        private const string NotEqualDimMessage = "Unequal the number of coordinates.";
+        private const string NotEqualDimMessage = "The number of coordinates is unequal.";
 
         /// <summary>
         /// Coordinates of point.
@@ -18,124 +23,100 @@
         /// <summary>
         /// Coordinates of point. Only for read.
         /// </summary>
-        public ReadOnlyCollection<double> Coordinates
-        {
-            get
-            {
-                return new ReadOnlyCollection<double>(coordinates);
-            }
-        }
+        public ReadOnlyCollection<double> Coordinates => new ReadOnlyCollection<double>(coordinates);
+
 
         /// <summary>
         /// Number of coordinates.
         /// </summary>
-        public int Dimension
-        {
-            get
-            {
-                return coordinates.Length;
-            }
-        }
+        public int Dimension => coordinates.Length;
+
 
         /// <summary>
-        /// Create point with number of coordinates equal  <paramref name="dimension"/> and value <paramref name="x"/>.
+        /// Create point with number of coordinates is equal  <paramref name="Dimension"/> and value is <paramref name="DefaultValue"/>.
         /// </summary>
-        /// <param name="x">The value of the coordinate.</param>
-        /// <param name="dimension">Number of coordinates.</param>
-        /// <exception cref="ArgumentException"></exception>
-        public PointND(double x, int dimension)
+        /// <param name="DefaultValue">The value of the coordinate.</param>
+        /// <param name="Dimension">Number of coordinates.</param>
+        /// <exception cref="ArgumentException">If <paramref name="Dimension"/> &lt; 1.</exception>
+        public PointND(double DefaultValue, int Dimension)
         {
-            if (dimension < 1)
-                throw new ArgumentException($"{nameof(dimension)} must be > 0", nameof(dimension));
+            if (Dimension < 1)
+                throw new ArgumentException($"{nameof(Dimension)} must be > 0.", nameof(Dimension));
 
-            coordinates = new double[dimension];
-    
+            coordinates = new double[Dimension];
+
             for (int i = 0; i < coordinates.Length; i++)
             {
-                coordinates[i] = x;
+                coordinates[i] = DefaultValue;
             }
         }
 
         /// <summary>
-        /// Create point from array <paramref name="x"/>.
+        /// Create point from array <paramref name="Coordinates"/>.
         /// </summary>
-        /// <param name="x">Array of coordinates.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public PointND(double[] x)
+        /// <param name="Coordinates">Array of coordinates.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="Coordinates"/> is null.</exception>
+        public PointND(double[] Coordinates)
         {
-            if (x == null)
-                throw new ArgumentNullException(nameof(x));
+            if (Coordinates == null)
+                throw new ArgumentNullException(nameof(Coordinates));
+            coordinates = new double[Coordinates.Length];
 
-            coordinates = new double[x.Length];
+            Coordinates.CopyTo(coordinates, 0);
 
-            x.CopyTo(coordinates, 0);
         }
+
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            return obj is PointND ? Equals((PointND)obj) : false;
-        }
+        public override bool Equals(object obj) => obj is PointND ? Equals((PointND)obj) : false;
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return coordinates.GetHashCode();
-        }
+        public override int GetHashCode() => coordinates.GetHashCode();
+   
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="point"></param>
+        /// <param name="Point"></param>
         /// <returns></returns>
-        public bool Equals(PointND point)
+        public bool Equals(PointND Point)
         {
-            if (point == null)
+            if (Point == null)
                 return false;
 
-            if (this.Dimension != point.Dimension)
+            if (this.Dimension != Point.Dimension)
                return false;
 
-            bool equal = true;
+            bool isEqual = true;
 
-            for (int i = 0; i < coordinates.Length; i++)
+            for (int i = 0; i < Dimension; i++)
             {
-                if(coordinates[i] != point.coordinates[i])
+                if(coordinates[i] != Point.coordinates[i])
                 {
-                    equal = false;
+                    isEqual = false;
                     break;
                 }
             }
 
-            return equal;
+            return isEqual;
         }
 
         /// <summary>
-        /// Create deep copy.
+        /// Create a deep copy.
         /// </summary>
         /// <returns></returns>
-        public PointND Clone()
-        {
-            PointND temp = new PointND(0, this.Dimension);
-
-            for (int i = 0; i < this.Dimension; i++)
-            {
-                temp[i] = this[i];
-            }
-
-            return temp;
-        }
+        public PointND DeepCopy() => new PointND(coordinates);
 
 
         /// <summary>
-        /// Get <paramref name="i"/> - th coordinate.
+        /// Get <paramref name="i"/>-th coordinate.
         /// </summary>
         /// <param name="i">Index of coordinate.</param>
         /// <returns></returns>
@@ -160,183 +141,219 @@
         {
             string cords = "(";
 
-            int Length = this.Dimension - 1;
+            int length = this.Dimension - 1;
 
-            for (int i = 0; i < Length; i++)
+            for (int i = 0; i < length; i++)
             {
                 cords += this[i].ToString() + "; ";
             }
 
-            return cords + this[Length].ToString() + ")";
+            return $"{cords} {this[length].ToString()})";
+        }
+
+        /// <summary>
+        /// Copy coordinates from <paramref name="Point"/>.
+        /// </summary>
+        /// <param name="Point"></param>
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/> is null.</exception>
+        /// <exception cref="ArgumentException">If dimensions are not equal.</exception>
+        public void SetAt(PointND Point)
+        {
+
+            if (Point == null)
+            {
+                throw new ArgumentNullException(nameof(Point));
+            }
+
+            if (Dimension != Point.Dimension)
+                throw new ArgumentException(NotEqualDimMessage, nameof(Point));
+
+            for(int i= 0; i < Dimension; i++)
+            {
+                this[i] = Point[i];
+            }
+        }
+
+        /// <summary>
+        /// To all coordinates of point add coordinates of <paramref name="Point"/>. This is making inplace.
+        /// </summary>
+        /// <param name="Point"></param>
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/> is null.</exception>
+        /// <exception cref="ArgumentException">If dimensions are not equal.</exception>
+        public void AddInplace(PointND Point)
+        {
+
+            if (Point == null)
+            {
+                throw new ArgumentNullException(nameof(Point));
+            }
+
+            if (Dimension != Point.Dimension)
+                throw new ArgumentException(NotEqualDimMessage, nameof(Point));
+
+            for (int i = 0; i < Dimension; i++)
+            {
+                this[i] += Point[i];
+            }
+        }
+
+        /// <summary>
+        /// Add a <paramref name="Value"/> to the all coordinates. This is making inplace.
+        /// </summary>
+        /// <param name="Value"></param>
+        public void AddInplace(double Value)
+        {
+            for (int i = 0; i < Dimension; i++)
+            {
+                this[i] += Value;
+            }
+        }
+
+        /// <summary>
+        /// All coordinates multiply by <paramref name="Value"/>. This is making inplace.
+        /// </summary>
+        /// <param name="Value"></param>
+        public void MultiplyByInplace(double Value)
+        {
+            for (int i = 0; i < Dimension; i++)
+            {
+                this[i] *= Value;
+            }
         }
 
         ///<summary>
         /// Add two points.
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static PointND operator +(PointND p1, PointND p2)
+        /// <exception cref="ArgumentException">If dimensions of <paramref name="Point1"/> is not equal dimension of <paramref name="Point2"/>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="Point1"/> or <paramref name="Point2"/> is null.</exception>
+        public static PointND operator +(PointND Point1, PointND Point2)
         {
 
-            if (p1 == null)
+            if (Point1 == null)
             {
-                throw new ArgumentNullException(nameof(p1));
+                throw new ArgumentNullException(nameof(Point1));
             }
 
-            if (p2 == null)
+            if (Point2 == null)
             {
-                throw new ArgumentNullException(nameof(p2));
+                throw new ArgumentNullException(nameof(Point2));
             }
 
-            if (p1.Dimension != p2.Dimension)
+            if (Point1.Dimension != Point2.Dimension)
                 throw new ArgumentException(NotEqualDimMessage);
 
-            PointND temp = new PointND(0, p1.Dimension);
+            PointND temp = new PointND(0, Point1.Dimension);
 
-            for (int i = 0; i < p1.Dimension; i++)
+            for (int i = 0; i < Point1.Dimension; i++)
             {
-                temp[i] = p1[i] + p2[i];
+                temp[i] = Point1[i] + Point2[i];
             }
 
             return temp;
         }
 
         ///<summary>
-        /// Subtraction two points.
+        /// Subtract two points.
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static PointND operator -(PointND p1, PointND p2)
+        /// <exception cref="ArgumentException">If dimensions of <paramref name="Point1"/> is not equal dimension of <paramref name="Point2"/>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="Point1"/> or <paramref name="Point2"/> is null.</exception>
+        public static PointND operator -(PointND Point1, PointND Point2)
         {
-            if (p1 == null)
+            if (Point1 == null)
             {
-                throw new ArgumentNullException(nameof(p1));
+                throw new ArgumentNullException(nameof(Point1));
             }
 
 
-            if (p2 == null)
+            if (Point2 == null)
             {
-                throw new ArgumentNullException(nameof(p2));
+                throw new ArgumentNullException(nameof(Point2));
             }
 
-            if (p1.Dimension != p2.Dimension)
+            if (Point1.Dimension != Point2.Dimension)
                 throw new ArgumentException(NotEqualDimMessage);
 
-            PointND temp = new PointND(0, p1.Dimension);
+            PointND temp = new PointND(0, Point1.Dimension);
 
-            for (int i = 0; i < p1.Dimension; i++)
+            for (int i = 0; i < Point1.Dimension; i++)
             {
-                temp[i] = p1[i] - p2[i];
+                temp[i] = Point1[i] - Point2[i];
             }
 
             return temp;
         }
 
         /// <summary>
-        /// Multiplication by -1 each coordinate.
+        /// All coordinates multiply by -1.
         /// </summary>
-        /// <param name="p1"></param>
+        /// <param name="Point"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static PointND operator -(PointND p1)
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/> is null.</exception>
+        public static PointND operator -(PointND Point)
         {
-            if (p1 == null)
+            if (Point == null)
             {
-                throw new ArgumentNullException(nameof(p1));
+                throw new ArgumentNullException(nameof(Point));
             }
 
-            PointND temp = new PointND(0, p1.Dimension);
+            PointND temp = new PointND(0, Point.Dimension);
 
-            for (int i = 0; i < p1.Dimension; i++)
+            for (int i = 0; i < Point.Dimension; i++)
             {
-                temp[i] = -p1[i];
+                temp[i] = -Point[i];
             }
 
             return temp;
         }
 
         /// <summary>
-        /// Multiplication by <paramref name="a"/>.
+        /// Multiplication by <paramref name="Value"/>.
         /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="a"></param>
+        /// <param name="Point"></param>
+        /// <param name="Value"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static PointND operator *(PointND p1, double a)
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/>  is null.</exception>
+        public static PointND operator *(PointND Point, double Value)
         {
-            if (p1 == null)
+            if (Point == null)
             {
-                throw new ArgumentNullException(nameof(p1));
+                throw new ArgumentNullException(nameof(Point));
             }
 
-            PointND temp = new PointND(0, p1.Dimension);
+            PointND temp = new PointND(0, Point.Dimension);
 
-            for (int i = 0; i < p1.Dimension; i++)
+            for (int i = 0; i < Point.Dimension; i++)
             {
-                temp[i] = p1[i] * a;
+                temp[i] = Point[i] * Value;
             }
 
             return temp;
         }
 
         /// <summary>
-        /// Multiplication by <paramref name="a"/>. 
+        /// Multiplication by <paramref name="Value"/>.
         /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="a"></param>
+        /// <param name="Point"></param>
+        /// <param name="Value"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static PointND operator *(double a, PointND p1)
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/>  is null.</exception>
+        public static PointND operator *(double Value, PointND Point)
         {
 
-            if (p1 == null)
+            if (Point == null)
             {
-                throw new ArgumentNullException(nameof(p1));
+                throw new ArgumentNullException(nameof(Point));
             }
 
-            PointND temp = new PointND(0, p1.Dimension);
+            PointND temp = new PointND(0, Point.Dimension);
 
-            for (int i = 0; i < p1.Dimension; i++)
+            for (int i = 0; i < Point.Dimension; i++)
             {
-                temp[i] = p1[i] * a;
+                temp[i] = Point[i] * Value;
             }
 
             return temp;
         }
-
-
-        /// <summary>
-        /// Euclidean distance between two points.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static double EuclidianDistance(PointND p1, PointND p2)
-        {
-            if (p1 == null)
-            {
-                throw new ArgumentNullException(nameof(p1));
-            }
-
-            if (p2 == null)
-            {
-                throw new ArgumentNullException(nameof(p2));
-            }
-
-            if (p1.Dimension != p2.Dimension)
-                throw new ArgumentException(NotEqualDimMessage);
-
-            double distance = 0;
-
-            for (int i = 0; i < p1.Dimension; i++)
-            {
-                distance += (p1[i] - p2[i]) * (p1[i] - p2[i]);
-            }
-
-            return Math.Sqrt(distance);
-        }
-
 
     } 
 }

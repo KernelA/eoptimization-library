@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Optimization
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Optimization
 {
     using System;
 
@@ -7,123 +9,74 @@
     /// Parameters for Fireworks method. <see cref="FWOptimizer"/>
     /// </summary>
     public class FWParams
-    {
-        private int np, nmax;
-
-        private double alpha, beta, amax, m;
-
-        private Func<PointND, PointND, double> distFunc;
-
+    { 
         /// <summary>
         /// Number of charges on each iteration.
         /// </summary>
-        public int NP
-        {
-            get
-            {
-                return this.np;
-            }
-        }
+        public int NP { get; private set; }
 
         /// <summary>
-        /// Parameter affecting the number of debris.
+        /// Parameter affecting  the number of debris.
         /// </summary>
-        public double M
-        {
-            get
-            {
-                return this.m;
-            }
-        }
+        public double M { get; private set; }
 
         /// <summary>
-        /// Max iteration.
+        /// The number of iteration.
         /// </summary>
-        public int Imax
-        {
-            get
-            {
-                return this.nmax;
-            }
-        }
+        public int Imax { get; private set; }
 
         /// <summary>
-        /// Parameter, which restricts the number of debris  from below.
+        /// Parameter restricts the number of debris from below.
         /// </summary>
-        public double Alpha
-        {
-            get
-            {
-                return this.alpha;
-            }
-        }
+        public double Alpha { get; private set; }
 
         /// <summary>
-        /// Parameter, which restricts the number of debris  from above.
+        /// Parameter restricts the number of debris from below.
         /// </summary>
-        public double Beta
-        {
-
-            get
-            {
-                return this.beta;
-            }
-        }
+        public double Beta { get; private set; }
 
         /// <summary>
-        /// Maximum amplitude of explosion.
+        /// The maximum amplitude of explosion.
         /// </summary>
-        public double Amax
-        {
-            get
-            {
-                return this.amax;
-            }
-        }
+        public double Amax { get; private set; }
 
         /// <summary>
-        /// Function for measurement distance between points.
+        /// Distance between points.
         /// </summary>
-        public Func<PointND, PointND, double> DistanceFunction
-        {
-            get
-            {
-                return distFunc;
-            }
-        }
+        public Func<PointND, PointND, double> DistanceFunction { get; private set; }
 
         /// <summary>
-        /// Parameters for Fireworks method.
+        /// Parameters for Fireworks method. <seealso cref="FWOptimizer"/>.
         /// </summary>
         /// <param name="NP">Number of charges on each iteration. <paramref name="NP"/> > 0.</param>
-        /// <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
-        /// <param name="distanceFunction">Function for measurement distance between points.</param>
-        /// <param name="m">Number of debris for each charge. <paramref name="m"/> > 0.</param>
-        /// <param name="alpha">Parameter, which restricts the number of debris  from below. <paramref name="alpha"/> in (0;1),  <paramref name="alpha"/> &lt; <paramref name="beta"/>.</param>
-        /// <param name="beta">Parameter, which restricts the number of debris  from above. <paramref name="beta"/> in (0;1), <paramref name="beta"/> &gt; <paramref name="alpha"/>.</param>
+        /// <param name="Imax">The number of iteration. <paramref name="Imax"/> > 0.</param>
+        /// <param name="DistanceFunction">Distance between points.</param>
+        /// <param name="M">Number of debris for each charge. <paramref name="M"/> > 0.</param>
+        /// <param name="Alpha">Parameter restricts the number of debris  from below. <paramref name="Alpha"/> in (0;1),  <paramref name="Alpha"/> &lt; <paramref name="Beta"/>.</param>
+        /// <param name="Beta">Parameter restricts the number of debris  from above. <paramref name="Beta"/> in (0;1), <paramref name="Beta"/> &gt; <paramref name="Alpha"/>.</param>
         /// <param name="Amax">Maximum amplitude of explosion. <paramref name="Amax"/> > 0.</param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public FWParams(int NP, int Imax, Func<PointND, PointND, double> distanceFunction, double m, double alpha = 0.1, double beta = 0.9, double Amax = 40)
+        /// <exception cref="ArgumentException">If conditions for parameters do not performed.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="DistanceFunction"/> is null.</exception>
+        public FWParams(int NP, int Imax, Func<PointND, PointND, double> DistanceFunction, double M, double Alpha = 0.1, double Beta = 0.9, double Amax = 40)
         {
             if (NP < 1 || Imax < 1)
-                throw new ArgumentException($"{nameof(Imax)}, {nameof(Imax)} must be > 0.");
-            if (m <= 0)
-                throw new ArgumentException($"{nameof(m)} must be > 0.");
-            if (alpha <= 0 || beta >= 1 || alpha >= beta)
-                throw new ArgumentException($"{nameof(alpha)} and {nameof(beta)} must be in (0;1), {nameof(alpha)} < {nameof(beta)}.");
+                throw new ArgumentException($"{nameof(Imax)} must be > 0.", nameof(Imax));
+            if (M <= 0)
+                throw new ArgumentException($"{nameof(M)} must be > 0.", nameof(M));
+            if (Alpha <= 0 || Beta >= 1 || Alpha >= Beta)
+                throw new ArgumentException($"{nameof(Alpha)} ({Alpha}) and {nameof(Beta)} ({Beta}) must be in (0;1), {nameof(Alpha)} ({Alpha}) < {nameof(Beta)}({Beta}).");
             if (Amax <= 0)
                 throw new ArgumentException($"{nameof(Amax)} must be > 0.", nameof(Amax));
-            if (distanceFunction == null)
-                throw new ArgumentNullException(nameof(distanceFunction));
+            if (DistanceFunction == null)
+                throw new ArgumentNullException(nameof(DistanceFunction));
 
-            this.np = NP;
-            this.nmax = Imax;
-            this.m = m;
-            this.amax = Amax;
-            this.alpha = alpha;
-            this.beta = beta;
-            distFunc = distanceFunction;
+            this.NP = NP;
+            this.Imax = Imax;
+            this.M = M;
+            this.Amax = Amax;
+            this.Alpha = Alpha;
+            this.Beta = Beta;
+            this.DistanceFunction = DistanceFunction;
         }
     }
 

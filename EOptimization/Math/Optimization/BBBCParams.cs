@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Optimization
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Optimization
 {
     using System;
 
@@ -21,41 +23,40 @@
 
 
         /// <summary>
-        /// Beta - parameter that determines the effect of  "center of mass" and best current solution.
+        /// Beta - the parameter that determines the effect of the "center of mass" and the best current solution.
         /// </summary>
         public double Beta { get; private set; }
 
 
         /// <summary>
-        /// Max iteration.
+        /// The number of iteration.
         /// </summary>
         public int Imax { get; private set; }
-
 
 
         /// <summary>
         /// Parameters for BBBC method.
         /// </summary>
         /// <param name="NP">Number of points for searching on each iteration. <paramref name="NP"/> > 0.</param>
-        /// <param name="Imax">Max iteration. <paramref name="Imax"/> > 0.</param>
-        /// <param name="alpha">Restricts the search area for each points. <paramref name="alpha"/> > 0.</param>
-        /// <param name="beta">Parameter that determines the effect of  "center of mass" and best current solution. <paramref name="beta"/> in [0;1]</param>
-        /// <exception cref="ArgumentException"></exception>
-        public BBBCParams(int NP, int Imax, double alpha, double beta)
+        /// <param name="Imax">The number of iteration. <paramref name="Imax"/> > 0.</param>
+        /// <param name="Alpha">Restricts the search area for each points. <paramref name="Alpha"/> > 0.</param>
+        /// <param name="Beta">Parameter that determines the effect of the "center of mass" and the best current solution. <paramref name="Beta"/> in [0;1]</param>
+        /// <exception cref="ArgumentException">If conditions for parameters do not performed.</exception>
+        public BBBCParams(int NP, int Imax, double Alpha, double Beta)
         {
             if (NP < 1)
-                throw new ArgumentException(nameof(NP) + " must be > 0.", nameof(NP));
+                throw new ArgumentException($"{nameof(NP)} must be > 0.", nameof(NP));
             if (Imax < 1)
-                throw new ArgumentException(nameof(Imax) + " must be > 0.", nameof(Imax));
-            if (alpha < 0)
-                throw new ArgumentException(nameof(alpha) + "must be > 0", nameof(alpha));
-            if (beta < 0 || beta > 1)
-                throw new ArgumentException(nameof(beta) + " in [0; 1]", nameof(beta));
+                throw new ArgumentException($"{nameof(Imax)} must be > 0.", nameof(Imax));
+            if (Alpha < 0)
+                throw new ArgumentException($"{nameof(Alpha)} must be > 0.", nameof(Alpha));
+            if (Beta < 0 || Beta > 1)
+                throw new ArgumentException($"{nameof(Beta)} must be in [0; 1].", nameof(Beta));
 
             this.NP = NP;
             this.Imax = Imax;
-            this.Alpha = alpha;
-            this.Beta = beta;
+            this.Alpha = Alpha;
+            this.Beta = Beta;
         }
     }
 }

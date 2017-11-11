@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Optimization
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Optimization
 {
     using System;
     using System.Threading;
@@ -40,17 +42,17 @@
         void Minimize(GeneralParams parametrs, CancellationToken cancelToken);
 
         /// <summary>
-        /// Finding solution of the constrained optimization problem. If you want see progress, then you need set <paramref name="reporter"/>.
+        /// Finding solution of the constrained optimization problem. If you want to see progress, then you need to set <paramref name="reporter"/>.
         /// </summary>
         /// <param name="parametrs">General parameters <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress&lt;Progress&gt; <see cref="Progress"/>.</param>
+        /// <param name="reporter">An object which implements interface <see cref="IProgress{T}"/>.</param>
         void Minimize(GeneralParams parametrs, IProgress<Progress> reporter);
 
         /// <summary>
-        /// Finding solution of the constrained optimization problem. If you want see progress, then you need set <paramref name="reporter"/>.
+        /// Finding solution of the constrained optimization problem. If you want to see progress, then you need to set <paramref name="reporter"/>.
         /// </summary>
         /// <param name="parametrs">General parameters <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress&lt;Progress&gt; <see cref="Progress"/>.</param>
+        /// <param name="reporter">An object which implements interface <see cref="IProgress{T}"/>.</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/></param>
         void Minimize(GeneralParams parametrs, IProgress<Progress> reporter, CancellationToken cancelToken);
     }

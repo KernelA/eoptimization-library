@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Random
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Random
 {
     using System;
 
@@ -10,7 +12,7 @@
 
         private double mean, stdDev, uniformRand1, uniformRand2, r, cachedValue;
 
-        private bool cachedValueQ;
+        private bool isCachedValue;
 
         private Random rand;
 
@@ -50,7 +52,7 @@
 
 
         /// <summary>
-        /// Create normal distribution with mean  equal 0 and standard deviation equal 1.
+        /// Create normal distribution with mean is equal 0 and standard deviation is equal 1.
         /// </summary>
         public NormalDistribution() : this(0, 1)
         {
@@ -58,7 +60,7 @@
         }
 
         /// <summary>
-        /// Create normal distribution with mean  equal <paramref name="Mean"/> and standard deviation equal <paramref name="StdDev"/>.
+        /// Create normal distribution with mean is equal <paramref name="Mean"/> and standard deviation is equal <paramref name="StdDev"/>.
         /// </summary>
         /// <param name="Mean">Mean value.</param>
         /// <param name="StdDev">Standard deviation.</param>
@@ -71,29 +73,29 @@
             cachedValue = 0;
             r = 0;
             uniformRand2 = 0;
-            cachedValueQ = false;
+            isCachedValue = false;
             this.Mean = Mean;
             this.StdDev = StdDev;
 
         }
 
         /// <summary>
-        /// Random value from normal distribution with mean equal <paramref name="Mean"/> and standard deviation equal <paramref name="StdDev"/>.
+        /// Random value from normal distribution with mean is equal <paramref name="Mean"/> and standard deviation is equal <paramref name="StdDev"/>.
         /// </summary>
         /// <remarks>Using Marsaglia polar method.</remarks>
         /// <param name="Mean">Mean.</param>
         /// <param name="StdDev">Standard deviation.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">If <paramref name="StdDev"/> &lt;=0</exception>
         public double NRandVal(double Mean, double StdDev)
         {
             if (StdDev <= 0)
                 throw new ArgumentException($"{nameof(StdDev)} must be > 0.", nameof(StdDev));
 
-            if(cachedValueQ)
+            if(isCachedValue)
             {
                 uniformRand1 = cachedValue;
-                cachedValueQ = false;
+                isCachedValue = false;
             }
             else
             {
@@ -105,7 +107,7 @@
                 }
                 while (r >= 1.0 || r == 0);
 
-                cachedValueQ = true;
+                isCachedValue = true;
 
                 cachedValue = uniformRand2;
 

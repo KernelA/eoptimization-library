@@ -43,7 +43,7 @@
 
             PointND b = new PointND(21, 4);
 
-            PointND c = a.Clone();
+            PointND c = a.DeepCopy();
 
             Assert.True(a.Equals(c) && !a.Equals(b));
         }
@@ -56,7 +56,7 @@
 
             p1 = new PointND(1, 2);
 
-            p2 = p1.Clone();
+            p2 = p1.DeepCopy();
 
             Assert.True(p1.Equals(p2));
         }

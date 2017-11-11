@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.LA
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.LA
 {
     using System;
     using System.Collections.Generic;
@@ -33,10 +35,10 @@
         public int ColumnCount => size;
 
         /// <summary>
-        /// Create symmetric matrix. Row and column count equal  <paramref name="Size"/>. Elements of matrix are equal default value 0.
+        /// Create a symmetric matrix. Row and column count are equal <paramref name="Size"/>. Elements of matrix are equal default value 0.
         /// </summary>
         /// <param name="Size">Row and column count.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">If <paramref name="Size"/> &lt;  1.</exception>
         public SymmetricMatrix(int Size) : this(Size, 0)
         {
         }
@@ -45,8 +47,8 @@
         /// Create symmetric matrix. Row and column count equal  <paramref name="Size"/>. Elements of matrix are equal <paramref name="DefaultValue"/>.
         /// </summary>
         /// <param name="Size">Row and column count.</param>
-        /// <param name="DefaultValue">Default value for elements of matrix.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="DefaultValue">A default value for elements of matrix.</param>
+        /// <exception cref="ArgumentException">If <paramref name="Size"/> &lt;  1.</exception>
         public SymmetricMatrix(int Size, double DefaultValue)
         {
             if (Size < 1)
@@ -66,8 +68,8 @@
         /// Create symmetric matrix from array <paramref name="Elements"/>.
         /// </summary>
         /// <param name="Elements"></param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException">If <paramref name="Elements"/> is not squared matrix or symmetric matrix.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="Elements"/> is null.</exception>
         public SymmetricMatrix(double[,] Elements)
         {
 
@@ -103,24 +105,26 @@
         }
 
         /// <summary>
-        /// Get or set value of element of matrix.
+        /// Get or set value of element of the matrix.
         /// </summary>
         /// <param name="RowIndex"></param>
         /// <param name="ColumnIndex"></param>
         /// <returns></returns>
         public double this[int RowIndex, int ColumnIndex]
         {
-            // We storing only part matrix. 
-            // Matrix. (* - it is element of matrix).
-            //     0 1 2 ... n - 1
-            // 0   *
-            // 1   * *
-            // 2   * * *
-            //     ...
-            // n-1 * * * *  *
+            // Stored only a part of the matrix.
+            // Matrix: (* - it is element of the matrix).
+            //           0 1 2 ... n - 1 (column index)
+            //       0   *
+            //       1   * *
+            //       2   * * *
+            //           ...
+            //       n-1 * * * *  *
+            //(row index) 
+
             get
             {
-                // If element above main diagonal then return equal symmetric element. 
+                // If the element is above main diagonal then returned equal symmetric element. 
                 if (RowIndex < ColumnIndex)
                     return elements[GetIndexInArray(ColumnIndex, RowIndex)];
                 else
@@ -136,22 +140,21 @@
         }
 
         /// <summary>
-        /// Transformation two - dimensional index to one - dimensional for determine position element in array.
-        /// Matrix. (* - it is element of matrix).
+        /// Transformation two-dimension index to one-dimension for determine position element in the array.
+        /// Matrix. (* - it is element of the matrix).
         ///   0 1 2 3
         /// 0 *
         /// 1 * *
         /// 2 * * *
         /// 3 * * * *
-        /// linearizion to 
+        /// Linearization: 
         /// [*]  [* *] [* * *] [* * * *] 
-        /// (0, 0) transform to  0
-        /// (1, 0) transform to  1
-        /// (1, 1) transform to  2
-        /// (2, 2) transform to  5
-        /// (i, j) transform to i * (i + 1) / 2 + j;
-        /// Formula works for i >= j.
-        /// We have mapped index element of matrix and index in array.
+        /// (0, 0) transform to  0;
+        /// (1, 0) transform to  1;
+        /// (1, 1) transform to  2;
+        /// (2, 2) transform to  5;
+        /// (i, j) transform to i * (i + 1) / 2 + j.
+        /// The formula works for i >= j.
         /// </summary>
         /// <param name="RowIndex"></param>
         /// <param name="ColumnIndex"></param>
@@ -162,7 +165,7 @@
         }
 
        /// <summary>
-       /// Copy matrix to two - dimensional array.
+       /// Copy matrix into two-dimensional array.
        /// </summary>
        /// <returns></returns>
         public double[,] ToArray()

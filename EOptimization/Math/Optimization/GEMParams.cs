@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Optimization
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Optimization
 {
     using System;
 
@@ -18,7 +20,7 @@
         public int NShrapnel { get; private set; }
 
         /// <summary>
-        /// Max iteration.
+        /// The number of iteration. 
         /// </summary>
         public int Imax { get; private set; }
 
@@ -63,9 +65,9 @@
         /// </summary>
         /// <param name="NGrenade">Number of grenades on each iteration. <paramref name="NGrenade"/> >= 1.</param>
         /// <param name="NShrapnel">Number of shrapnel for each grenade. <paramref name="NShrapnel"/> >= 1.</param>
-        /// <param name="IMax">Max iteration. <paramref name="NGrenade"/> >= 1.</param>
+        /// <param name="IMax">The number of iteration. <paramref name="IMax"/> >= 1.</param>
         /// <param name="InitRadiusGrenade">The initial radius of the grenade territory.
-        /// Maximum value is equal  2 * sqrt(n), where n - dimension space. 
+        /// Maximum value is equal  2 * sqrt(n), where n-dimension space. 
         /// <paramref name="InitRadiusGrenade"/> > 0.
         /// </param>
         /// <param name="RadiusReduct">The coefficient of radius reduction. <paramref name="RadiusReduct"/> > 1.</param>
@@ -80,7 +82,7 @@
         /// </param>
         /// <param name="DesiredMinimum">The number of desired minimums. <paramref name="DesiredMinimum"/> >= 1.</param>
         /// <param name="Psin">The exponent for determine weight optimal search direction m_osd. <paramref name="Psin"/> > 0.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">If conditions for parameters do not performed.</exception>
         public GEMParams(int NGrenade, int NShrapnel, int IMax, double InitRadiusGrenade,
             double RadiusReduct = 100, double ProbabilityCollision = 0.8, double Psin = 5, double Mmin = 0.1, double Mmax = 0.9, int DesiredMinimum = 1)
         {
@@ -96,7 +98,7 @@
             if (RadiusReduct < 1)
                 throw new ArgumentException($"{nameof(RadiusReduct)} must be > 1.", nameof(RadiusReduct));
 
-            if (Math.Abs(ProbabilityCollision) < 1E-6 || ProbabilityCollision < 0)
+            if (Math.Abs(ProbabilityCollision) < 1E-8 || ProbabilityCollision < 0)
                 throw new ArgumentException($"{nameof(ProbabilityCollision)} too small or less than 0.", nameof(ProbabilityCollision));
 
             if (Math.Abs(ProbabilityCollision - 1) < 1E-10 || ProbabilityCollision > 1)
@@ -106,7 +108,7 @@
                 throw new ArgumentException($"{nameof(Mmax)} must be in (0;1] and {nameof(Mmax)} > {nameof(Mmin)}.", nameof(Mmax));
 
             if (Mmin < 0 || Mmin > 1)
-                throw new ArgumentException($"{nameof(Mmin)}  must be in [0;1)", nameof(Mmin));
+                throw new ArgumentException($"{nameof(Mmin)} must be in [0;1)", nameof(Mmin));
 
 
             this.DesiredMin = DesiredMinimum;

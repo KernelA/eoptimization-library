@@ -11,7 +11,7 @@
         {
             ContUniformDistribution dist = new ContUniformDistribution();
 
-            Assert.True(dist.LeftBound == 0 && dist.RightBound == 1);
+            Assert.True(dist.LowBound == 0 && dist.UpperBound == 1);
         }
 
         [Fact]
