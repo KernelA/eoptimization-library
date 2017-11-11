@@ -1,4 +1,6 @@
-﻿namespace EOpt.Math.Random
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Random
 {
     using System;
 
@@ -8,43 +10,44 @@
     public class ContUniformDistribution : IContUniformGenerator
     {
 
-        private double a, b;
+        private double lowBound, upperBound;
 
         private Random rand;
 
         /// <summary>
         /// The left boundary of the distribution range.
         /// </summary>
-        public double LeftBound
+        /// <exception cref="ArgumentException">If value > UpperBound.</exception>
+        public double LowBound
         {
             get
             {
-                return a;
+                return lowBound;
             }
             set
             {
-                if (value > b)
-                    throw new ArgumentException($"{LeftBound} must be less than right boundary.", nameof(LeftBound));
+                if (value > upperBound)
+                    throw new ArgumentException($"The {LowBound} must be less than the upper boundary ({UpperBound}).", nameof(LowBound));
 
-                a = value;
+                lowBound = value;
             }
         }
 
         /// <summary>
         /// The right boundary of the distribution range.
         /// </summary>
-        public double RightBound
+        public double UpperBound
         {
             get
             {
-                return b;
+                return upperBound;
             }
             set
             {
-                if (value < a)
-                    throw new ArgumentException($"{RightBound} must be greater than left boundary.", nameof(RightBound));
+                if (value < lowBound)
+                    throw new ArgumentException($"The {UpperBound} must be greater than lower boundary ({LowBound}).", nameof(UpperBound));
 
-                b = value;
+                upperBound = value;
             }
         }
 
@@ -52,41 +55,40 @@
         /// <summary>
         /// Create continuous uniform distribution on [0; 1].
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
         public ContUniformDistribution() : this(0, 1)
         {
         }
 
         /// <summary>
-        /// Create continuous uniform distribution on [<paramref name="LeftBound"/>; <paramref name="RightBound"/>].
+        /// Create continuous uniform distribution on [<paramref name="LowBound"/>; <paramref name="UpperBound"/>].
         /// </summary>
-        /// <param name="LeftBound">The left boundary of the distribution range.</param>
-        /// <param name="RightBound">The right boundary of the distribution range.</param>
-        /// <exception cref="ArgumentException"></exception>
-        public ContUniformDistribution(double LeftBound, double RightBound)
+        /// <param name="LowBound">The lower boundary of the distribution range.</param>
+        /// <param name="UpperBound">The upper boundary of the distribution range.</param>
+        /// <exception cref="ArgumentException">If <paramref name="LowBound"/> >= <paramref name="UpperBound"/>.</exception>
+        public ContUniformDistribution(double LowBound, double UpperBound)
         {
-            if (LeftBound > RightBound)
-                throw new ArgumentException($"{RightBound} must be greater than {LeftBound}.");
+            if (LowBound >= UpperBound)
+                throw new ArgumentException($"{UpperBound} must be greater than {LowBound}.");
 
-            this.LeftBound = LeftBound;
-            this.RightBound = RightBound;
+            this.LowBound = LowBound;
+            this.UpperBound = UpperBound;
 
             rand = SyncRandom.Get();
         }
 
 
         /// <summary>
-        /// Random value from continuous uniform distribution on [<paramref name="LeftBound"/>; <paramref name="RightBound"/>].
+        /// Random value from continuous uniform distribution on [<paramref name="LowBound"/>; <paramref name="UpperBound"/>].
         /// </summary>
-        /// <param name="LeftBound">The left boundary of the distribution range.</param>
-        /// <param name="RightBound">The right boundary of the distribution range.</param>
-        /// <returns></returns>
-        public double URandVal(double LeftBound, double RightBound)
+        /// <param name="LowBound">The lower boundary of the distribution range.</param>
+        /// <param name="UpperBound">The upper boundary of the distribution range.</param>
+        /// <exception cref="ArgumentException">If <paramref name="LowBound"/> >= <paramref name="UpperBound"/>.</exception>
+        public double URandVal(double LowBound, double UpperBound)
         {
-            if (LeftBound > RightBound)
-                throw new ArgumentException($"{RightBound} must be greater than {LeftBound}.");
+            if (LowBound >= UpperBound)
+                throw new ArgumentException($"{UpperBound} must be greater than {LowBound}.");
 
-            return (RightBound - LeftBound) * rand.NextDouble() + LeftBound;
+            return (UpperBound - LowBound) * rand.NextDouble() + LowBound;
         }
     }
 }

@@ -10,7 +10,7 @@
 
     static class GeneralOptimizerTests
     {
-        public static readonly double[] LeftBound = { -10, 10 };
+        public static readonly double[] LeftBound = { -10, -10 };
 
         public static readonly double[] RightBound = { 10, 10 };
 

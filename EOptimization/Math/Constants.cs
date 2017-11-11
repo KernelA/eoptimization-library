@@ -14,6 +14,6 @@
         /// <summary>
         /// Number, which add for avoiding division by zero.
         /// </summary>
-        public const double Psi = 1E-8;
+        public const double ValueForAvoidDivByZero = 1E-8;
     }
 }

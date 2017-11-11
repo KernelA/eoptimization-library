@@ -1,17 +1,19 @@
-﻿namespace EOpt.Math.Random
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+namespace EOpt.Math.Random
 {
     using System;
 
     /// <summary>
-    ///  Interface for random generator normal distribution.
+    ///  Interface for a random generator of the normal distribution.
     /// </summary>
     public interface INormalGenerator
     {
         /// <summary>
-        /// Get random value which has normal distribution with mean equal <paramref name="Mean"/> and standart deviation equal <paramref name="StdDev"/>.
+        /// Get random value which has normal distribution with mean is equal <paramref name="Mean"/> and standard deviation is equal <paramref name="StdDev"/>.
         /// </summary>
-        /// <param name="Mean"></param>
-        /// <param name="StdDev"></param>
+        /// <param name="Mean">Mean value.</param>
+        /// <param name="StdDev">Standard deviation.</param>
         /// <returns></returns>
         double NRandVal(double Mean, double StdDev);
     }

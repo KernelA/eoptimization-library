@@ -1,3 +1,5 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Optimization
 {
     using System;
@@ -26,13 +28,15 @@ namespace EOpt.Math.Optimization
 
         private INormalGenerator normalRand;
 
-        private bool initParamsQ;
+        private bool isInitParams;
 
-        PointND xrnd, xcur, xosd, dosd, dgrs;
-
-        PointND solution;
+        PointND xrnd, xcur, xosd, dosd, dgrs, solution, tempPoint, drnd;
 
         private GEMParams parametrs;
+
+        // The temporary array has a 'Length' is equal 'dimension'.
+        // Used in the calculation the value of the target function.
+        private double[] tempArray;
 
 
         /// <summary>
@@ -49,28 +53,16 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Parameters for method. <see cref="GEMParams"/>.
         /// </summary>
-        public GEMParams Parameters
-        {
-            get
-            {
-                return parametrs;
-            }
-        }
+        public GEMParams Parameters => parametrs;
 
 
         /// <summary>
         /// The solution of the constrained optimization problem.
         /// </summary>
-        public PointND Solution
-        {
-            get
-            {
-                return solution;
-            }
-        }
+        public PointND Solution => solution;
 
         /// <summary>
-        /// Create object which use default implementation for random generators.
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         public GEMOptimizer() : this(new ContUniformDistribution(), new NormalDistribution())
         {
@@ -78,126 +70,172 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Create object which use custom implementation for random generators.
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
-        /// <param name="uniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface, 
-        /// for generating uniform random value.</param>
-        /// <param name="normalGen">Object, which implements <see cref="INormalGenerator"/> interface, 
-        /// for generating uniform random value.</param>
-        public GEMOptimizer(IContUniformGenerator uniformGen, INormalGenerator normalGen)
+        /// <param name="UniformGen">Object, which implements <see cref="IContUniformGenerator"/> interface.</param>
+        /// <param name="NormalGen">Object, which implements <see cref="INormalGenerator"/> interface.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="NormalGen"/> or <paramref name="UniformGen"/> is null.</exception>
+        public GEMOptimizer(IContUniformGenerator UniformGen, INormalGenerator NormalGen)
         {
 
-            if (uniformGen == null)
+            if (UniformGen == null)
             {
-                throw new ArgumentNullException(nameof(uniformGen));
+                throw new ArgumentNullException(nameof(UniformGen));
             }
 
-            if (normalGen == null)
+            if (NormalGen == null)
             {
-                throw new ArgumentNullException(nameof(normalGen));
+                throw new ArgumentNullException(nameof(NormalGen));
             }
 
-            uniformRand = uniformGen;
+            uniformRand = UniformGen;
 
-            normalRand = normalGen;
+            normalRand = NormalGen;
 
-            xrnd = xosd = xcur = dosd = dgrs = null;
 
-            initParamsQ = false;
+            isInitParams = false;
         }
 
-
-
-
-        private double EuclideanDistance(PointND a, PointND b)
+        private double EuclideanDistance(PointND Point1, PointND Point2)
         {
             double sum = 0;
 
-            // Last coordinate of point for storing the value of target function in this point.
-            for (int i = 0; i < a.Dimension - 1; i++)
+            // Last coordinate of point is storing the value of the target function.
+            for (int i = 0; i < Point1.Dimension - 1; i++)
             {
-                sum += (b[i] - a[i]) * (b[i] - a[i]);
+                sum += (Point2[i] - Point1[i]) * (Point2[i] - Point1[i]);
             }
 
             return Math.Sqrt(sum);
         }
 
-
-        private double EuclideanNorm(PointND p)
+        private double EuclideanNorm(PointND Point)
         {
-            // Last coordinate of point for storing the value of target function in this point.
-            double sum = p.Coordinates.Take(dimension).Sum(a => a * a);
+            // Last coordinate of point is storing the value of the target function.
+            double sum = 0;
+
+            for(int  i= 0; i < Point.Dimension - 1; i++)
+            {
+                sum += Point[i] * Point[i];
+            }
 
             return Math.Sqrt(sum);
         }
-
 
         /// <summary>
         /// Create grenades.
         /// </summary>
         private void InitializePopulation()
         {
-            grenades = new List<PointND>(parametrs.NGrenade);
-
-            shrapnels = new List<PointND>[parametrs.NGrenade];
-
-
-            for (int i = 0; i < parametrs.NGrenade; i++)
+            if(grenades == null)
             {
-                this.shrapnels[i] = new List<PointND>(parametrs.NShrapnel);
+                grenades = new List<PointND>(parametrs.NGrenade);
             }
 
-            PointND temp = new PointND(0, dimension + 1);
+            if (shrapnels == null)
+                InitShrapnels();
+            else if (shrapnels.Length != parametrs.NGrenade)
+                InitShrapnels();
+            
+
+            if (tempArray == null)
+                tempArray = new double[dimension];
+            else if (tempArray.Length != dimension)
+                tempArray = new double[dimension];
+
+            if (tempPoint == null)
+                tempPoint = new PointND(0, dimension + 1);
+            else if (tempPoint.Dimension != dimension + 1)
+                tempPoint = new PointND(0, dimension + 1);
+
+            if (drnd == null)
+                drnd = new PointND(0, dimension + 1);
+            else if (drnd.Dimension != dimension + 1)
+            {
+                drnd = new PointND(0, dimension + 1);
+            }
+
+            if (dgrs == null)
+                dgrs = new PointND(0, dimension + 1);
+            else if (dgrs.Dimension != dimension + 1)
+            {
+                dgrs = new PointND(0, dimension + 1);
+            }
+
+            if (solution == null)
+                solution = new PointND(0, dimension + 1);
+            else if (solution.Dimension != dimension + 1)
+            {
+                solution = new PointND(0, dimension + 1);
+            }
 
             for (int i = 0; i < parametrs.NGrenade; i++)
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    temp[j] = uniformRand.URandVal(-1, 1);
+                    tempPoint[j] = uniformRand.URandVal(-1, 1);
                 }
 
-                grenades.Add(temp.Clone());
+                grenades.Add(tempPoint.DeepCopy());
             }
         }
 
-        /// <summary>
-        /// Coordinates transformation  [-1; 1] -> [a[i]; b[i]].
-        /// </summary>
-        /// <param name="x">Input coordinates.</param>
-        /// <param name="a">Array of left boundaries.</param>
-        /// <param name="b">Array of right boundaries.</param>
-        private void TransformCoord(double[] x, double[] a, double[] b)
+        private void InitShrapnels()
         {
-            for (int i = 0; i < a.Length; i++)
+            shrapnels = new List<PointND>[parametrs.NGrenade];
+
+            for (int i = 0; i < parametrs.NGrenade; i++)
             {
-                x[i] = (a[i] + b[i] + (b[i] - a[i]) * x[i]) / 2;
+                this.shrapnels[i] = new List<PointND>(parametrs.NShrapnel);
+            }
+        }
+
+        private void Clear()
+        {
+            grenades.Clear();
+
+            for (int i = 0; i < parametrs.NGrenade; i++)
+            {
+                this.shrapnels[i].Clear();
+            }
+        }
+
+        /// <summary>
+        /// Coordinates transformation: [-1; 1] -> [a[i]; b[i]].
+        /// </summary>
+        /// <param name="X">An input coordinates.</param>
+        /// <param name="LowerBound">An array of the lower boundaries.</param>
+        /// <param name="UpperBound">An array of the upper boundaries.</param>
+        private void TransformCoord(double[] X, double[] LowerBound, double[] UpperBound)
+        {
+            for (int i = 0; i < LowerBound.Length; i++)
+            {
+                X[i] = (LowerBound[i] + UpperBound[i] + (UpperBound[i] - LowerBound[i]) * X[i]) / 2;
             }
         }
 
 
         /// <summary>
-        /// Calculate target function for grenades.
+        /// Calculate target function for the grenades.
         /// </summary>
-        /// <param name="function"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        private void CalculateFunctionForGrenade(Func<double[], double> function, double[] a, double[] b)
+        /// <param name="Function"></param>
+        /// <param name="LowerBound"></param>
+        /// <param name="UpperBound"></param>
+        private void CalculateFunctionForGrenade(Func<double[], double> Function, double[] LowerBound, double[] UpperBound)
         {
-            double[] x = new double[dimension];
-
             double value = 0;
 
             for (int i = 0; i < parametrs.NGrenade; i++)
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    x[i] = grenades[i][j];
+                    tempArray[j] = grenades[i][j];
 
                 }
 
-                TransformCoord(x, a, b);
+                TransformCoord(tempArray, LowerBound, UpperBound);
 
-                value = function(x);
+                value = Function(tempArray);
 
                 try
                 {
@@ -205,25 +243,23 @@ namespace EOpt.Math.Optimization
                 }
                 catch (ArithmeticException exc)
                 {
-                    throw new InvalidValueFunctionException($"Function has an invalid value at point {x}." + $"\n{exc.Message}", new PointND(x),
+                    throw new InvalidValueFunctionException($"Function has an invalid value at point.\n{exc.Message}", new PointND(tempArray),
                        value);
                 }
 
-                grenades[i][dimension] = function(x);
+                grenades[i][dimension] = value;
             }
         }
 
         /// <summary>
-        /// Calculate target function for shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>.
+        /// Calculate target function for the shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>.
         /// </summary>
-        /// <param name="function"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
+        /// <param name="Function"></param>
+        /// <param name="LowerBound"></param>
+        /// <param name="UpperBound"></param>
         /// <param name="WhichGrenade"></param>
-        private void CalculateFunctionForShrapnel(Func<double[], double> function, double[] a, double[] b, int WhichGrenade)
+        private void CalculateFunctionForShrapnel(Func<double[], double> Function, double[] LowerBound, double[] UpperBound, int WhichGrenade)
         {
-            double[] x = new double[dimension];
-
             double value = 0;
 
             for (int i = 0; i < parametrs.NShrapnel; i++)
@@ -232,12 +268,12 @@ namespace EOpt.Math.Optimization
                 {
                     for (int j = 0; j < dimension; j++)
                     {
-                        x[j] = shrapnels[WhichGrenade][i][j];
+                        tempArray[j] = shrapnels[WhichGrenade][i][j];
                     }
 
-                    TransformCoord(x, a, b);
+                    TransformCoord(tempArray, LowerBound, UpperBound);
 
-                    value = function(x);
+                    value = Function(tempArray);
 
                     try
                     {
@@ -245,7 +281,7 @@ namespace EOpt.Math.Optimization
                     }
                     catch (ArithmeticException exc)
                     {
-                        throw new InvalidValueFunctionException($"Function has an invalid value at point {x}." + $"\n{exc.Message}", new PointND(x),
+                        throw new InvalidValueFunctionException($"Function has an invalid value at point.\n{exc.Message}", new PointND(tempArray),
                        value);
                     }
 
@@ -257,44 +293,45 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Searching OSD and Xosd position.
         /// </summary>
-        /// <param name="function"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
+        /// <param name="Function"></param>
+        /// <param name="LowerBound"></param>
+        /// <param name="UpperBound"></param>
         /// <param name="WhichGrenade"></param>
-        /// <param name="NumberIter"></param>
-        private void FindOSD(Func<double[], double> function, double[] a, double[] b, int WhichGrenade, int NumberIter)
+        /// <param name="NumIter"></param>
+        private void FindOSD(Func<double[], double> Function, double[] LowerBound, double[] UpperBound, int WhichGrenade, int NumIter)
         {
-            PointND temp = new PointND(0, dimension + 1);
+            List<PointND> ortogonalArray = new List<PointND>(2 * dimension);
 
             // Generate 2 * n shrapnels along coordinate axis.
             // 1 in positive direction.
             // 1 in negative direction.
-            List<PointND> ortogonalArray = new List<PointND>(2 * dimension);
-
-            bool addToArray = true;
+            bool isAddToArray = true;
 
             for (int i = 0; i < ortogonalArray.Capacity; i++)
             {
-                addToArray = true;
+                isAddToArray = true;
 
-                temp = grenades[WhichGrenade].Clone();
+                tempPoint.SetAt(grenades[WhichGrenade]);
 
-                // Positive direction along coordinate axis.
+                // The positive direction along the coordinate axis.
                 if (i % 2 == 0)
                 {
-                    temp[i / 2] = uniformRand.URandVal(grenades[WhichGrenade][i / 2], 1);
+                    tempPoint[i / 2] = uniformRand.URandVal(grenades[WhichGrenade][i / 2], 1);
                 }
-                // Negative direction along coordinate axis.
+                // The negative direction along the coordinate axis.
                 else
                 {
-                    temp[i / 2] = uniformRand.URandVal(-1, grenades[WhichGrenade][i / 2]);
+                    tempPoint[i / 2] = uniformRand.URandVal(-1, grenades[WhichGrenade][i / 2]);
                 }
 
-                double[] x = temp.Coordinates.Take(dimension).ToArray();
+                for(int j = 0; j < dimension; j++)
+                {
+                    tempArray[j] = tempPoint[j];
+                }
 
-                TransformCoord(x, a, b);
+                TransformCoord(tempArray, LowerBound, UpperBound);
 
-                temp[dimension] = function(x);
+                tempPoint[dimension] = Function(tempArray);
 
                 // If shrapnel and grenade too near, then shrapnel deleted.
                 for (int j = 0; j < parametrs.NGrenade; j++)
@@ -302,15 +339,15 @@ namespace EOpt.Math.Optimization
                     if (j == WhichGrenade)
                         continue;
 
-                    if (EuclideanDistance(temp, grenades[WhichGrenade]) <= radiusGrenade)
+                    if (EuclideanDistance(tempPoint, grenades[WhichGrenade]) <= radiusGrenade)
                     {
-                        addToArray = false;
+                        isAddToArray = false;
                         break;
                     }
                 }
 
-                if (addToArray)
-                    ortogonalArray.Add(temp.Clone());
+                if (isAddToArray)
+                    ortogonalArray.Add(tempPoint.DeepCopy());
             }
 
             double min = 0; 
@@ -330,7 +367,7 @@ namespace EOpt.Math.Optimization
             // Determine position Xcur.
             xcur = grenades[WhichGrenade];
 
-            // If grenade do not in a neighborhood of other grenades, then xcur = null.
+            // If grenade do not in a neighborhood of the other grenades, then xcur = null.
             for (int j = 0; j < parametrs.NGrenade; j++)
             {
                 if (j == WhichGrenade)
@@ -350,40 +387,36 @@ namespace EOpt.Math.Optimization
             // Normalization vector.
             if (dosd != null)
             {
-                dosd *= (1 / EuclideanNorm(dosd));
+                dosd.MultiplyByInplace(1 / EuclideanNorm(dosd));
             }
         }
 
         /// <summary>
         /// Determine shrapnels position.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="function"></param>
+        /// <param name="LowerBound"></param>
+        /// <param name="UpperBound"></param>
+        /// <param name="Function"></param>
         /// <param name="WhichGrenade"></param>
-        /// <param name="NumberIter"></param>
-        private void GenerateShrapneles(Func<double[], double> function, double[] a, double[] b, int WhichGrenade, int NumberIter)
+        /// <param name="NumIter"></param>
+        private void GenerateShrapneles(Func<double[], double> Function, double[] LowerBound, double[] UpperBound, int WhichGrenade, int NumIter)
         {
 
             double p = Math.Max(1.0 / dimension,
                  Math.Log10(radiusGrenade / radiusExplosion) / Math.Log10(parametrs.Pts));
 
-            PointND temp = new PointND(0, dimension + 1);
-
-            PointND drnd = new PointND(0, dimension + 1);
-
             // Determine OSD and Xosd.
-            if (NumberIter <= 0.1 * parametrs.Imax && WhichGrenade < parametrs.DesiredMin)
+            if (NumIter <= 0.1 * parametrs.Imax && WhichGrenade < parametrs.DesiredMin)
             {
-                FindOSD(function, a, b, WhichGrenade, NumberIter);
+                FindOSD(Function, LowerBound, UpperBound, WhichGrenade, NumIter);
             }
 
-            double r1, r2;
+            double randomValue1, randomValue2;
 
             // Generating shrapnels.
             for (int i = 0; i < parametrs.NShrapnel; i++)
             {
-                r1 = uniformRand.URandVal(0, 1);
+                randomValue1 = uniformRand.URandVal(0, 1);
 
                 // Random search direction.
                 for (int w = 0; w < drnd.Dimension; w++)
@@ -391,25 +424,40 @@ namespace EOpt.Math.Optimization
                     drnd[w] = normalRand.NRandVal(0, 1);
                 }
 
-                drnd *= (1 / EuclideanNorm(drnd));
+                drnd.MultiplyByInplace(1 / EuclideanNorm(drnd));
 
                 // If exist OSD.
                 if (dosd != null)
                 {
-                    r2 = uniformRand.URandVal(0, 1);
-                    dgrs = mosd * r1 * dosd + (1 - mosd) * r2 * drnd;
-                    dgrs *= (1 / EuclideanNorm(dgrs));
-                    r1 = Math.Pow(r1, p) * this.radiusExplosion;
-                    temp = grenades[WhichGrenade] + r1 * dgrs;
+                    randomValue2 = uniformRand.URandVal(0, 1);
+
+                    for(int coordIndex= 0; coordIndex < dgrs.Dimension; coordIndex++)
+                    {
+                        dgrs[coordIndex] = mosd * randomValue1 * dosd[coordIndex] + (1 - mosd) * randomValue2 * drnd[coordIndex];
+                    }
+                    
+                    dgrs.MultiplyByInplace(1 / EuclideanNorm(dgrs));
+
+                    randomValue1 = Math.Pow(randomValue1, p) * this.radiusExplosion;
+
+                    for (int coordIndex = 0; coordIndex < dgrs.Dimension; coordIndex++)
+                    {
+                        tempPoint[coordIndex] = grenades[WhichGrenade][coordIndex] + randomValue1 * dgrs[coordIndex];
+                    }
+
 
                 }
                 else
                 {
-                    r1 = Math.Pow(r1, p) * this.radiusExplosion;
-                    temp = grenades[WhichGrenade] + r1 * drnd;
+                    randomValue1 = Math.Pow(randomValue1, p) * this.radiusExplosion;
+
+                    for (int coordIndex = 0; coordIndex < dgrs.Dimension; coordIndex++)
+                    {
+                        tempPoint[coordIndex] = grenades[WhichGrenade][coordIndex] + randomValue1 * drnd[coordIndex];
+                    }
                 }
 
-                shrapnels[WhichGrenade].Add(temp);
+                shrapnels[WhichGrenade].Add(tempPoint.DeepCopy());
 
                 // Out of range [-1,1]^n.
                 for (int j = 0; j < dimension; j++)
@@ -420,9 +468,12 @@ namespace EOpt.Math.Optimization
 
                         double large_comp = shrapnels[WhichGrenade][i].Coordinates.Max(num => Math.Abs(num));
 
-                        temp = this.shrapnels[WhichGrenade][i] * (1 / large_comp);
+                        for (int coordIndex = 0; coordIndex < dgrs.Dimension; coordIndex++)
+                        {
+                            tempPoint[coordIndex] = this.shrapnels[WhichGrenade][i][coordIndex] * (1 / large_comp);
 
-                        this.shrapnels[WhichGrenade][i] = rand_num * (temp - this.grenades[WhichGrenade]) + this.grenades[WhichGrenade];
+                            this.shrapnels[WhichGrenade][i][coordIndex] = rand_num * (tempPoint[coordIndex] - this.grenades[WhichGrenade][coordIndex]) + this.grenades[WhichGrenade][coordIndex];
+                        }
 
                         break;
                     }
@@ -449,16 +500,16 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Update parameters.
         /// </summary>
-        /// <param name="iter">Current iteration.</param>
-        private void UpdateParams(int iter)
+        /// <param name="NumIter"></param>
+        private void UpdateParams(int NumIter)
         {
-            radiusGrenade = radiusInitial / Math.Pow(parametrs.RadiusReduct, (double)iter / parametrs.Imax);
+            radiusGrenade = radiusInitial / Math.Pow(parametrs.RadiusReduct, (double)NumIter / parametrs.Imax);
 
-            double m = this.parametrs.Mmax - (double)iter / parametrs.Imax * (this.parametrs.Mmax - this.parametrs.Mmin);
+            double m = this.parametrs.Mmax - (double)NumIter / parametrs.Imax * (this.parametrs.Mmax - this.parametrs.Mmin);
 
             radiusExplosion = Math.Pow(2 * Math.Sqrt(dimension), m) * Math.Pow(radiusGrenade, 1 - m);
 
-            mosd = Math.Sin(Math.PI / 2 * Math.Pow(Math.Abs((iter - 0.1 * parametrs.Imax)) / (0.9 * parametrs.Imax), this.parametrs.Psin));
+            mosd = Math.Sin(Math.PI / 2 * Math.Pow(Math.Abs(NumIter - 0.1 * parametrs.Imax) / (0.9 * parametrs.Imax), this.parametrs.Psin));
         }
 
         /// <summary>
@@ -506,8 +557,6 @@ namespace EOpt.Math.Optimization
 
             xrnd = index_best == -1 ? null : shrapnels[WhichGrenade][index_best];
 
-
-
             List<PointND> points = new List<PointND>(3);
 
             if (xcur != null)
@@ -540,7 +589,6 @@ namespace EOpt.Math.Optimization
             xrnd = null;
             xcur = null;
             dosd = null;
-            dgrs = null;
 
             this.shrapnels[WhichGrenade].Clear();
         }
@@ -549,34 +597,47 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Find best solution.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        private void FindBestSolution(double[] a, double[] b)
+        /// <param name="LowerBound"></param>
+        /// <param name="UpperBound"></param>
+        private void FindBestSolution(double[] LowerBound, double[] UpperBound)
         {
             double f_best = grenades.Min(point => point[dimension]);
 
             int index_best = grenades.FindIndex(point => point[dimension] == f_best);
 
-            double[] x = this.grenades[index_best].Coordinates.ToArray();
+            for(int i = 0; i < dimension; i++)
+            {
+                tempArray[i] = this.grenades[index_best][i];
+            }
 
-            TransformCoord(x, a, b);
+            TransformCoord(tempArray, LowerBound, UpperBound);
 
-            this.solution = new PointND(x);
+            for(int i = 0; i < dimension; i++)
+            {
+                solution[i] = tempArray[i];
+            }
+
+            solution[dimension] = f_best;
 
         }
 
-        private void FirstStep(GeneralParams genParams)
+        private void FirstStep(GeneralParams GenParams)
         {
-            if (!initParamsQ)
+
+            if (GenParams == null)
+            {
+                throw new ArgumentNullException(nameof(GenParams));
+            }
+            if (!isInitParams)
                 throw new InvalidOperationException($"Before you need invoke {nameof(InitializeParameters)}.");
 
-            dimension = genParams.LeftBound.Length;
+            dimension = GenParams.LowerBound.Length;
 
             this.radiusExplosion = 2 * Math.Sqrt(dimension);
 
             InitializePopulation();
 
-            CalculateFunctionForGrenade(genParams.ObjectiveFunction, genParams.LeftBound, genParams.RightBound);
+            CalculateFunctionForGrenade(GenParams.TargetFunction, GenParams.LowerBound, GenParams.UpperBound);
         }
 
 
@@ -586,22 +647,23 @@ namespace EOpt.Math.Optimization
 
             for (int j = 0; j < this.parametrs.NGrenade; j++)
             {
-                GenerateShrapneles(genParams.ObjectiveFunction, genParams.LeftBound, genParams.RightBound, j, iter);
+                GenerateShrapneles(genParams.TargetFunction, genParams.LowerBound, genParams.UpperBound, j, iter);
 
-                CalculateFunctionForShrapnel(genParams.ObjectiveFunction, genParams.LeftBound, genParams.RightBound, j);
+                CalculateFunctionForShrapnel(genParams.TargetFunction, genParams.LowerBound, genParams.UpperBound, j);
 
                 FindBestPosition(j);
             }
 
             UpdateParams(iter);
 
-            FindBestSolution(genParams.LeftBound, genParams.RightBound);
+            FindBestSolution(genParams.LowerBound, genParams.UpperBound);
         }
 
         /// <summary>
         /// <see cref="IOptimizer{T}.InitializeParameters(T)"/>
         /// </summary>
-        /// <param name="Parameters"></param>
+        /// <param name="Parameters">Parameters for method.<see cref="GEMParams"/>.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="Parameters"/> is null.</exception>
         public void InitializeParameters(GEMParams Parameters)
         {
 
@@ -616,107 +678,117 @@ namespace EOpt.Math.Optimization
 
             mosd = 0;
 
-            initParamsQ = true;
+            isInitParams = true;
         }
 
 
         /// <summary>
         /// <see cref="IOptimizer{T}.Minimize(GeneralParams)"/>
         /// </summary>
-        /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="GenParams">General parameters. <see cref="GeneralParams"/>.</param>
+        /// <exception cref="InvalidOperationException">If parameters do not set.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="GenParams"/> is null.</exception>
         /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
-        public void Minimize(GeneralParams genParams)
+        public void Minimize(GeneralParams GenParams)
         {
-            FirstStep(genParams);
+            FirstStep(GenParams);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                NextStep(genParams, i);
+                NextStep(GenParams, i);
             }
+            Clear();
         }
 
         /// <summary>
         /// <see cref="IOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/>
         /// </summary>
-        /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="cancelToken"><see cref="CancellationToken"/></param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="GenParams">General parameters. <see cref="GeneralParams"/>.</param>
+        /// <param name="CancelToken"><see cref="CancellationToken"/></param>
+        /// <exception cref="InvalidOperationException">If parameters do not set.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="GenParams"/> is null.</exception>
         /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
-        public void Minimize(GeneralParams genParams, CancellationToken cancelToken)
+        /// <exception cref="OperationCanceledException"></exception>
+        public void Minimize(GeneralParams GenParams, CancellationToken CancelToken)
         {
-            FirstStep(genParams);
+            FirstStep(GenParams);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                cancelToken.ThrowIfCancellationRequested();
-                NextStep(genParams, i);
+                CancelToken.ThrowIfCancellationRequested();
+                NextStep(GenParams, i);
             }
+            Clear();
         }
 
         /// <summary>
         /// <see cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
-        /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress{Progress}.
+        /// <param name="GenParams">General parameters. <see cref="GeneralParams"/>.</param>
+        /// <param name="Reporter">Object which implements interface IProgress{Progress}.
         /// <seealso cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException">If parameters do not set.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="GenParams"/> or <paramref name="Reporter"/> is null.</exception>
         /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
-        public void Minimize(GeneralParams genParams, IProgress<Progress> reporter)
+        public void Minimize(GeneralParams GenParams, IProgress<Progress> Reporter)
         {
-            if (reporter == null)
+            if (Reporter == null)
             {
-                throw new ArgumentNullException(nameof(reporter));
+                throw new ArgumentNullException(nameof(Reporter));
             }
 
-            FirstStep(genParams);
+            FirstStep(GenParams);
 
             Progress progress = new Progress(this, 1, this.parametrs.Imax, 1);
 
-            reporter.Report(progress);
+            Reporter.Report(progress);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                NextStep(genParams, i);
+                NextStep(GenParams, i);
                 progress.Current = i;
-                reporter.Report(progress);
+                Reporter.Report(progress);
             }
+
+            Clear();
         }
 
         /// <summary>
         /// <see cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
-        /// <param name="genParams">General parameters. <see cref="GeneralParams"/>.</param>
-        /// <param name="reporter">Object which implement interface IProgress{Progress}. 
+        /// <param name="GenParams">General parameters. <see cref="GeneralParams"/>.</param>
+        /// <param name="Reporter">Object which implements interface IProgress{Progress}. 
         /// <seealso cref="IOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
-        /// <param name="cancelToken"><see cref="CancellationToken"/></param>
+        /// <param name="CancelToken"><see cref="CancellationToken"/></param>
         /// </param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException">If parameters do not set.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="GenParams"/> or <paramref name="Reporter"/> is null.</exception>
         /// <exception cref="ArithmeticException">If the function has value is NaN, PositiveInfinity or NegativeInfinity.</exception>
-        public void Minimize(GeneralParams genParams, IProgress<Progress> reporter, CancellationToken cancelToken)
+        /// <exception cref="OperationCanceledException"></exception>
+        public void Minimize(GeneralParams GenParams, IProgress<Progress> Reporter, CancellationToken CancelToken)
         {
-            if (reporter == null)
+            if (Reporter == null)
             {
-                throw new ArgumentNullException(nameof(reporter));
+                throw new ArgumentNullException(nameof(Reporter));
             }
 
-            FirstStep(genParams);
+            FirstStep(GenParams);
 
             Progress progress = new Progress(this, 1, this.parametrs.Imax, 1);
 
-            reporter.Report(progress);
+            Reporter.Report(progress);
 
             for (int i = 1; i <= this.parametrs.Imax; i++)
             {
-                cancelToken.ThrowIfCancellationRequested();
+                CancelToken.ThrowIfCancellationRequested();
 
-                NextStep(genParams, i);
+                NextStep(GenParams, i);
                 progress.Current = i;
-                reporter.Report(progress);
+                Reporter.Report(progress);
             }
+
+            Clear();
         }
     }
 }
