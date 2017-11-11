@@ -1,7 +1,10 @@
 # EOptimization library 
 
 ## Summary
+
 The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion. Implementation for .Net Core. Supported version .NET Standard is 1.0.
+
+It does not require third-party dependencies.
 
 **Problem formulation**
 
@@ -23,7 +26,7 @@ The library for solving constrained optimization problems. Implemented three alg
 
 You can read about methods in the next articles.
 
-**References to atricle**
+**References to the articles**
 
 1. [Big bung - big crunch method.](http://www.sciencedirect.com/science/article/pii/S0965997805000827)
 2. [Fireworks method.](http://link.springer.com/chapter/10.1007/978-3-642-13495-1_44)
@@ -32,7 +35,3 @@ You can read about methods in the next articles.
 ## How to use?
 
 See [wiki.](https://github.com/KernelA/EOptimization-library/wiki)
-
-## License
-
-The library distributed under [MIT license](https://mit-license.org/).
