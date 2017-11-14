@@ -70,7 +70,7 @@ namespace EOpt.Math
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="obj"></param
         /// <returns></returns>
         public override bool Equals(object obj) => obj is PointND ? Equals((PointND)obj) : false;
 

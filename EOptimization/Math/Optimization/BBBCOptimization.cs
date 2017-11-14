@@ -10,6 +10,7 @@ namespace EOpt.Math.Optimization
     using Math.Random;
     using Math;
     using Help;
+    using Exceptions;
 
     /// <summary>
     /// Optimization method BBBC.

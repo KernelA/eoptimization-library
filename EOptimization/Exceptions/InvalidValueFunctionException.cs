@@ -1,6 +1,6 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-namespace EOpt.Help
+namespace EOpt.Exceptions
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +8,10 @@ namespace EOpt.Help
 
     using Math;
 
-    class InvalidValueFunctionException : ArithmeticException
+    /// <summary>
+    /// The exception presents an invalid value of the function.
+    /// </summary>
+    public class InvalidValueFunctionException : ArithmeticException
     {
         protected PointND point;
 
@@ -28,11 +31,16 @@ namespace EOpt.Help
         /// The exception that is thrown for errors in a calculation of function.
         /// </summary>
         /// <param name="Message">A message of exception.</param>
-        /// <param name="point">A point, where function has an invalid value. </param>
+        /// <param name="Point">A point, where function has an invalid value. </param>
         /// <param name="ValueFunction">An invalid value of function.</param>
-        public InvalidValueFunctionException(string Message, PointND point, double ValueFunction) : base(Message)
+        /// <exception cref="ArgumentNullException">If <paramref name="Point"/> is null.</exception>
+        public InvalidValueFunctionException(string Message, PointND Point, double ValueFunction) : base(Message)
         {
-            this.point = point;
+            if (Point == null)
+            {
+                throw new ArgumentNullException(nameof(Point));
+            }
+            this.point = Point;
             this.value = ValueFunction;
         }
     }

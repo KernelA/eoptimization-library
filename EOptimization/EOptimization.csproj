@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.1</AssemblyVersion>
+    <FileVersion>1.1.0.1</FileVersion>
     <Version>1.1.0</Version>
     <RepositoryUrl>https://github.com/KernelA/eoptimization-library</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/KernelA/eoptimization-library/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,6 +12,7 @@
     <Description>The library for solving constrained optimization problems. Implemented three algorithms: Big bung - big crunch, Fireworks, Grenade explosion.</Description>
     <Company />
     <Authors>Alexander Kryuchkov</Authors>
+    <RootNamespace>EOpt</RootNamespace>
   </PropertyGroup>
 
 </Project>

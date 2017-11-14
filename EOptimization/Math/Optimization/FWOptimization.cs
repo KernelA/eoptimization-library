@@ -11,6 +11,7 @@ namespace EOpt.Math.Optimization
     using Math.Random;
     using Math.LA;
     using Math;
+    using Exceptions;
 
     using Help;
 
@@ -340,7 +341,7 @@ namespace EOpt.Math.Optimization
                 coordNumbers[i] = i;
             }
 
-            ML.Math.Сombinatorics.RandomPermutation(coordNumbers, SyncRandom.Get());
+            EOpt.Math.Сombinatorics.RandomPermutation(coordNumbers, SyncRandom.Get());
         }
 
         /// <summary>

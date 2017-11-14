@@ -45,13 +45,13 @@ namespace EOpt.Math.Optimization
         public BBBCParams(int NP, int Imax, double Alpha, double Beta)
         {
             if (NP < 1)
-                throw new ArgumentException($"{nameof(NP)} must be > 0.", nameof(NP));
+                throw new ArgumentException($"{nameof(NP)} (actual value is {NP}) must be > 0.", nameof(NP));
             if (Imax < 1)
-                throw new ArgumentException($"{nameof(Imax)} must be > 0.", nameof(Imax));
+                throw new ArgumentException($"{nameof(Imax)} (actual value is {Imax})  must be > 0.", nameof(Imax));
             if (Alpha < 0)
-                throw new ArgumentException($"{nameof(Alpha)} must be > 0.", nameof(Alpha));
+                throw new ArgumentException($"{nameof(Alpha)}  (actual value is {Alpha}) must be > 0.", nameof(Alpha));
             if (Beta < 0 || Beta > 1)
-                throw new ArgumentException($"{nameof(Beta)} must be in [0; 1].", nameof(Beta));
+                throw new ArgumentException($"{nameof(Beta)} (actual value is {Beta})  must be in range [0; 1].", nameof(Beta));
 
             this.NP = NP;
             this.Imax = Imax;

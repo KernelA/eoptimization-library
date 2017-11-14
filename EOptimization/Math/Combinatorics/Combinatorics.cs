@@ -1,8 +1,9 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-namespace ML.Math
+namespace EOpt.Math
 {
     using System;
+    
 
     /// <summary>
     /// Combinatorics algorithms.
@@ -16,7 +17,7 @@ namespace ML.Math
         /// <typeparam name="T"></typeparam>
         /// <param name="Array"></param>
         /// <param name="RandGen"></param>
-        public static void RandomPermutation<T>(T[] Array, Random RandGen)
+        public static void RandomPermutation<T>(T[] Array, System.Random RandGen)
         {
             int j = 0;
 

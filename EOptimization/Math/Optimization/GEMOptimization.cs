@@ -9,6 +9,7 @@ namespace EOpt.Math.Optimization
 
     using Math.Random;
     using Math;
+    using Exceptions;
 
     using Help;
 

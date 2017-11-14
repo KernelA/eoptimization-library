@@ -65,7 +65,7 @@ namespace EOpt.Math.Optimization
         /// </summary>
         /// <param name="NGrenade">Number of grenades on each iteration. <paramref name="NGrenade"/> >= 1.</param>
         /// <param name="NShrapnel">Number of shrapnel for each grenade. <paramref name="NShrapnel"/> >= 1.</param>
-        /// <param name="IMax">The number of iteration. <paramref name="IMax"/> >= 1.</param>
+        /// <param name="Imax">The number of iteration. <paramref name="Imax"/> >= 1.</param>
         /// <param name="InitRadiusGrenade">The initial radius of the grenade territory.
         /// Maximum value is equal  2 * sqrt(n), where n-dimension space. 
         /// <paramref name="InitRadiusGrenade"/> > 0.
@@ -83,38 +83,38 @@ namespace EOpt.Math.Optimization
         /// <param name="DesiredMinimum">The number of desired minimums. <paramref name="DesiredMinimum"/> >= 1.</param>
         /// <param name="Psin">The exponent for determine weight optimal search direction m_osd. <paramref name="Psin"/> > 0.</param>
         /// <exception cref="ArgumentException">If conditions for parameters do not performed.</exception>
-        public GEMParams(int NGrenade, int NShrapnel, int IMax, double InitRadiusGrenade,
+        public GEMParams(int NGrenade, int NShrapnel, int Imax, double InitRadiusGrenade,
             double RadiusReduct = 100, double ProbabilityCollision = 0.8, double Psin = 5, double Mmin = 0.1, double Mmax = 0.9, int DesiredMinimum = 1)
         {
             if (NGrenade < 1)
-                throw new ArgumentException($"{nameof(NGrenade)} must be > 0.", nameof(NGrenade));
+                throw new ArgumentException($"{nameof(NGrenade)} (actual value is {NGrenade}) must be > 0.", nameof(NGrenade));
             if (NShrapnel < 1)
-                throw new ArgumentException($"{nameof(NShrapnel)} must be > 0.", nameof(NShrapnel));
-            if (IMax < 1)
-                throw new ArgumentException($"{nameof(IMax)} must be > 0.", nameof(IMax));
+                throw new ArgumentException($"{nameof(NShrapnel)} (actual value is {NShrapnel}) must be > 0.", nameof(NShrapnel));
+            if (Imax < 1)
+                throw new ArgumentException($"{nameof(Imax)}  (actual value is {Imax}) must be > 0.", nameof(Imax));
             if (DesiredMinimum < 1)
-                throw new ArgumentException($"{nameof(DesiredMinimum)} must be > 0.", nameof(DesiredMinimum));
+                throw new ArgumentException($"{nameof(DesiredMinimum)}  (actual value is {DesiredMinimum}) must be > 0.", nameof(DesiredMinimum));
 
             if (RadiusReduct < 1)
-                throw new ArgumentException($"{nameof(RadiusReduct)} must be > 1.", nameof(RadiusReduct));
+                throw new ArgumentException($"{nameof(RadiusReduct)} (actual value is {RadiusReduct}) must be > 1.", nameof(RadiusReduct));
 
-            if (Math.Abs(ProbabilityCollision) < 1E-8 || ProbabilityCollision < 0)
-                throw new ArgumentException($"{nameof(ProbabilityCollision)} too small or less than 0.", nameof(ProbabilityCollision));
+            if (CompareDouble.AlmostEqual(0, ProbabilityCollision, -Constants.EpsExponent / 2) || ProbabilityCollision < 0)
+                throw new ArgumentException($"{nameof(ProbabilityCollision)} (actual value is {ProbabilityCollision})  too small or less than 0.", nameof(ProbabilityCollision));
 
-            if (Math.Abs(ProbabilityCollision - 1) < 1E-10 || ProbabilityCollision > 1)
-                throw new ArgumentException($"{nameof(ProbabilityCollision)} must be < 1.", nameof(ProbabilityCollision));
+            if (CompareDouble.AlmostEqual(1, ProbabilityCollision, 2) || ProbabilityCollision > 1)
+                throw new ArgumentException($"{nameof(ProbabilityCollision)} (actual value is {ProbabilityCollision}) must be < 1.", nameof(ProbabilityCollision));
 
             if (Mmax < 0 || Mmax > 1 || Mmax < Mmin)
-                throw new ArgumentException($"{nameof(Mmax)} must be in (0;1] and {nameof(Mmax)} > {nameof(Mmin)}.", nameof(Mmax));
+                throw new ArgumentException($"{nameof(Mmax)}  (actual value is {Mmax}) must be in (0;1] and {nameof(Mmax)} > {nameof(Mmin)} (actual value is {Mmin}).", nameof(Mmax));
 
             if (Mmin < 0 || Mmin > 1)
-                throw new ArgumentException($"{nameof(Mmin)} must be in [0;1)", nameof(Mmin));
+                throw new ArgumentException($"{nameof(Mmin)}  (actual value is {Mmin}) must be in [0;1)", nameof(Mmin));
 
 
             this.DesiredMin = DesiredMinimum;
             this.NGrenade = NGrenade;
             this.NShrapnel = NShrapnel;
-            this.Imax = IMax;
+            this.Imax = Imax;
             this.InitRadiusGrenade = InitRadiusGrenade;
             this.RadiusReduct = RadiusReduct;
             this.Pts = ProbabilityCollision;

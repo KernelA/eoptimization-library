@@ -9,15 +9,15 @@ namespace EOpt.Help
         /// <summary>
         /// Throw exception, if the value is  NaN, PositiveInfinity or NegativeInfinity. 
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="Value"></param>
         /// <exception cref="ArithmeticException"></exception>
-        internal static void CheckInvalidValue(double value)
+        public static void CheckInvalidValue(double Value)
         {
-            if (Double.IsNaN(value))
+            if (Double.IsNaN(Value))
                 throw new ArithmeticException("Value is NaN.");
-            if (Double.IsNegativeInfinity(value))
+            if (Double.IsNegativeInfinity(Value))
                 throw new ArithmeticException("Value is NegativeInfinity.");
-            if (Double.IsPositiveInfinity(value))
+            if (Double.IsPositiveInfinity(Value))
                 throw new ArithmeticException("Value is PositiveInfinity.");            
         }
     }
