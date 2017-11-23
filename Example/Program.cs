@@ -1,10 +1,9 @@
-using System;
-
+﻿using System;
 
 using EOpt.Math.Optimization;
 using EOpt.Math;
 
-namespace ConsoleApp1
+namespace Example
 {
     class Program
     {
@@ -54,17 +53,15 @@ namespace ConsoleApp1
 
             double min = 0;
 
-            for (int i = 0; i < 10; i++)
+            Opt.Minimize(GenParam);
+
+            bestSolution = Opt.Solution;
+
+            for (int i = 1; i < 10; i++)
             {
                 Opt.Minimize(GenParam);
 
-                if (bestSolution == null)
-                {
-                    bestSolution = Opt.Solution;
-                    min = bestSolution[2];
-                }
-
-                else if (Opt.Solution[2] < min)
+                if (Opt.Solution[2] < min)
                 {
                     bestSolution = Opt.Solution;
                     min = bestSolution[2];

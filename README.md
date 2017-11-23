@@ -24,9 +24,7 @@ It does not require third-party dependencies.
 
 ## Description of methods
 
-You can read about methods in the next articles.
-
-**References to the articles**
+You can read about methods in the next articles:
 
 1. [Big bung - big crunch method.](http://www.sciencedirect.com/science/article/pii/S0965997805000827)
 2. [Fireworks method.](http://link.springer.com/chapter/10.1007/978-3-642-13495-1_44)
