@@ -18,19 +18,8 @@
         [Fact]
         public void NormalDistributionConstrTest1()
         {
-            bool error = true;
 
-            try
-            {
-                NormalDistribution dist = new NormalDistribution(1, -2);
-            }
-            catch(ArgumentException exc)
-            {
-                error = false;
-            }
-
-            Assert.False(error);
-            
+            Assert.Throws<ArgumentException>(() => new NormalDistribution(1, -2));            
         }
 
         [Fact]
@@ -46,18 +35,7 @@
         {
             NormalDistribution dist = new NormalDistribution(0, 2);
 
-            bool error = true;
-
-            try
-            {
-                dist.NRandVal(1, -1);
-            }
-            catch(ArgumentException exc)
-            {
-                error = false;
-            }
-
-            Assert.False(error);
+            Assert.Throws<ArgumentException>(() => dist.NRandVal(1, -1));
         }
     }
 }

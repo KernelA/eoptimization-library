@@ -17,38 +17,19 @@
         [Fact]
         public void ContUniformDistributionConstrTest1()
         {
-            bool error = true;
 
-            try
-            {
-                ContUniformDistribution dist = new ContUniformDistribution(-2, -3);
-            }
-            catch(ArgumentException exc)
-            {
-                error = false;
-            }
-
-            Assert.False(error);
+            Assert.Throws<ArgumentException>(() => new ContUniformDistribution(-2, -3));
         }
 
 
         [Fact]
         public void URandValTest()
         {
-            bool error = true;
 
             ContUniformDistribution dist = new ContUniformDistribution();
 
-            try
-            {
-                dist.URandVal(3, 2);
-            }
-            catch (ArgumentException exc)
-            {
-                error = false;
-            }
+            Assert.Throws<ArgumentException>(() => dist.URandVal(3, 2));
 
-            Assert.False(error);
         }
     }
 }

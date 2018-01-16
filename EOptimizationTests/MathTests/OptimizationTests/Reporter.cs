@@ -7,22 +7,22 @@
     {
         public bool Error { get; private set; } = false;
 
-        private int iterMin, iterMax;
+        private int _iterMin, _iterMax;
 
-        private Type optimizerType;
+        private Type _optimizerType;
 
         public TestReporter(Type OptimizerType, int IterMin, int IterMax)
         {
-            iterMin = IterMin;
-            iterMax = IterMax;
-            optimizerType = OptimizerType;
+            _iterMin = IterMin;
+            _iterMax = IterMax;
+            _optimizerType = OptimizerType;
         }
 
-        public void Report(Progress Progress)
+        public void Report(Progress Prog)
         {
-            if (typeof(object).Equals(optimizerType) || iterMin != Progress.Start || iterMax != Progress.End)
+            if (_iterMin != Prog.Start || _iterMax != Prog.End)
                 Error = true;
-            if (Progress.Current < iterMin || Progress.Current > iterMax)
+            if (Prog.Current < _iterMin || Prog.Current > _iterMax)
                 Error = true;             
         }
 

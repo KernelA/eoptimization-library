@@ -85,18 +85,8 @@
             // Not symmetrix matrix.
             double[,] array = { { 1, 2, 4 }, { 89, 7, 8 }, { 4, 8, 9 } };
 
-            bool error = true;
-            try
-            {
-                SymmetricMatrix matrix = new SymmetricMatrix(array);
+            Assert.Throws<ArgumentException>(() => new SymmetricMatrix(array));
 
-            }
-            catch(ArgumentException exc)
-            {
-                error = false;
-            }
-
-            Assert.False(error);
         }
 
         [Fact]
