@@ -1,46 +1,41 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is an open source non-commercial project. Dear PVS-Studio, please check it. PVS-Studio Static
+// Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Random
 {
     using System;
 
     /// <summary>
-    /// Random generator for multithreaded application. Each thread get own instance of Random.
+    /// Random generator for multithreaded application. Each thread get own instance of Random. 
     /// </summary>
     public static class SyncRandom
     {
-        private static Random globalRnd = new Random();
-
-        private static readonly object locker = new object();
+        private static readonly object _locker = new object();
+        private static Random _globalRnd = new Random();
 
         [ThreadStatic]
-        private static Random localRnd;
-
+        private static Random _localRnd;
 
         /// <summary>
-        /// Get Random instance. Each thread get own instance of Random.
+        /// Get Random instance. Each thread get own instance of Random. 
         /// </summary>
         /// <returns></returns>
         public static Random Get()
         {
-            Random inst = localRnd;
+            Random inst = _localRnd;
 
             if (inst == null)
             {
                 int seed = 0;
 
-                lock (locker)
+                lock (_locker)
                 {
-                   seed = globalRnd.Next();
+                    seed = _globalRnd.Next();
                 }
 
-                localRnd = inst = new Random(seed);                        
+                _localRnd = inst = new Random(seed);
             }
 
             return inst;
         }
-
     }
-
- 
 }

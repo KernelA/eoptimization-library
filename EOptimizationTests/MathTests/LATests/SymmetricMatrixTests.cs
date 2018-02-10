@@ -1,9 +1,10 @@
 ﻿namespace EOpt.Math.LA.Tests
 {
-    using Xunit;
-    using EOpt.Math.LA;
     using System;
 
+    using EOpt.Math.LA;
+
+    using Xunit;
 
     public class SymmetricMatrixTests
     {
@@ -56,6 +57,26 @@
         }
 
         [Fact]
+        public void SymmetricMatrixTestIndexator()
+        {
+            SymmetricMatrix matrix = new SymmetricMatrix(5, 9);
+
+            matrix[3, 4] = 10;
+
+            Assert.True(matrix[4, 3] == matrix[3, 4]);
+        }
+
+        [Fact]
+        public void SymmetricMatrixTestIndexator1()
+        {
+            SymmetricMatrix matrix = new SymmetricMatrix(5, 0);
+
+            matrix[1, 1] = 2;
+
+            Assert.True(matrix[1, 1] == 2);
+        }
+
+        [Fact]
         public void SymmetricMatrixTestToArray()
         {
             double[,] array = { { 1, 2 }, { 2, 8 } };
@@ -76,7 +97,6 @@
             }
 
             Assert.False(error);
-
         }
 
         [Fact]
@@ -86,27 +106,6 @@
             double[,] array = { { 1, 2, 4 }, { 89, 7, 8 }, { 4, 8, 9 } };
 
             Assert.Throws<ArgumentException>(() => new SymmetricMatrix(array));
-
-        }
-
-        [Fact]
-        public void SymmetricMatrixTestIndexator()
-        {
-            SymmetricMatrix matrix = new SymmetricMatrix(5, 9);
-
-            matrix[3, 4] = 10;
-
-            Assert.True(matrix[4, 3] == matrix[3, 4]);
-        }
-
-        [Fact]
-        public void SymmetricMatrixTestIndexator1()
-        {
-            SymmetricMatrix matrix = new SymmetricMatrix(5, 0);
-
-            matrix[1, 1] = 2;
-
-            Assert.True(matrix[1, 1] == 2);
         }
     }
 }

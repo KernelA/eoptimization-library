@@ -1,39 +1,23 @@
 ﻿namespace EOpt.Math.Tests
 {
-    using Xunit;
-    using EOpt.Math;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
+
+    using EOpt.Math;
+
+    using Xunit;
 
     public class PointNDTests
     {
-
         [Fact]
-        public void PointNDConstrTest4()
+        public void CloneTest()
         {
-            PointND point = new PointND(12, 5);
+            PointND p1, p2;
 
-            bool error = false;
+            p1 = new PointND(1, 2);
 
-            foreach (double item in point.Coordinates)
-            {
-                if (item != 12)
-                    error = true;
-            }
+            p2 = p1.DeepCopy();
 
-            Assert.True(!error && point.Dimension == 5);
-        }
-
-        [Fact]
-        public void PointNDConstrTest5()
-        {
-            double[] x = new double[4] { 45, 56, 8, 10 };
-
-            PointND point = new PointND(x);
-
-            Assert.True(point.Coordinates.SequenceEqual(x) && point.Dimension == 4);
+            Assert.True(p1.Equals(p2));
         }
 
         [Fact]
@@ -48,17 +32,30 @@
             Assert.True(a.Equals(c) && !a.Equals(b));
         }
 
+        [Fact]
+        public void PointNDConstrTest4()
+        {
+            PointND point = new PointND(12, 5);
+
+            bool error = false;
+
+            foreach (double item in point)
+            {
+                if (item != 12)
+                    error = true;
+            }
+
+            Assert.True(!error && point.Count == 5);
+        }
 
         [Fact]
-        public void CloneTest()
+        public void PointNDConstrTest5()
         {
-            PointND p1, p2;
+            double[] x = new double[4] { 45, 56, 8, 10 };
 
-            p1 = new PointND(1, 2);
+            PointND point = new PointND(x);
 
-            p2 = p1.DeepCopy();
-
-            Assert.True(p1.Equals(p2));
+            Assert.True(point.SequenceEqual(x) && point.Count == 4);
         }
 
         [Fact]

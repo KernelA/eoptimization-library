@@ -1,15 +1,16 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
+
     using Help;
 
-    class TestReporter : IProgress<Progress>
+    internal class TestReporter : IProgress<Progress>
     {
-        public bool Error { get; private set; } = false;
-
         private int _iterMin, _iterMax;
 
         private Type _optimizerType;
+
+        public bool Error { get; private set; } = false;
 
         public TestReporter(Type OptimizerType, int IterMin, int IterMax)
         {
@@ -23,8 +24,7 @@
             if (_iterMin != Prog.Start || _iterMax != Prog.End)
                 Error = true;
             if (Prog.Current < _iterMin || Prog.Current > _iterMax)
-                Error = true;             
+                Error = true;
         }
-
     }
 }
