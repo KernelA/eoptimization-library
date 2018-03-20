@@ -15,10 +15,8 @@ namespace EOpt.Math.Optimization
     /// Base class for the FW method. 
     /// </summary>
     /// <typeparam name="TProblem"></typeparam>
-    public abstract class BaseFW<TProblem> : IBaseOptimizer<FWParams, TProblem>
+    public abstract class BaseFW<TObj, TProblem> : IBaseOptimizer<FWParams, TProblem> where TProblem : IConstrOptProblem<double, TObj>
     {
-        private CmpWeightOfAgentByProbability _cmp = new CmpWeightOfAgentByProbability();
-
         /// <summary>
         /// Charges. 
         /// </summary>
@@ -46,10 +44,7 @@ namespace EOpt.Math.Optimization
 
         protected WeightOfAgent[] _weights;
 
-        protected class CmpWeightOfAgentByProbability : Comparer<WeightOfAgent>
-        {
-            public override int Compare(WeightOfAgent x, WeightOfAgent y) => -x.Probability.CompareTo(y.Probability);
-        }
+        protected KahanSum _distKahanSum, _denumForProbKahanSum;
 
         /// <summary>
         /// Class for internal computation. 
@@ -69,12 +64,28 @@ namespace EOpt.Math.Optimization
                 this.IsTake = false;
             }
 
-            public int CompareTo(WeightOfAgent Other) => Probability.CompareTo(Other.Probability);
+            public int CompareTo(WeightOfAgent Other)
+            {
+                // If probability of 'Agent1' less than probability of 'Agent2' then 'Agent1' greater than 'Agent2'.
+                if (Probability < Other.Probability)
+                {
+                    return 1;
+                }
+                else if (Probability > Other.Probability)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
+
 
         protected void CalculateDistances(int ActualSizeMatrix)
         {
-            double denumeratorForProbability = 0;
+            _denumForProbKahanSum.SumResest();
 
             // Calculate distance between all points.
             for (int i = 0; i < ActualSizeMatrix; i++)
@@ -87,28 +98,28 @@ namespace EOpt.Math.Optimization
 
             for (int ii = 0; ii < ActualSizeMatrix; ii++)
             {
-                double dist = 0;
+                _distKahanSum.SumResest();
 
                 for (int j = 0; j < ActualSizeMatrix; j++)
                 {
-                    dist += _matrixOfDistances[ii, j];
+                    _distKahanSum.Add(_matrixOfDistances[ii, j]);
                 }
 
-                _weights[ii].Probability = dist;
+                _weights[ii].Probability = _distKahanSum.Sum;
 
-                denumeratorForProbability += dist;
+                _denumForProbKahanSum.Add(_distKahanSum.Sum);
             }
 
             // Probability of explosion.
             for (int jj = 0; jj < ActualSizeMatrix; jj++)
             {
-                if (double.IsInfinity(denumeratorForProbability) || double.IsNaN(denumeratorForProbability))
+                if (CheckDouble.GetTypeValue(_denumForProbKahanSum.Sum) != DoubleTypeValue.Valid || CheckDouble.GetTypeValue(_weights[jj].Probability) != DoubleTypeValue.Valid)
                 {
                     _weights[jj].Probability = 1.0 / ActualSizeMatrix;
                 }
                 else
                 {
-                    _weights[jj].Probability /= denumeratorForProbability;
+                    _weights[jj].Probability /= _denumForProbKahanSum.Sum;
                 }
             }
         }
@@ -398,7 +409,7 @@ namespace EOpt.Math.Optimization
             {
                 // Sort by descending probability of explosion. All points with IsTake = true will in
                 // the end. Points with higher probability are taking.
-                Array.Sort<WeightOfAgent>(Weights, 0, ActualSize, _cmp);
+                Array.Sort<WeightOfAgent>(Weights, 0, ActualSize);
 
                 for (int i = 0; i < remainder; i++)
                 {
@@ -444,6 +455,9 @@ namespace EOpt.Math.Optimization
             _uniformRand = UniformGen;
 
             _normalRand = NormalGen;
+
+            _distKahanSum = new KahanSum();
+            _denumForProbKahanSum = new KahanSum();
         }
 
         /// <summary>

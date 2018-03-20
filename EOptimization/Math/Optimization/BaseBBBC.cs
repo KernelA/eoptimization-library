@@ -14,12 +14,17 @@ namespace EOpt.Math.Optimization
     /// Base class for the BBBC method. 
     /// </summary>
     /// <typeparam name="TProblem"></typeparam>
-    public abstract class BBBBC<TProblem> : IBaseOptimizer<BBBCParams, TProblem>
+    public abstract class BBBBC<TObj, TProblem> : IBaseOptimizer<BBBCParams, TProblem> where TProblem : IConstrOptProblem<double, TObj>
     {
         protected List<Agent> _agents;
+
         protected INormalGen _normalRand;
+
         protected BBBCParams _parameters;
+
         protected IContUniformGen _uniformRand;
+
+        protected KahanSum _denumKahanSum;
 
         protected virtual void Clear()
         {
@@ -31,8 +36,7 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// </summary>
         /// <param name="Parameters"></param>
-        /// <param name="Dimension"> </param>
-        protected virtual void Init(BBBCParams Parameters, int Dimension, int DimObjs)
+        protected virtual void Init(BBBCParams Parameters, TProblem Problem, int DimObjs)
         {
             if (!Parameters.IsParamsInit)
             {
@@ -54,12 +58,10 @@ namespace EOpt.Math.Optimization
 
         /// <summary>
         /// </summary>
-        /// <param name="LowerBounds"></param>
-        /// <param name="UpperBounds"></param>
         /// <param name="DimObjs">    </param>
-        protected virtual void InitAgents(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int DimObjs)
+        protected virtual void InitAgents(TProblem Problem, int DimObjs)
         {
-            int dimension = LowerBounds.Count;
+            int dimension = Problem.LowerBounds.Count;
 
             for (int i = 0; i < _parameters.NP; i++)
             {
@@ -67,7 +69,7 @@ namespace EOpt.Math.Optimization
 
                 for (int j = 0; j < dimension; j++)
                 {
-                    point[j] = _uniformRand.URandVal(LowerBounds[j], UpperBounds[j]);
+                    point[j] = _uniformRand.URandVal(Problem.LowerBounds[j], Problem.UpperBounds[j]);
                 }
 
                 _agents.Add(new Agent(point, new PointND(0.0, DimObjs)));
@@ -111,6 +113,8 @@ namespace EOpt.Math.Optimization
             _uniformRand = UniformGen;
 
             _normalRand = NormalGen;
+
+            _denumKahanSum = new KahanSum();
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace EOpt.Math.Optimization
     using EOpt.Math.Random;
     using EOpt.Exceptions;
 
-    public abstract class BaseGEM<TProblem> : IBaseOptimizer<GEMParams, TProblem>
+    public abstract class BaseGEM<TObjs, TProblem> :  IBaseOptimizer<GEMParams, TProblem> where TProblem : IConstrOptProblem<double, TObjs>
     {
         protected PointND _dosd, _dgrs, _drnd;
 
@@ -21,8 +21,14 @@ namespace EOpt.Math.Optimization
         protected List<Agent> _grenades;
 
         protected INormalGen _normalRand;
+
         protected GEMParams _parameters;
+
         protected double _radiusGrenade, _radiusExplosion, _radiusInitial, _mosd;
+
+        private IConstrOptProblem<double, TObjs> _problem;
+
+        protected Func<IReadOnlyList<double>, TObjs> _targetFuncWithTransformedCoords;
 
         /// <summary>
         /// Shrapnels. 
@@ -36,6 +42,8 @@ namespace EOpt.Math.Optimization
         protected IContUniformGen _uniformRand;
         protected Agent _xcur, _xosd, _xrnd;
 
+
+
         protected virtual void Clear()
         {
             _grenades.Clear();
@@ -46,13 +54,11 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected abstract double EvalFuncForTransformedCoord(IReadOnlyList<double> Point);
-
         /// <summary>
         /// Search a best position to grenade. 
         /// </summary>
         /// <param name="WhichGrenade"></param>
-        protected void FindBestPosition(int WhichGrenade)
+        protected void FindBestPosition(int WhichGrenade, Func<Agent, Agent, bool> IsLessByObjs)
         {
             // Find shrapnel with a minimum value of the target function.
             _xrnd = null;
@@ -75,7 +81,8 @@ namespace EOpt.Math.Optimization
             // Find best position with a minimum value of the target function among: xcur, xrnd, xosd.
             if (_xcur == null && _xrnd != null)
             {
-                bestPosition = _xrnd;
+                //bestPosition = _xrnd;
+                bestPosition = _grenades[WhichGrenade];
             }
             else if (_xcur != null && _xrnd == null)
             {
@@ -83,12 +90,12 @@ namespace EOpt.Math.Optimization
             }
             else if (_xcur != null && _xrnd != null)
             {
-                bestPosition = IsLessByObjs(_xcur, _xrnd) ? _xcur : _xrnd;
+                bestPosition = IsLessByObjs(_xrnd, _xcur) ? _xrnd : _xcur;
             }
 
             if (_xosd != null && bestPosition != null)
             {
-                bestPosition = IsLessByObjs(_xosd, bestPosition) ? _xosd : bestPosition;
+                bestPosition = IsLessByObjs(bestPosition, _xosd) ? bestPosition : _xosd;
             }
             else if (_xosd != null && bestPosition == null)
             {
@@ -109,12 +116,14 @@ namespace EOpt.Math.Optimization
             _shrapnels[WhichGrenade].Clear();
         }
 
+        protected abstract void EvalTempAgent(Agent Temp);
+
         /// <summary>
         /// Searching OSD and Xosd position. 
         /// </summary>
         /// <param name="WhichGrenade"></param>
         /// <param name="NumIter">     </param>
-        protected void FindOSD(int WhichGrenade, int NumIter, int Dimension, int DimObjs)
+        protected void FindOSD(int WhichGrenade, int NumIter, int Dimension, int DimObjs, Func<Agent, Agent, bool> IsLessByObjs) 
         {
             LinkedList<Agent> ortogonalArray = new LinkedList<Agent>();
 
@@ -141,7 +150,7 @@ namespace EOpt.Math.Optimization
                 // The positive direction along the coordinate axis.
                 if (isPosDirection)
                 {
-                    if (CompareDouble.AlmostEqual(_grenades[WhichGrenade].Point[i / 2], 1, Exponent: 1))
+                    if (CmpDouble.AlmostEqual(_grenades[WhichGrenade].Point[i / 2], 1, Exponent: 1))
                     {
                         tempAgent.Point[i / 2] = 1;
                     }
@@ -153,7 +162,7 @@ namespace EOpt.Math.Optimization
                 // The negative direction along the coordinate axis.
                 else
                 {
-                    if (CompareDouble.AlmostEqual(_grenades[WhichGrenade].Point[i / 2], -1, Exponent: 1))
+                    if (CmpDouble.AlmostEqual(_grenades[WhichGrenade].Point[i / 2], -1, Exponent: 1))
                     {
                         tempAgent.Point[i / 2] = -1;
                     }
@@ -181,7 +190,7 @@ namespace EOpt.Math.Optimization
 
                 if (isAddToList)
                 {
-                    tempAgent.Eval(EvalFuncForTransformedCoord);
+                    EvalTempAgent(tempAgent);
                     ortogonalArray.AddLast(tempAgent);
                 }
             }
@@ -227,7 +236,7 @@ namespace EOpt.Math.Optimization
             {
                 double norm = _dosd.Norm();
 
-                if(CompareDouble.AlmostEqual(norm, 0.0, 2))
+                if(CmpDouble.AlmostEqual(norm, 0.0, 2))
                 {
                     _dosd = null;
                 }
@@ -238,12 +247,29 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected abstract void FirstStep();
+        protected abstract void FirstStep(TProblem Problem);
+
+        protected TObjs TargetFunctionWithTransformedCoords(IReadOnlyList<double> Point)
+        {
+            for (int i = 0; i < Point.Count; i++)
+            {
+                _tempArray[i] = Point[i];
+            }
+
+            TransformCoord(_tempArray, _problem.LowerBounds, _problem.UpperBounds);
+
+            return _problem.TargetFunction(_tempArray);
+        }
 
         protected void GenerateShrapnelesForGrenade(int WhichGrenade, int NumIter, int Dimension, int DimObjs)
         {
             double p = Math.Max(1.0 / Dimension,
                  Math.Log10(_radiusGrenade / _radiusExplosion) / Math.Log10(_parameters.Pts));
+
+            if(CheckDouble.GetTypeValue(p) != DoubleTypeValue.Valid)
+            {
+                throw new InvalidValueFunctionException("sdd", new PointND(0.0, 2));
+            }
 
             double randomValue1, randomValue2;
 
@@ -320,8 +346,6 @@ namespace EOpt.Math.Optimization
                             tempPoint[coordIndex] = randNum * (normPos - _grenades[WhichGrenade].Point[coordIndex]) + _grenades[WhichGrenade].Point[coordIndex];
                         }
 
-                       
-
                         break;
                     }
                 }
@@ -346,7 +370,6 @@ namespace EOpt.Math.Optimization
                 }
 
                 
-
                 if (isShrapnelAdd)
                 {
                     _shrapnels[WhichGrenade].AddLast(new Agent(tempPoint, new PointND(0.0, DimObjs)));
@@ -354,7 +377,7 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected virtual void Init(GEMParams Parameters, TProblem Problem, int Dimension, int DimObjs)
+        protected virtual void Init(GEMParams Parameters, TProblem Problem, int DimObjs)
         {
             if (!Parameters.IsParamsInit)
             {
@@ -363,10 +386,13 @@ namespace EOpt.Math.Optimization
             }
 
             _parameters = Parameters;
-            ;
+
+            _problem = Problem;
 
             _radiusGrenade = _parameters.InitRadiusGrenade;
             _radiusInitial = _parameters.InitRadiusGrenade;
+
+            int dim = Problem.LowerBounds.Count;
 
             _mosd = 0;
 
@@ -390,29 +416,29 @@ namespace EOpt.Math.Optimization
 
             if (_tempArray == null)
             {
-                _tempArray = new double[Dimension];
+                _tempArray = new double[dim];
             }
-            else if (_tempArray.Length != Dimension)
+            else if (_tempArray.Length != dim)
             {
-                _tempArray = new double[Dimension];
+                _tempArray = new double[dim];
             }
 
             if (_drnd == null)
             {
-                _drnd = new PointND(0.0, Dimension);
+                _drnd = new PointND(0.0, dim);
             }
-            else if (_drnd.Count != Dimension)
+            else if (_drnd.Count != dim)
             {
-                _drnd = new PointND(0.0, Dimension);
+                _drnd = new PointND(0.0, dim);
             }
 
             if (_dgrs == null)
             {
-                _dgrs = new PointND(0, Dimension);
+                _dgrs = new PointND(0, dim);
             }
-            else if (_dgrs.Count != Dimension)
+            else if (_dgrs.Count != dim)
             {
-                _dgrs = new PointND(0, Dimension);
+                _dgrs = new PointND(0, dim);
             }
         }
 
@@ -449,9 +475,7 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected abstract bool IsLessByObjs(Agent First, Agent Second);
-
-        protected abstract void NextStep(int Iter);
+        protected abstract void NextStep(TProblem Problem, int Iter);
 
         /// <summary>
         /// Coordinates transformation: [-1; 1] -&gt; [LowerBounds[i]; UpperBounds[i]]. 
@@ -510,6 +534,8 @@ namespace EOpt.Math.Optimization
             _uniformRand = UniformGen;
 
             _normalRand = NormalGen;
+
+            _targetFuncWithTransformedCoords = TargetFunctionWithTransformedCoords;
         }
 
         public abstract void Minimize(GEMParams Parameters, TProblem Problem);
