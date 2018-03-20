@@ -6,29 +6,11 @@ namespace EOpt.Math.Optimization
     using System.Collections.Generic;
 
     /// <summary>
-    /// Base optimization problem. 
+    /// Constraints for the optimization problem.
     /// </summary>
-    public abstract class BaseOptimizationProblem
+    internal static class Constraints
     {
-        private double[] _lowerBounds, _upperBounds;
-
-        /// <summary>
-        /// Lower bounds. 
-        /// </summary>
-        public IReadOnlyList<double> LowerBounds => _lowerBounds;
-
-        /// <summary>
-        /// Upper bounds. 
-        /// </summary>
-        public IReadOnlyList<double> UpperBounds => _upperBounds;
-
-        /// <summary>
-        /// </summary>
-        /// <param name="LowerBounds">   </param>
-        /// <param name="UpperBounds">   </param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public BaseOptimizationProblem(IReadOnlyCollection<double> LowerBounds, IReadOnlyCollection<double> UpperBounds)
+        public static void CheckConstraints(IReadOnlyCollection<double> LowerBounds, IReadOnlyCollection<double> UpperBounds)
         {
             if (LowerBounds == null)
             {
@@ -50,9 +32,6 @@ namespace EOpt.Math.Optimization
                 throw new ArgumentException($"The constraints are empty.");
             }
 
-            _lowerBounds = new double[LowerBounds.Count];
-            _upperBounds = new double[UpperBounds.Count];
-
             int position = 0;
 
             using (IEnumerator<double> enumLower = LowerBounds.GetEnumerator(), enumUpper = UpperBounds.GetEnumerator())
@@ -63,10 +42,6 @@ namespace EOpt.Math.Optimization
                     {
                         throw new ArgumentException($"The lower bound at position {position} is greater than upper bound.");
                     }
-
-                    _lowerBounds[position] = enumLower.Current;
-                    _upperBounds[position] = enumUpper.Current;
-
                     position++;
                 }
             }

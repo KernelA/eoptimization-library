@@ -18,11 +18,20 @@ namespace EOpt.Math.LA
         private int _size;
 
         /// <summary>
-        /// Transformation two-dimension index to one-dimension for determine position element in the
-        /// array. Matrix. (* - it is element of the matrix). 0 1 2 3 0 * 1 * * 2 * * * 3 * * * *
+        /// <para>
+        ///  Transformation two-dimension index to one-dimension for determine position element in the array. 
+        /// </para>
+        /// <para>
+        /// Matrix. (* - it is element of the matrix). 
+        ///   0 1 2 3 (indices)
+        /// 0 * 
+        /// 1 * * 
+        /// 2 * * * 
+        /// 3 * * * *
         /// Linearization: [*] [* *] [* * *] [* * * *] (0, 0) transform to 0; (1, 0) transform to 1;
         /// (1, 1) transform to 2; (2, 2) transform to 5; (i, j) transform to i * (i + 1) / 2 + j.
         /// The formula works for i &gt;= j.
+        /// </para>
         /// </summary>
         /// <param name="RowIndex">   </param>
         /// <param name="ColumnIndex"></param>
