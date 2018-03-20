@@ -6,6 +6,7 @@ namespace EOpt.Exceptions
 
     using Math;
 
+
     /// <summary>
     /// The exception presents an invalid value of the function. 
     /// </summary>
@@ -18,20 +19,27 @@ namespace EOpt.Exceptions
         /// </summary>
         public PointND AtPoint => _point;
 
+        /// <summary>
+        /// The exception that is thrown for errors in a calculation of function. 
+        /// </summary>
+        /// <param name="Message"> A message of exception. </param>
+        /// <param name="Point"> A point, where function has an invalid value. </param>
+        /// <exception cref="ArgumentNullException"> If <paramref name="Point"/> is null. </exception>
+        public InvalidValueFunctionException(string Message, PointND Point) : base(Message)
+        {
+            _point = Point;
+        }
 
         /// <summary>
         /// The exception that is thrown for errors in a calculation of function. 
         /// </summary>
-        /// <param name="Message">       A message of exception. </param>
-        /// <param name="Point">         A point, where function has an invalid value. </param>
+        /// <param name="Message"> A message of exception. </param>
+        /// <param name="Point"> A point, where function has an invalid value. </param>
+        /// <param name="Inner"> An inner exception. </param>
         /// <exception cref="ArgumentNullException"> If <paramref name="Point"/> is null. </exception>
-        public InvalidValueFunctionException(string Message, PointND Point) : base(Message)
+        public InvalidValueFunctionException(string Message, PointND Point, Exception Inner) : base(Message, Inner)
         {
-            if (Point == null)
-            {
-                throw new ArgumentNullException(nameof(Point));
-            }
-            this._point = Point;
+            _point = Point;
         }
     }
 }
