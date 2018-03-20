@@ -18,11 +18,12 @@ namespace EOpt.Math.Optimization.OOOpt
     /// <summary>
     /// Optimization method BBBC. 
     /// </summary>
-    public class BBBCOptimizer : BBBBC<OOOptimizationProblem>, IOOOptimizer<BBBCParams>
+    public class BBBCOptimizer : BBBBC<double, IOOOptProblem>, IOOOptimizer<BBBCParams>
     {
         private PointND _centerOfMass;
 
         private int _indexBestSol;
+
         private Agent _solution;
 
         private void EvalFunction(Func<IReadOnlyList<double>, double> Func)
@@ -50,11 +51,11 @@ namespace EOpt.Math.Optimization.OOOpt
 
         private void FindCenterOfMass()
         {
-            double denominator = 0.0;
-
             double mass = 0.0;
 
             _centerOfMass.MultiplyByInplace(0);
+
+            base._denumKahanSum.SumResest();
 
             for (int i = 0; i < _parameters.NP; i++)
             {
@@ -67,7 +68,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
                 mass = 1 / mass;
 
-                denominator += mass;
+                base._denumKahanSum.Add(mass);
 
                 for (int coordNum = 0; coordNum < _centerOfMass.Count; coordNum++)
                 {
@@ -75,7 +76,7 @@ namespace EOpt.Math.Optimization.OOOpt
                 }
             }
 
-            _centerOfMass.MultiplyByInplace(1 / denominator);
+            _centerOfMass.MultiplyByInplace(1 / base._denumKahanSum.Sum);
         }
 
         private void GenNextAgents(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int IterNum)
@@ -95,35 +96,37 @@ namespace EOpt.Math.Optimization.OOOpt
             }
         }
 
-        protected override void FirstStep(OOOptimizationProblem Problem)
+        protected override void FirstStep(IOOOptProblem Problem)
         {
             if (Problem == null)
             {
                 throw new ArgumentNullException(nameof(Problem));
             }
 
-            base.InitAgents(Problem.LowerBounds, Problem.UpperBounds, 1);
+            base.InitAgents(Problem, 1);
 
             EvalFunction(Problem.TargetFunction);
 
             FindBestSolution();
         }
 
-        protected override void Init(BBBCParams Parameters, int Dimension, int DimObj)
+        protected override void Init(BBBCParams Parameters, IOOOptProblem Problem, int DimObjs)
         {
-            base.Init(Parameters, Dimension, DimObj);
+            base.Init(Parameters, Problem, DimObjs);
+
+            int dim = Problem.LowerBounds.Count;
 
             if (_centerOfMass == null)
             {
-                _centerOfMass = new PointND(0.0, Dimension);
+                _centerOfMass = new PointND(0.0, dim);
             }
-            else if (_centerOfMass.Count != Dimension)
+            else if (_centerOfMass.Count != dim)
             {
-                _centerOfMass = new PointND(0.0, Dimension);
+                _centerOfMass = new PointND(0.0, dim);
             }
         }
 
-        protected override void NextStep(OOOptimizationProblem Problem, int Iter)
+        protected override void NextStep(IOOOptProblem Problem, int Iter)
         {
             FindCenterOfMass();
 
@@ -168,9 +171,9 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="InvalidValueFunctionException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(BBBCParams Parameters, OOOptimizationProblem Problem)
+        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem)
         {
-            Init(Parameters, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
             FirstStep(Problem);
 
@@ -194,9 +197,9 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(BBBCParams Parameters, OOOptimizationProblem Problem, CancellationToken CancelToken)
+        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, CancellationToken CancelToken)
         {
-            Init(Parameters, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
             FirstStep(Problem);
 
@@ -224,14 +227,14 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="InvalidValueFunctionException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(BBBCParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter)
+        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter)
         {
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
             }
 
-            Init(Parameters, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
             FirstStep(Problem);
 
@@ -266,14 +269,14 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(BBBCParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
+        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
         {
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
             }
 
-            Init(Parameters, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
             FirstStep(Problem);
 

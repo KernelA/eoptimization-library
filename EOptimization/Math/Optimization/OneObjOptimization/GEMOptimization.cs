@@ -13,10 +13,11 @@ namespace EOpt.Math.Optimization.OOOpt
     /// <summary>
     /// Optimization method GEM. 
     /// </summary>
-    public class GEMOptimizer : BaseGEM<OOOptimizationProblem>, IOOOptimizer<GEMParams>
+    public class GEMOptimizer : BaseGEM<double, IOOOptProblem>, IOOOptimizer<GEMParams>
     {
-        private OOOptimizationProblem _problem;
         private Agent _solution;
+
+       
 
         /// <summary>
         /// Sort by ascending. 
@@ -33,7 +34,7 @@ namespace EOpt.Math.Optimization.OOOpt
         {
             for (int i = 0; i < _parameters.NGrenade; i++)
             {
-                _grenades[i].Eval(EvalFuncForTransformedCoord);
+                _grenades[i].Eval(base._targetFuncWithTransformedCoords);
             }
         }
 
@@ -44,14 +45,14 @@ namespace EOpt.Math.Optimization.OOOpt
         {
             foreach (Agent shrapnel in _shrapnels[WhichGrenade])
             {
-                shrapnel.Eval(EvalFuncForTransformedCoord);
+                shrapnel.Eval(_targetFuncWithTransformedCoords);
             }
         }
 
         /// <summary>
         /// Find best solution. 
         /// </summary>
-        private void FindSolution()
+        private void FindSolution(IOOOptProblem Problem)
         {
             double fMin = _grenades[0].Objs[0];
 
@@ -74,7 +75,7 @@ namespace EOpt.Math.Optimization.OOOpt
                 _tempArray[i] = _solution.Point[i];
             }
 
-            TransformCoord(_tempArray, _problem.LowerBounds, _problem.UpperBounds);
+            TransformCoord(_tempArray, Problem.LowerBounds, Problem.UpperBounds);
 
             for (int i = 0; i < _solution.Point.Count; i++)
             {
@@ -87,82 +88,73 @@ namespace EOpt.Math.Optimization.OOOpt
         /// </summary>
         /// <param name="WhichGrenade"></param>
         /// <param name="NumIter">     </param>
-        private void GenerateShrapneles(int WhichGrenade, int NumIter)
+        private void GenerateShrapneles(IOOOptProblem Problem, int WhichGrenade, int NumIter)
         {
             // Determine OSD and Xosd.
             if (NumIter <= 0.1 * _parameters.Imax && WhichGrenade < _parameters.DesiredMin)
             {
-                base.FindOSD(WhichGrenade, NumIter, _problem.LowerBounds.Count, 1);
+                base.FindOSD(WhichGrenade, NumIter, Problem.LowerBounds.Count, 1, (a, b) => a.Objs[0] < b.Objs[0]);
             }
 
-            base.GenerateShrapnelesForGrenade(WhichGrenade, NumIter, _problem.LowerBounds.Count, 1);
+            base.GenerateShrapnelesForGrenade(WhichGrenade, NumIter, Problem.LowerBounds.Count, 1);
         }
 
-        protected override double EvalFuncForTransformedCoord(IReadOnlyList<double> Point)
+
+
+        protected override void FirstStep(IOOOptProblem Problem)
         {
-            for (int j = 0; j < Point.Count; j++)
-            {
-                _tempArray[j] = Point[j];
-            }
-
-            base.TransformCoord(_tempArray, _problem.LowerBounds, _problem.UpperBounds);
-
-            return _problem.TargetFunction(_tempArray);
-        }
-
-        protected override void FirstStep()
-        {
-            int dimension = _problem.LowerBounds.Count;
+            int dimension = Problem.LowerBounds.Count;
 
             _radiusExplosion = 2 * Math.Sqrt(dimension);
 
-            InitAgents(_problem.LowerBounds, _problem.UpperBounds, 1);
+            InitAgents(Problem.LowerBounds, Problem.UpperBounds, 1);
 
             EvalFunctionForGrenades();
         }
 
-        protected override void Init(GEMParams Parameters, OOOptimizationProblem Problem, int Dimesnion, int DimObjs)
+        protected override void Init(GEMParams Parameters, IOOOptProblem Problem, int DimObjs)
         {
             if (Problem == null)
             {
                 throw new ArgumentNullException(nameof(Problem));
             }
 
-            base.Init(Parameters, Problem, Dimesnion, DimObjs);
+            base.Init(Parameters, Problem, DimObjs);
 
-            _problem = Problem;
+            int dim = Problem.LowerBounds.Count;
 
             if (_solution == null)
             {
-                _solution = new Agent(Dimesnion, DimObjs);
+                _solution = new Agent(dim, DimObjs);
             }
-            else if (_solution.Point.Count != Dimesnion)
+            else if (_solution.Point.Count != dim)
             {
-                _solution = new Agent(Dimesnion, DimObjs);
+                _solution = new Agent(dim, DimObjs);
             }
         }
 
-        protected override bool IsLessByObjs(Agent First, Agent Second)
+        protected override void EvalTempAgent(Agent Temp)
         {
-            return First.Objs[0] < Second.Objs[0];
+            Temp.Eval(_targetFuncWithTransformedCoords);
         }
 
-        protected override void NextStep(int Iter)
+
+        protected override void NextStep(IOOOptProblem Problem, int Iter)
         {
             ArrangeGrenades();
 
             for (int j = 0; j < this._parameters.NGrenade; j++)
             {
-                GenerateShrapneles(j, Iter);
+                GenerateShrapneles(Problem, j, Iter);
 
                 EvalFunctionForShrapnels(j);
 
-                FindBestPosition(j);
+                FindBestPosition(j, (a,b) => a.Objs[0] < b.Objs[0]);
             }
 
-            base.UpdateParams(Iter, _problem.LowerBounds.Count);
+            base.UpdateParams(Iter, Problem.LowerBounds.Count);
 
-            FindSolution();
+            FindSolution(Problem);
         }
 
         /// <summary>
@@ -199,15 +191,15 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(GEMParams Parameters, OOOptimizationProblem Problem)
+        public override void Minimize(GEMParams Parameters, IOOOptProblem Problem)
         {
-            Init(Parameters, Problem, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
-            FirstStep();
+            FirstStep(Problem);
 
             for (int i = 1; i <= _parameters.Imax; i++)
             {
-                NextStep(i);
+                NextStep(Problem, i);
             }
 
             Clear();
@@ -225,16 +217,16 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(GEMParams Parameters, OOOptimizationProblem Problem, CancellationToken CancelToken)
+        public override void Minimize(GEMParams Parameters, IOOOptProblem Problem, CancellationToken CancelToken)
         {
-            Init(Parameters, Problem, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
-            FirstStep();
+            FirstStep(Problem);
 
             for (int i = 1; i <= _parameters.Imax; i++)
             {
                 CancelToken.ThrowIfCancellationRequested();
-                NextStep(i);
+                NextStep(Problem, i);
             }
             Clear();
         }
@@ -255,15 +247,16 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(GEMParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter)
+        public override void Minimize(GEMParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter)
         {
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
             }
-            Init(Parameters, Problem, Problem.LowerBounds.Count, 1);
 
-            FirstStep();
+            Init(Parameters, Problem, 1);
+
+            FirstStep(Problem);
 
             Progress progress = new Progress(this, 1, _parameters.Imax, 1);
 
@@ -271,7 +264,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
             for (int i = 1; i <= _parameters.Imax; i++)
             {
-                NextStep(i);
+                NextStep(Problem, i);
                 progress.Current = i;
                 Reporter.Report(progress);
             }
@@ -297,16 +290,16 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(GEMParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
+        public override void Minimize(GEMParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
         {
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
             }
 
-            Init(Parameters, Problem, Problem.LowerBounds.Count, 1);
+            Init(Parameters, Problem, 1);
 
-            FirstStep();
+            FirstStep(Problem);
 
             Progress progress = new Progress(this, 1, _parameters.Imax, 1);
 
@@ -316,7 +309,7 @@ namespace EOpt.Math.Optimization.OOOpt
             {
                 CancelToken.ThrowIfCancellationRequested();
 
-                NextStep(i);
+                NextStep(Problem, i);
                 progress.Current = i;
                 Reporter.Report(progress);
             }

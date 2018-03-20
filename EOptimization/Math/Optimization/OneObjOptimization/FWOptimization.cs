@@ -16,7 +16,7 @@ namespace EOpt.Math.Optimization.OOOpt
     /// <summary>
     /// Optimization method Fireworks. 
     /// </summary>
-    public class FWOptimizer : BaseFW<OOOptimizationProblem>, IOOOptimizer<FWParams>
+    public class FWOptimizer : BaseFW<double, IOOOptProblem>, IOOOptimizer<FWParams>
     {
         private double _fmax, _fmin;
 
@@ -225,7 +225,7 @@ namespace EOpt.Math.Optimization.OOOpt
             }
         }
 
-        protected override void FirstStep(OOOptimizationProblem Problem)
+        protected override void FirstStep(IOOOptProblem Problem)
         {
             if (Problem == null)
             {
@@ -261,7 +261,7 @@ namespace EOpt.Math.Optimization.OOOpt
             }
         }
 
-        protected override void NextStep(OOOptimizationProblem Problem)
+        protected override void NextStep(IOOOptProblem Problem)
         {
             GenerateNextAgents();
 
@@ -312,7 +312,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(FWParams Parameters, OOOptimizationProblem Problem)
+        public override void Minimize(FWParams Parameters, IOOOptProblem Problem)
         {
             Init(Parameters, Problem.LowerBounds.Count, 1);
 
@@ -338,7 +338,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(FWParams Parameters, OOOptimizationProblem Problem, CancellationToken CancelToken)
+        public override void Minimize(FWParams Parameters, IOOOptProblem Problem, CancellationToken CancelToken)
         {
             Init(Parameters, Problem.LowerBounds.Count, 1);
 
@@ -369,7 +369,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(FWParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter)
+        public override void Minimize(FWParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter)
         {
             if (Reporter == null)
             {
@@ -412,7 +412,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(FWParams Parameters, OOOptimizationProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
+        public override void Minimize(FWParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
         {
             if (Reporter == null)
             {
