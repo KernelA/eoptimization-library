@@ -8,7 +8,7 @@ namespace EOpt.Math.Optimization.MOOpt
     /// Interface for multiobjective optimization methods. 
     /// </summary>
     /// <typeparam name="TParams"></typeparam>
-    public interface IMOOptimizer<TParams> : IBaseOptimizer<TParams, MOOptimizationProblem>
+    public interface IMOOptimizer<TParams> : IBaseOptimizer<TParams, IMOOptProblem>
     {
         /// <summary>
         /// The solution of the constrained optimization problem. 

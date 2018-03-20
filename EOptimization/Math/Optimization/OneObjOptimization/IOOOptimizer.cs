@@ -7,7 +7,7 @@ namespace EOpt.Math.Optimization
     /// <summary>
     /// Interface for optimization methods. 
     /// </summary>
-    public interface IOOOptimizer<TParams> : IBaseOptimizer<TParams, OOOptimizationProblem>
+    public interface IOOOptimizer<TParams> : IBaseOptimizer<TParams, IOOOptProblem>
     {
         /// <summary>
         /// The solution of the constrained optimization problem. 
