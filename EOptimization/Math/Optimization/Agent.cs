@@ -10,7 +10,8 @@ namespace EOpt.Math.Optimization
 
     using Optimization.OOOpt;
 
-    using TTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, double>;
+    using TMOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, System.Collections.Generic.IEnumerable<double>>;
+    using TOOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, double>;
 
     public class Agent : IEquatable<Agent>
     {
@@ -61,18 +62,14 @@ namespace EOpt.Math.Optimization
             return Equals(obj as Agent);
         }
 
-        public void Eval(IEnumerable<TTargetFunction> Function)
+        public void Eval(TMOTargetFunction Function)
         {
-            double value = 0.0;
-
             int position = 0;
 
             DoubleTypeValue typeValue;
 
-            foreach (var func in Function)
+            foreach (double value in Function(_point))
             {
-                value = func(_point);
-
                 typeValue = CheckDouble.GetTypeValue(value);
 
                 if (typeValue != DoubleTypeValue.Valid)
@@ -86,7 +83,7 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        public void Eval(TTargetFunction Function)
+        public void Eval(TOOTargetFunction Function)
         {
             double value = Function(_point);
 
