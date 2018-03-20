@@ -6,17 +6,33 @@ using EOpt.Math.Optimization.OOOpt;
 
 namespace Example
 {
+    /// See http://www.sfu.ca/~ssurjano/rastr.html
+    internal class RastriginProblem : IOOOptProblem
+    {
+        private double[] _lowerBounds, _upperBounds;
+
+
+        public IReadOnlyList<double> LowerBounds => _lowerBounds;
+
+        public IReadOnlyList<double> UpperBounds => _upperBounds;
+
+        public RastriginProblem()
+        {
+            _lowerBounds = new double[2] { -5.12, -5.12 };
+            _upperBounds = new double[2] {5.12, 5.12 };
+        }
+
+        public double TargetFunction(IReadOnlyList<double> Point)
+        {
+            return 20 + (Point[0] * Point[0] - 10 * Math.Cos(2 * Math.PI * Point[0])) +
+              (Point[1] * Point[1] - 10 * Math.Cos(2 * Math.PI * Point[1]));
+        }
+    }
     internal class Program
     {
         private static void Main(string[] args)
         {
-            /// See http://www.sfu.ca/~ssurjano/rastr.html
-            double RastriginFunction(IReadOnlyList<double> x)
-            {
-                return 20 + (x[0] * x[0] - 10 * Math.Cos(2 * Math.PI * x[0])) +
-               (x[1] * x[1] - 10 * Math.Cos(2 * Math.PI * x[1]));
-            }
-
+            
             IOOOptimizer<BBBCParams> bbbc = new BBBCOptimizer();
             IOOOptimizer<FWParams> fw = new FWOptimizer();
             IOOOptimizer<GEMParams> gem = new GEMOptimizer();
@@ -25,10 +41,8 @@ namespace Example
             FWParams param2 = new FWParams(20, 100, 20);
             GEMParams param3 = new GEMParams(1, 100, 50, 2 * Math.Sqrt(2), 100);
 
-            double[] constr1 = { -5.12, -5.12 };
-            double[] constr2 = { 5.12, 5.12 };
 
-            OOOptimizationProblem param = new OOOptimizationProblem(RastriginFunction, constr1, constr2);
+            IOOOptProblem param = new RastriginProblem();
 
             Console.WriteLine("Exact solution: f(x) = 0, x = (0, 0).");
             Console.WriteLine();
@@ -41,7 +55,7 @@ namespace Example
             Console.ReadKey();
         }
 
-        private static void Test<T>(IOOOptimizer<T> Opt, T Parameters, OOOptimizationProblem Problem, string Method)
+        private static void Test<T>(IOOOptimizer<T> Opt, T Parameters, IOOOptProblem Problem, string Method)
         {
             Agent bestSolution = null;
 
