@@ -15,4 +15,10 @@
     <RootNamespace>EOpt</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Ndomsort">
+      <HintPath>..\..\nds\Src\Ndomsort\bin\Release\netstandard1.0\Ndomsort.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

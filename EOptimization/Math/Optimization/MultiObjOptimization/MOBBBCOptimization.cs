@@ -9,21 +9,54 @@ namespace EOpt.Math.Optimization.MOOpt
     using EOpt.Help;
     using EOpt.Math;
     using EOpt.Math.Random;
+    using EOpt.Math.LA;
 
     using Nds;
 
-    public class MOBBBCOptimizer : BBBBC<MOOptimizationProblem>, IMOOptimizer<BBBCParams>
+
+    public class MOBBBCOptimizer : BBBBC<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<BBBCParams>
     {
         private PointND _centerOfMass;
 
+        private Ndsort<double> _nds;
+
         private Random _rand;
 
-        private void EvalFunction(IEnumerable<Func<IReadOnlyList<double>, double>> Functions)
+        private SymmetricMatrix _distances;
+
+        private int _nearestAgentsCount;
+
+
+        private class IdxDistance : IComparable<IdxDistance>
+        {
+            public int Index { get; set; }
+
+            public double Distance { get; set; }
+
+            public IdxDistance(int Index, double Dist)
+            {
+                this.Index = Index;
+                this.Distance = Dist;
+            }
+
+            public int CompareTo(IdxDistance Other)
+            {
+                return Distance.CompareTo(Other.Distance);
+            }
+
+        }
+
+        private void EvalFunction(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
             for (int i = 0; i < _agents.Count; i++)
             {
-                _agents[i].Eval(Functions);
+                _agents[i].Eval(Function);
             }
+        }
+
+        protected override void Clear()
+        {
+
         }
 
         private void FindCenterOfMass(IEnumerable<int> IndicesCurrentFront)
@@ -61,9 +94,9 @@ namespace EOpt.Math.Optimization.MOOpt
             _centerOfMass.MultiplyByInplace(1.0 / length);
         }
 
-        private void GenerateNextAgents(MOOptimizationProblem Problem, int IterNum)
+        private void GenerateNextAgents(IMOOptProblem Problem, int IterNum)
         {
-            int[] fronts = Ndsort.NonDominSort(_agents, agent => agent.Objs);
+            int[] fronts = _nds.NonDominSort(_agents, agent => agent.Objs);
 
             Dictionary<int, List<int>> frontIndicesDict = new Dictionary<int, List<int>>();
 
@@ -79,13 +112,26 @@ namespace EOpt.Math.Optimization.MOOpt
                 }
             }
 
+            LinkedList<int> allIndices = new LinkedList<int>();
+
+            foreach (int front in frontIndicesDict.Keys)
+            {
+                if(allIndices.Count <= 0.3 * _parameters.NP)
+                {
+                    for (int i = 0; i < frontIndicesDict[front].Count; i++)
+                    {
+                        allIndices.AddLast(frontIndicesDict[front][i]);
+                    }
+                }
+            }
+
             List<int> indicesFirstFront = frontIndicesDict[0];
 
             //_idealPoint.SetAt(_agents[indicesFirstFront[0]].Objs);
 
             //foreach (int indexFirstFront in indicesFirstFront)
             //{
-            //    for (int j = 0; j < _agents[indexFirstFront].Objs.Count; j++)
+            //    for (iFt j = 0; j < _agents[indexFirstFront].Objs.Count; j++)
             //    {
             //        if (_agents[indexFirstFront].Objs[j] < _idealPoint[j])
             //        {
@@ -150,22 +196,24 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        protected override void FirstStep(MOOptimizationProblem Problem)
+        protected override void FirstStep(IMOOptProblem Problem)
         {
-            InitAgents(Problem.LowerBounds, Problem.UpperBounds, Problem.TargetFunction.Count);
+            InitAgents(Problem, Problem.CountObjs);
             EvalFunction(Problem.TargetFunction);
         }
 
-        protected override void Init(BBBCParams Parameters, int Dimension, int DimObjs)
+        protected override void Init(BBBCParams Parameters, IMOOptProblem Problem, int DimObjs)
         {
-            base.Init(Parameters, Dimension, DimObjs);
+            base.Init(Parameters, Problem, DimObjs);
+            _distances = new SymmetricMatrix(Parameters.NP);
         }
 
-        protected override void InitAgents(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int DimObjs)
-        {
-            int dimPoint = LowerBounds.Count;
 
-            base.InitAgents(LowerBounds, UpperBounds, DimObjs);
+        protected override void InitAgents(IMOOptProblem Problem, int DimObjs)
+        {
+            int dimPoint = Problem.LowerBounds.Count;
+
+            base.InitAgents(Problem, DimObjs);
 
             if (_centerOfMass == null)
             {
@@ -177,7 +225,7 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        protected override void NextStep(MOOptimizationProblem Problem, int Iter)
+        protected override void NextStep(IMOOptProblem Problem, int Iter)
         {
             GenerateNextAgents(Problem, Iter);
             EvalFunction(Problem.TargetFunction);
@@ -203,16 +251,18 @@ namespace EOpt.Math.Optimization.MOOpt
         public MOBBBCOptimizer(IContUniformGen UniformGen, INormalGen NormalGen) : base(UniformGen, NormalGen)
         {
             _rand = SyncRandom.Get();
+            _nds = new Ndsort<double>(CmpDouble.DoubleCompare);
+            _nearestAgentsCount = 5;
         }
 
-        public override void Minimize(BBBCParams Parameters, MOOptimizationProblem Problem)
+        public override void Minimize(BBBCParams Parameters, IMOOptProblem Problem)
         {
             if (Problem == null)
             {
                 throw new ArgumentNullException(nameof(Problem));
             }
 
-            _parameters = Parameters;
+            Init(Parameters, Problem, Problem.CountObjs);
 
             FirstStep(Problem);
 
@@ -222,16 +272,52 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        public override void Minimize(BBBCParams Parameters, MOOptimizationProblem Problem, CancellationToken cancelToken) => throw new NotImplementedException();
+        private void ComputeDistances()
+        {
 
-        public override void Minimize(BBBCParams Parameters, MOOptimizationProblem Problem, IProgress<Progress> Reporter)
+            for (int i = 0; i < _parameters.NP; i++)
+            {
+                for (int j = i + 1; j < _parameters.NP; j++)
+                {
+                    _distances[i, j] = PointND.Distance(_agents[i].Point, _agents[j].Point);
+                }
+            }
+        }
+
+        private int[] FindNearestForAgent(int IndexAgent, IReadOnlyCollection<int> IndicesOtherAgents)
+        {
+            IdxDistance[] nearestAgents = new IdxDistance[IndicesOtherAgents.Count];
+
+            int j = 0;
+
+            foreach (int index in IndicesOtherAgents)
+            {
+                nearestAgents[j].Index = index;
+                nearestAgents[j++].Distance = _distances[IndexAgent, index];
+            }
+
+            Array.Sort(nearestAgents);
+
+            int[] indicesNearest = new int[_nearestAgentsCount];
+
+            for (int i = 0; i < indicesNearest.Length; i++)
+            {
+                indicesNearest[i] = nearestAgents[i].Index;
+            }
+
+            return indicesNearest;
+        }
+
+        public override void Minimize(BBBCParams Parameters, IMOOptProblem Problem, CancellationToken cancelToken) => throw new NotImplementedException();
+
+        public override void Minimize(BBBCParams Parameters, IMOOptProblem Problem, IProgress<Progress> Reporter)
         {
             if (Problem == null)
             {
                 throw new ArgumentNullException(nameof(Problem));
             }
 
-            _parameters = Parameters;
+            Init(Parameters, Problem, Problem.CountObjs);
 
             Progress pr = new Progress(this, 1, _parameters.Imax, 1);
 
@@ -247,6 +333,6 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        public override void Minimize(BBBCParams Parameters, MOOptimizationProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken) => throw new NotImplementedException();
+        public override void Minimize(BBBCParams Parameters, IMOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken) => throw new NotImplementedException();
     }
 }

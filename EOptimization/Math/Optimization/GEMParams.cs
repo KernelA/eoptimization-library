@@ -121,10 +121,10 @@ namespace EOpt.Math.Optimization
             if (RadiusReduct < 1)
                 throw new ArgumentException($"{nameof(RadiusReduct)} (actual value is {RadiusReduct}) must be > 1.", nameof(RadiusReduct));
 
-            if (CompareDouble.AlmostEqual(0, ProbabilityCollision, -Constants.EPS_EXPONENT / 2) || ProbabilityCollision < 0)
+            if (CmpDouble.AlmostEqual(0, ProbabilityCollision, -Constants.EPS_EXPONENT / 2) || ProbabilityCollision < 0)
                 throw new ArgumentException($"{nameof(ProbabilityCollision)} (actual value is {ProbabilityCollision})  too small or less than 0.", nameof(ProbabilityCollision));
 
-            if (CompareDouble.AlmostEqual(1, ProbabilityCollision, 2) || ProbabilityCollision > 1)
+            if (CmpDouble.AlmostEqual(1, ProbabilityCollision, 2) || ProbabilityCollision > 1)
                 throw new ArgumentException($"{nameof(ProbabilityCollision)} (actual value is {ProbabilityCollision}) must be < 1.", nameof(ProbabilityCollision));
 
             if (Mmax < 0 || Mmax > 1 || Mmax < Mmin)
