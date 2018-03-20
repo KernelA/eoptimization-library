@@ -6,7 +6,7 @@ namespace EOpt.Math
 
     /// <summary>
     /// </summary>
-    public static class CompareDouble
+    public static class CmpDouble
     {
         /// <summary>
         /// Compares two doubles and determines if they are equal within the specified precision. The
@@ -34,6 +34,29 @@ namespace EOpt.Math
             }
 
             return Math.Abs(Value1 - Value2) < Math.Pow(10, Exponent) * Constants.EPS * (1.0 + Math.Max(Math.Abs(Value1), Math.Abs(Value2)));
+        }
+
+
+        /// <summary>
+        /// Usual comparison of double. It needed for the non-dominated sorting.
+        /// </summary>
+        /// <param name="Value1"></param>
+        /// <param name="Value2"></param>
+        /// <returns></returns>
+        internal static int DoubleCompare(double Value1, double Value2)
+        {
+            if(Value1 < Value2)
+            {
+                return -1;
+            }
+            else if(Value1 > Value2)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
