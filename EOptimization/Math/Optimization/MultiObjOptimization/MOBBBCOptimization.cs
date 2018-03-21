@@ -22,7 +22,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private Random _rand;
 
-        private SymmetricMatrix _distances;
+        private DynSymmetricMatrix _distances;
 
         private int _nearestAgentsCount;
 
@@ -205,7 +205,7 @@ namespace EOpt.Math.Optimization.MOOpt
         protected override void Init(BBBCParams Parameters, IMOOptProblem Problem, int DimObjs)
         {
             base.Init(Parameters, Problem, DimObjs);
-            _distances = new SymmetricMatrix(Parameters.NP);
+            _distances = new DynSymmetricMatrix(Parameters.NP);
         }
 
 

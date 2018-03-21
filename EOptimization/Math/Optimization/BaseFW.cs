@@ -30,7 +30,7 @@ namespace EOpt.Math.Optimization
         /// </summary>
         protected LinkedList<Agent>[] _debris;
 
-        protected SymmetricMatrix _matrixOfDistances;
+        protected DynSymmetricMatrix _matrixOfDistances;
 
         protected int _minDebrisCount, _maxDebrisCount;
 
@@ -304,11 +304,11 @@ namespace EOpt.Math.Optimization
             if (_matrixOfDistances == null)
             {
                 // The matrix have a maximum size. Its size always changes.
-                _matrixOfDistances = new SymmetricMatrix(newSizeMatrix);
+                _matrixOfDistances = new DynSymmetricMatrix(newSizeMatrix);
             }
             else if (_matrixOfDistances.RowCount < newSizeMatrix)
             {
-                _matrixOfDistances = new SymmetricMatrix(newSizeMatrix);
+                _matrixOfDistances = new DynSymmetricMatrix(newSizeMatrix);
             }
         }
 

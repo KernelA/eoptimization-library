@@ -3,18 +3,22 @@
 namespace EOpt.Math.LA
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Symmetric matrix. 
     /// </summary>
-    public class SymmetricMatrix
+    public class DynSymmetricMatrix
     {
-        private const string InvalidSizeMessage = "Row count must be grater than 0.";
+        private const string InvalidSizeMessage = "Row or column count must be greater than 0.";
 
         private const string NotSymmetricMatrixMessage = "Matrix must be symmetric.";
-        private const string SqrMatrixMessage = "Matrix must be square.";
-        private double[] _elements;
 
+        private const string SqrMatrixMessage = "Matrix must be square.";
+
+        private List<double> _elements;
+       
         private int _size;
 
         /// <summary>
@@ -44,12 +48,43 @@ namespace EOpt.Math.LA
         /// <summary>
         /// Get column count of matrix. 
         /// </summary>
-        public int ColumnCount => _size;
+        public int ColumnCount
+        {
+            get => _size;
+
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentException(InvalidSizeMessage);
+
+                if(value < ColumnCount)
+                {
+                    int countToDel = ((value + 1 + ColumnCount) * (ColumnCount - value)) / 2;
+                    _elements.RemoveRange(GetIndexInArray(value + 1, 0), countToDel);
+                }
+                else if(value > ColumnCount)
+                {
+                    int countToAdd = ((ColumnCount + 1 + value) * (value - ColumnCount)) / 2;
+                    _elements.AddRange(Enumerable.Repeat(0.0, countToAdd));
+                }
+
+                _size = value;
+            }
+        }
+
 
         /// <summary>
         /// Get row count of matrix. 
         /// </summary>
-        public int RowCount => _size;
+        public int RowCount
+        {
+            get => _size;
+
+            set
+            {
+                ColumnCount = value;
+            }
+        }
 
         /// <summary>
         /// Create a symmetric matrix. Row and column count are equal <paramref name="Size"/>.
@@ -57,7 +92,7 @@ namespace EOpt.Math.LA
         /// </summary>
         /// <param name="Size"> Row and column count. </param>
         /// <exception cref="ArgumentException"> If <paramref name="Size"/> &lt; 1. </exception>
-        public SymmetricMatrix(int Size) : this(Size, 0)
+        public DynSymmetricMatrix(int Size) : this(Size, 0)
         {
         }
 
@@ -68,19 +103,16 @@ namespace EOpt.Math.LA
         /// <param name="Size">         Row and column count. </param>
         /// <param name="DefaultValue"> A default value for elements of matrix. </param>
         /// <exception cref="ArgumentException"> If <paramref name="Size"/> &lt; 1. </exception>
-        public SymmetricMatrix(int Size, double DefaultValue)
+        public DynSymmetricMatrix(int Size, double DefaultValue)
         {
             if (Size < 1)
                 throw new ArgumentException(InvalidSizeMessage, nameof(Size));
 
             _size = Size;
 
-            _elements = new double[(_size + 1) * _size / 2];
+            _elements = new List<double>((_size + 1) * _size / 2);
 
-            for (int i = 0; i < _elements.Length; i++)
-            {
-                _elements[i] = DefaultValue;
-            }
+            _elements.AddRange(Enumerable.Repeat(DefaultValue, _elements.Capacity));
         }
 
         /// <summary>
@@ -91,7 +123,7 @@ namespace EOpt.Math.LA
         /// If <paramref name="Elements"/> is not squared matrix or symmetric matrix.
         /// </exception>
         /// <exception cref="ArgumentNullException"> If <paramref name="Elements"/> is null. </exception>
-        public SymmetricMatrix(double[,] Elements)
+        public DynSymmetricMatrix(double[,] Elements)
         {
             if (Elements == null)
             {
@@ -111,7 +143,9 @@ namespace EOpt.Math.LA
                 }
             }
 
-            _elements = new double[(_size + 1) * _size / 2];
+            _elements = new List<double>((_size + 1) * _size / 2);
+
+            _elements.AddRange(Enumerable.Repeat(0.0, _elements.Capacity));
 
             for (int i = 0; i < RowCount; i++)
             {
@@ -155,6 +189,8 @@ namespace EOpt.Math.LA
                     _elements[GetIndexInArray(RowIndex, ColumnIndex)] = value;
             }
         }
+
+
 
         /// <summary>
         /// Copy matrix into two-dimensional array. 

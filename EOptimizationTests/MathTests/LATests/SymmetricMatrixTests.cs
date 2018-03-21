@@ -11,7 +11,7 @@
         [Fact]
         public void SymmetricMatrixTestConstr()
         {
-            SymmetricMatrix matrix = new SymmetricMatrix(4);
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(4);
 
             Assert.True(matrix.RowCount == matrix.ColumnCount && matrix.RowCount == 4);
         }
@@ -19,7 +19,7 @@
         [Fact]
         public void SymmetricMatrixTestConstr1()
         {
-            SymmetricMatrix matrix = new SymmetricMatrix(3, 5);
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(3, 5);
 
             bool error = false;
 
@@ -40,7 +40,7 @@
         {
             double[,] array = { { 1, 2, 4 }, { 2, 7, 8 }, { 4, 8, 9 } };
 
-            SymmetricMatrix matrix = new SymmetricMatrix(array);
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(array);
 
             bool error = false;
 
@@ -59,7 +59,7 @@
         [Fact]
         public void SymmetricMatrixTestIndexator()
         {
-            SymmetricMatrix matrix = new SymmetricMatrix(5, 9);
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(5, 9);
 
             matrix[3, 4] = 10;
 
@@ -69,7 +69,7 @@
         [Fact]
         public void SymmetricMatrixTestIndexator1()
         {
-            SymmetricMatrix matrix = new SymmetricMatrix(5, 0);
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(5, 0);
 
             matrix[1, 1] = 2;
 
@@ -81,7 +81,7 @@
         {
             double[,] array = { { 1, 2 }, { 2, 8 } };
 
-            SymmetricMatrix martix = new SymmetricMatrix(array);
+            DynSymmetricMatrix martix = new DynSymmetricMatrix(array);
 
             double[,] arrayRes = martix.ToArray();
 
@@ -105,7 +105,7 @@
             // Not symmetrix matrix.
             double[,] array = { { 1, 2, 4 }, { 89, 7, 8 }, { 4, 8, 9 } };
 
-            Assert.Throws<ArgumentException>(() => new SymmetricMatrix(array));
+            Assert.Throws<ArgumentException>(() => new DynSymmetricMatrix(array));
         }
     }
 }
