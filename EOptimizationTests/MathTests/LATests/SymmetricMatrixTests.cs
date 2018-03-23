@@ -107,5 +107,61 @@
 
             Assert.Throws<ArgumentException>(() => new DynSymmetricMatrix(array));
         }
+
+        [Theory]
+        [InlineData(4)]
+        [InlineData(2)]
+        public void SymmetrixMatrixDynResizeTest(int NewSize)
+        {
+            double[,] values =
+            {
+                {1, 2, 3 },
+                {2, 5, 6 },
+                {3, 6, 9 }
+            };
+
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(values);
+
+            bool isError = false;
+
+            matrix.ColumnCount = NewSize;
+
+            int rowCount = Math.Min(matrix.RowCount, values.GetLength(0));
+            int columnCount = rowCount;
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 0; j < columnCount; j++)
+                {
+                    if (matrix[i, j] != values[i, j])
+                    {
+                        isError = true;
+                    }
+                }
+            }
+
+            if (matrix.RowCount > rowCount)
+            {
+                for (int i = 0; i < matrix.RowCount; i++)
+                {
+                    if (matrix[matrix.RowCount - 1, i] != 0.0)
+                    {
+                        isError = true;
+                    }
+                }
+            }
+
+            Assert.False(isError || matrix.ColumnCount != NewSize);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void SymmetrixMatrixDynResizeWrongNewSizeTest(int NewSize)
+        {
+            DynSymmetricMatrix matrix = new DynSymmetricMatrix(2, 0.0);
+
+            Assert.Throws<ArgumentException>(() => matrix.ColumnCount = NewSize);
+        }
     }
 }

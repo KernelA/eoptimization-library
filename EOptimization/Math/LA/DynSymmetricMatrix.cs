@@ -7,7 +7,7 @@ namespace EOpt.Math.LA
     using System.Linq;
 
     /// <summary>
-    /// Symmetric matrix. 
+    /// Symmetric matrix.
     /// </summary>
     public class DynSymmetricMatrix
     {
@@ -46,7 +46,7 @@ namespace EOpt.Math.LA
         }
 
         /// <summary>
-        /// Get column count of matrix. 
+        /// Get column count of matrix. The column count is equal to row count.
         /// </summary>
         public int ColumnCount
         {
@@ -60,7 +60,7 @@ namespace EOpt.Math.LA
                 if(value < ColumnCount)
                 {
                     int countToDel = ((value + 1 + ColumnCount) * (ColumnCount - value)) / 2;
-                    _elements.RemoveRange(GetIndexInArray(value + 1, 0), countToDel);
+                    _elements.RemoveRange(GetIndexInArray(value, 0), countToDel);
                 }
                 else if(value > ColumnCount)
                 {
@@ -74,7 +74,7 @@ namespace EOpt.Math.LA
 
 
         /// <summary>
-        /// Get row count of matrix. 
+        /// Get row count of matrix. The row count is equal to column count.
         /// </summary>
         public int RowCount
         {
