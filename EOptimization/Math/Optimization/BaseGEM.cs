@@ -81,8 +81,7 @@ namespace EOpt.Math.Optimization
             // Find best position with a minimum value of the target function among: xcur, xrnd, xosd.
             if (_xcur == null && _xrnd != null)
             {
-                //bestPosition = _xrnd;
-                bestPosition = _grenades[WhichGrenade];
+                bestPosition = _xrnd;
             }
             else if (_xcur != null && _xrnd == null)
             {
