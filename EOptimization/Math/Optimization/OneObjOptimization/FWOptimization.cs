@@ -163,7 +163,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// </summary>
         private void GenerateNextAgents()
         {
-            base.ResetMatrixAndWeights();
+           
 
             // The total count minus solution.
             int actualSizeMatrix = _chargePoints.Count - 1;
@@ -173,6 +173,8 @@ namespace EOpt.Math.Optimization.OOOpt
                 actualSizeMatrix += _debris[k].Count;
             }
 
+            base.ResetMatrixAndTrimWeights(actualSizeMatrix);
+
             {
                 int index = 0;
 
@@ -181,7 +183,7 @@ namespace EOpt.Math.Optimization.OOOpt
                     // Skip solution.
                     if (i != _indexSolutionInCharges)
                     {
-                        _weights[index].Agent.SetAt(_chargePoints[i]);
+                        _weightedAgents[index].Agent.SetAt(_chargePoints[i]);
                         index++;
                     }
                 }
@@ -195,7 +197,7 @@ namespace EOpt.Math.Optimization.OOOpt
                         // Skip solution, if it in the debris.
                         if (_indexSolutionInDebrisFromCharge != i || _indexSolutionInDebris != k)
                         {
-                            _weights[index].Agent.SetAt(splinter);
+                            _weightedAgents[index].Agent.SetAt(splinter);
                             index++;
                         }
 
@@ -204,11 +206,11 @@ namespace EOpt.Math.Optimization.OOOpt
                 }
             }
 
-            base.CalculateDistances(actualSizeMatrix);
+            base.CalculateDistances();
 
             int totalToTake = _parameters.NP - 1;
 
-            base.TakeAgents(_weights, actualSizeMatrix, totalToTake);
+            base.TakeAgents(actualSizeMatrix, totalToTake);
 
             _chargePoints[0].SetAt(_solution);
 
@@ -216,9 +218,9 @@ namespace EOpt.Math.Optimization.OOOpt
 
             for (int i = 0; i < actualSizeMatrix && totalToTake > 0; i++)
             {
-                if (_weights[i].IsTake)
+                if (_weightedAgents[i].IsTake)
                 {
-                    _chargePoints[startIndex].SetAt(_weights[i].Agent);
+                    _chargePoints[startIndex].SetAt(_weightedAgents[i].Agent);
                     startIndex++;
                     totalToTake--;
                 }
