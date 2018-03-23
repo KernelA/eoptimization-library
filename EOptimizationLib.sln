@@ -8,8 +8,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOptimizationTests", "EOpti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{97FBB620-6B59-4AD7-9C50-EA3C590EDFDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{27399AB2-D229-464D-A78B-3937F2926417}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,18 +54,6 @@ Global
 		{97FBB620-6B59-4AD7-9C50-EA3C590EDFDE}.Release|x64.Build.0 = Release|Any CPU
 		{97FBB620-6B59-4AD7-9C50-EA3C590EDFDE}.Release|x86.ActiveCfg = Release|Any CPU
 		{97FBB620-6B59-4AD7-9C50-EA3C590EDFDE}.Release|x86.Build.0 = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|x64.Build.0 = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Debug|x86.Build.0 = Debug|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|x64.ActiveCfg = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|x64.Build.0 = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|x86.ActiveCfg = Release|Any CPU
-		{27399AB2-D229-464D-A78B-3937F2926417}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
