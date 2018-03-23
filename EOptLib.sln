@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOptimization", "EOptimization\EOptimization.csproj", "{CF4C80C8-86E4-41D3-B4BE-BE6F10DB3347}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOpt", "EOptimization\EOpt.csproj", "{CF4C80C8-86E4-41D3-B4BE-BE6F10DB3347}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOptimizationTests", "EOptimizationTests\EOptimizationTests.csproj", "{59A93816-B0D1-4E0C-8EBD-7214B1DAFDEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOptTests", "EOptimizationTests\EOptTests.csproj", "{59A93816-B0D1-4E0C-8EBD-7214B1DAFDEB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{97FBB620-6B59-4AD7-9C50-EA3C590EDFDE}"
 EndProject

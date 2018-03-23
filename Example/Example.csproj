@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EOptimization\EOptimization.csproj" />
+    <ProjectReference Include="..\EOptimization\EOpt.csproj" />
   </ItemGroup>
 
 </Project>
