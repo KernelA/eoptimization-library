@@ -87,6 +87,18 @@ namespace EOpt.Math.LA
         }
 
         /// <summary>
+        /// Fill the matrix with <paramref name="Value"/>.
+        /// </summary>
+        /// <param name="Value"></param>
+        public void Fill(double Value)
+        {
+            for (int i = 0; i < _elements.Count; i++)
+            {
+                _elements[i] = Value;
+            }
+        }
+
+        /// <summary>
         /// Create a symmetric matrix. Row and column count are equal <paramref name="Size"/>.
         /// Elements of matrix are equal default value 0.
         /// </summary>
