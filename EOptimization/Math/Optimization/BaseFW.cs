@@ -47,6 +47,8 @@ namespace EOpt.Math.Optimization
 
         protected KahanSum _distKahanSum, _denumForProbKahanSum;
 
+        protected AgentPool _pool;
+
         /// <summary>
         /// Class for internal computation. 
         /// </summary>
@@ -92,7 +94,7 @@ namespace EOpt.Math.Optimization
             {
                 for (int j = i + 1; j < _matrixOfDistances.ColumnCount; j++)
                 {
-                    _matrixOfDistances[i, j] = PointND.Distance(_weightedAgents[i].Agent.Point, _weightedAgents[j].Agent.Point);
+                    _matrixOfDistances[i, j] = PointND.Distance(_weightedAgents[i].Agent.Objs, _weightedAgents[j].Agent.Objs);
                 }
             }
 
@@ -117,7 +119,12 @@ namespace EOpt.Math.Optimization
 
                 if (CheckDouble.GetTypeValue(_weightedAgents[jj].Weight) != DoubleTypeValue.Valid)
                 {
-                    _weightedAgents[jj].Weight = 1.0 / _matrixOfDistances.ColumnCount;
+                    for (int k = 0; k < _weightedAgents.Count; k++)
+                    {
+                        _weightedAgents[jj].Weight = 1.0 / _matrixOfDistances.ColumnCount;
+                    }
+
+                    break;
                 }
             }
         }
@@ -132,7 +139,7 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected void FindAmountDebrisForCharge(double S, int WhicCharge, int DimObjs)
+        protected void FindAmountDebrisForCharge(double S, int WhichCharge, int DimObjs)
         {
             int countDebris = 0;
 
@@ -149,29 +156,25 @@ namespace EOpt.Math.Optimization
                 countDebris = (int)Math.Truncate(S);
             }
 
-            if (countDebris == 0)
+
+            if (_debris[WhichCharge].Count > countDebris)
             {
-                _debris[WhicCharge].Clear();
-            }
-            else if (_debris[WhicCharge].Count > countDebris)
-            {
-                int del = _debris[WhicCharge].Count - countDebris;
+                int del = _debris[WhichCharge].Count - countDebris;
 
                 while (del > 0)
                 {
-                    _debris[WhicCharge].RemoveLast();
+                    _pool.AddAgent(_debris[WhichCharge].Last.Value);
+                    _debris[WhichCharge].RemoveLast();
                     del--;
                 }
             }
-            else if (_debris[WhicCharge].Count < countDebris)
+            else if (_debris[WhichCharge].Count < countDebris)
             {
-                int total = countDebris - _debris[WhicCharge].Count;
-
-                int dimension = _chargePoints[0].Point.Count;
+                int total = countDebris - _debris[WhichCharge].Count;
 
                 while (total > 0)
                 {
-                    _debris[WhicCharge].AddLast(new Agent(dimension, DimObjs));
+                    _debris[WhichCharge].AddLast(_pool.GetAgent());
                     total--;
                 }
             }
@@ -201,7 +204,20 @@ namespace EOpt.Math.Optimization
 
                 Splinter.Point[axisIndex] += h;
 
-                Splinter.Point[axisIndex] = ClampDouble.Clamp(Splinter.Point[axisIndex], LowerBounds[axisIndex], UpperBounds[axisIndex]);
+                if(Splinter.Point[axisIndex] < LowerBounds[axisIndex])
+                {
+                    Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
+
+                }
+                else if(Splinter.Point[axisIndex] > UpperBounds[axisIndex])
+                {
+                    Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
+                }
+
+                //if (Splinter.Point[axisIndex] < LowerBounds[axisIndex] || Splinter.Point[axisIndex] > UpperBounds[axisIndex])
+                //{
+                //    Splinter.Point[axisIndex] = LowerBounds[axisIndex] + Math.Abs(Math.IEEERemainder(Math.Abs(Splinter.Point[axisIndex]), UpperBounds[axisIndex] - LowerBounds[axisIndex]));
+                //}
             }
         }
 
@@ -277,6 +293,7 @@ namespace EOpt.Math.Optimization
             }
             else
             {
+                _chargePoints.Clear();
                 _chargePoints.Capacity = _parameters.NP;
             }
 
@@ -293,6 +310,9 @@ namespace EOpt.Math.Optimization
 
             _weightedAgents = new List<WeightOfAgent>(newSizeMatrix);
 
+
+            _pool = new AgentPool(_parameters.NP * _maxDebrisCount / 2, new AgenCreator(Dim, DimObjs));
+
             //for (int i = 0; i < _weights.Count; i++)
             //{
             //    // The structure is storing an agent and its probability of choosing.
@@ -303,10 +323,6 @@ namespace EOpt.Math.Optimization
             {
                 _matrixOfDistances = new DynSymmetricMatrix(newSizeMatrix);
             }
-            else if (_matrixOfDistances.RowCount != newSizeMatrix)
-            {
-                _matrixOfDistances.RowCount = newSizeMatrix;
-            }
         }
 
         protected virtual void InitAgents(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int DimObjs)
@@ -316,14 +332,16 @@ namespace EOpt.Math.Optimization
             // Create points of explosion.
             for (int i = 0; i < _parameters.NP; i++)
             {
-                PointND point = new PointND(0.0, dimension);
+                Agent agent = _pool.GetAgent();
+
+                //PointND point = new PointND(0.0, dimension);
 
                 for (int j = 0; j < dimension; j++)
                 {
-                    point[j] = _uniformRand.URandVal(LowerBounds[j], UpperBounds[j]);
+                    agent.Point[j] = _uniformRand.URandVal(LowerBounds[j], UpperBounds[j]);
                 }
 
-                _chargePoints.Add(new Agent(point, new PointND(0.0, DimObjs)));
+                _chargePoints.Add(agent);
             }
         }
 
@@ -343,13 +361,7 @@ namespace EOpt.Math.Optimization
         {
             _matrixOfDistances.ColumnCount = NewSize;
 
-            for (int row = 0; row < _matrixOfDistances.RowCount; row++)
-            {
-                for (int column = 0; column < _matrixOfDistances.ColumnCount; column++)
-                {
-                    _matrixOfDistances[row, column] = 0;
-                }
-            }
+            _matrixOfDistances.Fill(0.0);
 
             if(NewSize > _weightedAgents.Count)
             {
@@ -357,12 +369,17 @@ namespace EOpt.Math.Optimization
 
                 while(countAdd > 0)
                 {
-                    _weightedAgents.Add(new WeightOfAgent(new Agent(_chargePoints[0].Point.Count, _chargePoints[0].Objs.Count), 0.0));
+                    _weightedAgents.Add(new WeightOfAgent(_pool.GetAgent(), 0.0));
                     countAdd--;
                 }
             }
             else if(_weightedAgents.Count > NewSize)
             {
+                for (int i = NewSize; i < _weightedAgents.Count; i++)
+                {
+                    _pool.AddAgent(_weightedAgents[i].Agent);
+                }
+
                 _weightedAgents.RemoveRange(NewSize, _weightedAgents.Count - NewSize);
             }
 
@@ -397,7 +414,21 @@ namespace EOpt.Math.Optimization
 
                 Splinter.Point[axisIndex] *= g;
 
-                Splinter.Point[axisIndex] = ClampDouble.Clamp(Splinter.Point[axisIndex], LowerBounds[axisIndex], UpperBounds[axisIndex]);
+
+                if (Splinter.Point[axisIndex] < LowerBounds[axisIndex])
+                {
+                    Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
+
+                }
+                else if (Splinter.Point[axisIndex] > UpperBounds[axisIndex])
+                {
+                    Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
+                }
+
+                //if (Splinter.Point[axisIndex] < LowerBounds[axisIndex] || Splinter.Point[axisIndex] > UpperBounds[axisIndex])
+                //{
+                //    Splinter.Point[axisIndex] = LowerBounds[axisIndex] + Math.Abs(Math.IEEERemainder(Math.Abs(Splinter.Point[axisIndex]), UpperBounds[axisIndex] - LowerBounds[axisIndex]));
+                //}
             }
         }
 
@@ -412,11 +443,9 @@ namespace EOpt.Math.Optimization
         /// </remarks>
         /// <param name="Weights"></param>
         /// <param name="ActualSize"></param>
-        /// <param name="TotalToTake"></param>
-        protected void TakeAgents(int ActualSize, int TotalToTake)
+        /// <param name="TotalTake"></param>
+        protected void TakeAgents(int ActualSize, int TotalTake)
         {
-            int count = 0;
-
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
                 _weightedAgents[i].Weight = Math.Pow(_uniformRand.URandVal(0, 1), 1 / _weightedAgents[i].Weight);
@@ -425,7 +454,7 @@ namespace EOpt.Math.Optimization
             // Sort by descending.
             _weightedAgents.Sort((a, b) => -a.CompareTo(b));
 
-            for (int i = 0; i < TotalToTake; i++)
+            for (int i = 0; i < TotalTake; i++)
             {
                 _weightedAgents[i].IsTake = true;
             }
