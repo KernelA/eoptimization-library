@@ -38,7 +38,7 @@ namespace Example
             IOOOptimizer<GEMParams> gem = new GEMOptimizer();
 
             BBBCParams param1 = new BBBCParams(20, 100, 0.4, 0.5);
-            FWParams param2 = new FWParams(20, 100, 20);
+            FWParams param2 = new FWParams(20, 100, 20, 10, 20, 40);
             GEMParams param3 = new GEMParams(1, 100, 50, 2 * Math.Sqrt(2), 100);
 
 
