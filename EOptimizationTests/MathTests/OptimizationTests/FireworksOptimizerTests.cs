@@ -18,7 +18,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            FWParams param = new FWParams(10, 1000 * 1000, 3);
+            FWParams param = new FWParams(10, 1000 * 1000, 3, 5, 10, 40);
 
             Assert.Throws<InvalidValueFunctionException>(() => GeneralOptimizerTests.TestInavlidFunction(fw, param, TypeFunc));
         }
@@ -29,7 +29,7 @@
             FWOptimizer fw = new FWOptimizer();
 
             // Distance is Manhattan distance.
-            FWParams param = new FWParams(10, 1000 * 1000, 3);
+            FWParams param = new FWParams(10, 1000 * 1000, 3, 5, 10, 40);
 
             bool error = GeneralOptimizerTests.TestCancel(fw, param);
 
@@ -41,7 +41,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            FWParams param = new FWParams(10, GeneralOptimizerTests.ITER_MAX, 3);
+            FWParams param = new FWParams(10, GeneralOptimizerTests.ITER_MAX, 3, 1, 2, 4);
 
             bool error = GeneralOptimizerTests.TestOptimizer(fw, param);
 
@@ -53,7 +53,7 @@
         {
             FWOptimizer fw = new FWOptimizer();
 
-            FWParams param = new FWParams(10, GeneralOptimizerTests.ITER_MAX, 3);
+            FWParams param = new FWParams(10, GeneralOptimizerTests.ITER_MAX, 3, 1, 4, 5);
 
             var reporter = new TestReporter(typeof(FWOptimizer), 0, GeneralOptimizerTests.ITER_MAX - 1);
 
