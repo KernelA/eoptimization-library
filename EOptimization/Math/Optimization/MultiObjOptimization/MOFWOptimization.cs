@@ -151,7 +151,7 @@ namespace EOpt.Math.Optimization.MOOpt
             }
 
 
-            base.CalculateDistances();
+            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
 
            
             int startIndex = 0;

@@ -35,8 +35,6 @@ namespace EOpt.Math.Optimization
 
         protected int _minDebrisCount, _maxDebrisCount;
 
-        protected double _minS, _maxS;
-
         protected INormalGen _normalRand;
 
         protected FWParams _parameters;
@@ -85,7 +83,7 @@ namespace EOpt.Math.Optimization
         }
 
 
-        protected void CalculateDistances()
+        protected void CalculateDistances(Func<Agent, Agent, double> Distance)
         {
             _denumForProbKahanSum.SumResest();
 
@@ -94,7 +92,7 @@ namespace EOpt.Math.Optimization
             {
                 for (int j = i + 1; j < _matrixOfDistances.ColumnCount; j++)
                 {
-                    _matrixOfDistances[i, j] = PointND.Distance(_weightedAgents[i].Agent.Objs, _weightedAgents[j].Agent.Objs);
+                    _matrixOfDistances[i, j] = Distance(_weightedAgents[i].Agent, _weightedAgents[j].Agent);
                 }
             }
 
@@ -141,21 +139,16 @@ namespace EOpt.Math.Optimization
 
         protected void FindAmountDebrisForCharge(double S, int WhichCharge, int DimObjs)
         {
-            int countDebris = 0;
+            int countDebris = (int)Math.Truncate(S);
 
-            if (S < _minS)
+            if (countDebris < _minDebrisCount)
             {
                 countDebris = _minDebrisCount;
             }
-            else if (S > _maxS)
+            else if (countDebris > _maxDebrisCount)
             {
                 countDebris = _maxDebrisCount;
             }
-            else
-            {
-                countDebris = (int)Math.Truncate(S);
-            }
-
 
             if (_debris[WhichCharge].Count > countDebris)
             {
@@ -273,10 +266,8 @@ namespace EOpt.Math.Optimization
 
             _parameters = Parameters;
 
-            _minS = _parameters.Alpha * _parameters.M;
-            _maxS = _parameters.Beta * _parameters.M;
-            _minDebrisCount = (int)Math.Truncate(_minS);
-            _maxDebrisCount = (int)Math.Truncate(_maxS);
+            _minDebrisCount = _parameters.Smin;
+            _maxDebrisCount = _parameters.Smax;
 
             if (_coordNumbers == null)
             {

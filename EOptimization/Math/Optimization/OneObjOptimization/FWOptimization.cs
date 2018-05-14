@@ -162,9 +162,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// Generate current population. 
         /// </summary>
         private void GenerateNextAgents()
-        {
-           
-
+        {        
             // The total count minus solution.
             int actualSizeMatrix = _chargePoints.Count - 1;
 
@@ -206,7 +204,7 @@ namespace EOpt.Math.Optimization.OOOpt
                 }
             }
 
-            base.CalculateDistances();
+            base.CalculateDistances((a, b) => PointND.Distance(a.Point, b.Point));
 
             int totalToTake = _parameters.NP - 1;
 
