@@ -20,7 +20,9 @@ namespace EOpt.Math.Optimization.MOOpt
     /// </summary>
     public class MOFWOptimizer : BaseFW<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<FWParams>
     {
-        private PointND _idealPoint, _nadirPoint;
+        private double _minHV, _maxHV;
+
+        private PointND _idealPoint;
 
         private Ndsort<double> _nds;
 
@@ -56,7 +58,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                denumerator += PointND.Distance(_nadirPoint, _chargePoints[i].Objs);
+                denumerator += _maxHV - ComputePseudoHV(_chargePoints[i].Objs);
             }
 
             if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
@@ -66,9 +68,49 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                s = _parameters.M * (PointND.Distance(_nadirPoint, _chargePoints[i].Objs) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                s = _parameters.M * (_maxHV - ComputePseudoHV(_chargePoints[i].Objs) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
                 base.FindAmountDebrisForCharge(s, i, dimObjs);
+            }
+        }
+
+        private double ComputePseudoHV(PointND Objs)
+        {
+            double tempDiff = 0, tempHV = 1;
+
+            for (int i = 0; i < Objs.Count; i++)
+            {
+                tempDiff = Objs[i] - _idealPoint[i];
+
+                if(tempDiff < Constants.VALUE_AVOID_DIV_BY_ZERO)
+                {
+                    tempDiff += Constants.VALUE_AVOID_DIV_BY_ZERO;
+                }
+
+                tempHV *= tempDiff;
+            }
+
+            return tempHV;
+        }
+
+        private void FindMaxMinPseudoHyperVolume()
+        {
+            _minHV = _maxHV = ComputePseudoHV(_chargePoints[0].Objs);
+
+            double tempHV;
+
+            for (int i = 1; i < _chargePoints.Count; i++)
+            {
+                tempHV = ComputePseudoHV(_chargePoints[i].Objs);
+
+                if(tempHV < _minHV)
+                {
+                    _minHV = tempHV;
+                }
+                else if(tempHV > _maxHV)
+                {
+                    _maxHV = tempHV;
+                }
             }
         }
 
@@ -85,7 +127,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int j = 0; j < _parameters.NP; j++)
             {
-                denumerator += PointND.Distance(_chargePoints[j].Objs, _idealPoint);
+                denumerator += ComputePseudoHV(_chargePoints[j].Objs) - _minHV;
             }
 
             if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
@@ -98,7 +140,7 @@ namespace EOpt.Math.Optimization.MOOpt
                 double amplitude = 0;
 
                 // Amplitude of explosion.
-                amplitude = _parameters.Amax * (PointND.Distance(_chargePoints[i].Objs, _idealPoint) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                amplitude = _parameters.Amax * (ComputePseudoHV(_chargePoints[i].Objs) - _minHV + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
@@ -107,76 +149,53 @@ namespace EOpt.Math.Optimization.MOOpt
         /// <summary>
         /// Generate current population. 
         /// </summary>
-        private void GenerateNextAgents(IEnumerable<KeyValuePair<int, Agent>> ChargesAndDebris)
+        private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            int firstFrontCount = ChargesAndDebris.Count(kvalue => kvalue.Key == 0);
+            int lastFrontIndex = 0, lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max();
 
-            int actualSizeMatrix = 0;
-
-            if (firstFrontCount > _parameters.NP)
+            for (int front = 0; front <= maxFront; front++)
             {
-                actualSizeMatrix = firstFrontCount;
+                lengthLastFront = Fronts.Count(fr => fr == front);
 
-                base.ResetMatrixAndTrimWeights(actualSizeMatrix);
-
-                int index = 0;
-
-                foreach (var agent in ChargesAndDebris.Where(kvalue => kvalue.Key == 0).Select(kvalue => kvalue.Value))
+                if (totalTaken + lengthLastFront <= _parameters.NP)
                 {
-                    _weightedAgents[index++].Agent.SetAt(agent);
+                    totalTaken += lengthLastFront;
+                }
+                else
+                {
+                    lastFrontIndex = front;
+                    break;
                 }
             }
-            else
-            {
-                // The total count minus non-dominated solutions.
-                actualSizeMatrix = _parameters.NP - firstFrontCount;
 
-                for (int k = 0; k < _debris.Length; k++)
-                {
-                    actualSizeMatrix += _debris[k].Count;
-                }
+            // Need to compare 'lengthLastFront' agents.
+            base.ResetMatrixAndTrimWeights(lengthLastFront);
 
-                base.ResetMatrixAndTrimWeights(actualSizeMatrix);
+            int startIndex = 0;
 
+            { 
                 int index = 0;
+                int i = 0;
 
-                foreach (var frontAgent in ChargesAndDebris)
+                foreach (Agent agent in ChargesAndDebris)
                 {
-                    // Solutions from all fronts except zero front are taken.
-                    if (frontAgent.Key != 0)
+                    // Solutions with front index equals to 'lastFrontIndex' are taken.
+                    if (Fronts[i] == lastFrontIndex)
                     {
-                        _weightedAgents[index++].Agent.SetAt(frontAgent.Value);
+                        _weightedAgents[index++].Agent.SetAt(agent);
                     }
+                    else if(Fronts[i] < lastFrontIndex)
+                    {
+                        _chargePoints[startIndex++].SetAt(agent);
+                    }
+
+                    i++;
                 }
             }
-
 
             base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
 
-           
-            int startIndex = 0;
-
-            int totalToTake = 0;
-
-            if (firstFrontCount > _parameters.NP)
-            {
-                totalToTake = _parameters.NP;
-            }
-            else
-            {
-                foreach (var agent in ChargesAndDebris.Where(kvalue => kvalue.Key == 0).Select(kvalue => kvalue.Value))
-                {
-                    _chargePoints[startIndex++].SetAt(agent);
-                }
-
-                totalToTake = _parameters.NP - firstFrontCount;
-            }
-
-
-            if (totalToTake > 0)
-            {
-                base.TakeAgents(actualSizeMatrix, totalToTake);
-            }
+            base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
 
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
@@ -206,7 +225,9 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void NextStep(IMOOptProblem Problem)
         {
-            FindIdealAndNadirPoint();
+            FindIdealPoint();
+
+            FindMaxMinPseudoHyperVolume();
 
             FindAmountDebris();
 
@@ -218,7 +239,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             int[] allFronts = _nds.NonDominSort(allAgents, item => item.Objs);
 
-            GenerateNextAgents(allAgents.Zip(allFronts, (agent, front) => new KeyValuePair<int, Agent>(front, agent)));
+            GenerateNextAgents(allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
         }
@@ -235,21 +256,11 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 _idealPoint = new PointND(0.0, DimObjs);
             }
-
-            if (_nadirPoint == null)
-            {
-                _nadirPoint = new PointND(0.0, DimObjs);
-            }
-            else if (_nadirPoint.Count != DimObjs)
-            {
-                _nadirPoint = new PointND(0.0, DimObjs);
-            }
         }
 
-        private void FindIdealAndNadirPoint()
+        private void FindIdealPoint()
         {
             _idealPoint.SetAt(_chargePoints[0].Objs);
-            _nadirPoint.SetAt(_chargePoints[0].Objs);
 
             for (int i = 1; i < _parameters.NP; i++)
             {
@@ -259,19 +270,11 @@ namespace EOpt.Math.Optimization.MOOpt
                     {
                         _idealPoint[j] = _chargePoints[i].Objs[j];
                     }
-                    else if (_chargePoints[i].Objs[j] > _nadirPoint[j])
-                    {
-                        _nadirPoint[j] = _chargePoints[i].Objs[j];
-                    }
                 }
             }
         }
 
-        public IEnumerable<Agent> ParetoFront
-        {
-            get => _nds.NonDominSort(_chargePoints, ag => ag.Objs).Zip(_chargePoints, (front, agent) => new KeyValuePair<int, Agent>(front, agent)).Where(kv => kv.Key == 0).Select(kv => kv.Value);
-
-        }
+        public IEnumerable<Agent> ParetoFront => _chargePoints;
 
         /// <summary>
         /// Create object which uses default implementation for random generators. 
