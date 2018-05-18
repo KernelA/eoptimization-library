@@ -23,6 +23,7 @@ namespace EOpt.Math.Optimization.MOOpt
         private PointND _idealPoint, _nadirPoint;
 
         private Ndsort<double> _nds;
+        private int _iter;
 
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
@@ -104,79 +105,73 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        /// <summary>
-        /// Generate current population. 
-        /// </summary>
-        private void GenerateNextAgents(IEnumerable<KeyValuePair<int, Agent>> ChargesAndDebris)
+        private void FirstMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            int firstFrontCount = ChargesAndDebris.Count(kvalue => kvalue.Key == 0);
+            int actualSizeMatrix = 0, totalTake = 0;
 
-            int actualSizeMatrix = 0;
+            int lengthFirstFront = Fronts.Count(fr => fr == 0);
 
-            if (firstFrontCount > _parameters.NP)
+            if (lengthFirstFront > _parameters.NP)
             {
-                actualSizeMatrix = firstFrontCount;
-
-                base.ResetMatrixAndTrimWeights(actualSizeMatrix);
-
-                int index = 0;
-
-                foreach (var agent in ChargesAndDebris.Where(kvalue => kvalue.Key == 0).Select(kvalue => kvalue.Value))
-                {
-                    _weightedAgents[index++].Agent.SetAt(agent);
-                }
+                actualSizeMatrix = lengthFirstFront;
+                totalTake = _parameters.NP;
             }
             else
             {
                 // The total count minus non-dominated solutions.
-                actualSizeMatrix = _parameters.NP - firstFrontCount;
-
-                for (int k = 0; k < _debris.Length; k++)
-                {
-                    actualSizeMatrix += _debris[k].Count;
-                }
-
-                base.ResetMatrixAndTrimWeights(actualSizeMatrix);
-
-                int index = 0;
-
-                foreach (var frontAgent in ChargesAndDebris)
-                {
-                    // Solutions from all fronts except zero front are taken.
-                    if (frontAgent.Key != 0)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(frontAgent.Value);
-                    }
-                }
+                actualSizeMatrix = Fronts.Length - lengthFirstFront;
+                totalTake = _parameters.NP - lengthFirstFront;
             }
 
 
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+            // Need to compare 'lengthLastFront' agents.
+            base.ResetMatrixAndTrimWeights(actualSizeMatrix);
 
-           
-            int startIndex = 0;
+            int k = 0, index = 0;
 
-            int totalToTake = 0;
-
-            if (firstFrontCount > _parameters.NP)
+            if (lengthFirstFront > _parameters.NP)
             {
-                totalToTake = _parameters.NP;
+                foreach (Agent agent in ChargesAndDebris)
+                {
+                    if (Fronts[k] == 0)
+                    {
+                        _weightedAgents[index++].Agent.SetAt(agent);
+                    }
+                    k++;
+                }
             }
             else
             {
-                foreach (var agent in ChargesAndDebris.Where(kvalue => kvalue.Key == 0).Select(kvalue => kvalue.Value))
+                foreach (Agent agent in ChargesAndDebris)
                 {
-                    _chargePoints[startIndex++].SetAt(agent);
+                    if (Fronts[k] != 0)
+                    {
+                        _weightedAgents[index++].Agent.SetAt(agent);
+                    }
+                    k++;
                 }
-
-                totalToTake = _parameters.NP - firstFrontCount;
             }
 
+            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
 
-            if (totalToTake > 0)
+            int startIndex = 0;
+
+            if (lengthFirstFront <= _parameters.NP)
             {
-                base.TakeAgents(actualSizeMatrix, totalToTake);
+                int j = 0;
+
+                foreach (Agent agent in ChargesAndDebris)
+                {
+                    // Solutions with front index equals to 'lastFrontIndex' are taken.
+                    if (Fronts[j] == 0)
+                    {
+                        _chargePoints[startIndex++].SetAt(agent);
+                    }
+                    j++;
+                }
             }
+
+            base.TakeAgents(actualSizeMatrix, totalTake);
 
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
@@ -187,6 +182,84 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
+        private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        {
+            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max(), lastFrontIndex = 0;
+
+            for (int front = 0; front <= maxFront; front++)
+            {
+                lengthLastFront = Fronts.Count(fr => fr == front);
+
+                if (totalTaken + lengthLastFront <= _parameters.NP)
+                {
+                    totalTaken += lengthLastFront;
+                }
+                else
+                {
+                    lastFrontIndex = front;
+                    break;
+                }
+            }
+
+            // Need to compare 'lengthLastFront' agents.
+            base.ResetMatrixAndTrimWeights(lengthLastFront);
+
+            int k = 0, index = 0;
+
+            foreach (Agent agent in ChargesAndDebris)
+            {
+                // Solutions with front index equals to 'lastFrontIndex' are taken.
+                if (Fronts[k] == lastFrontIndex)
+                {
+                    _weightedAgents[index++].Agent.SetAt(agent);
+                }
+
+                k++;
+            }
+
+            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+
+            int startIndex = 0;
+
+
+            int j = 0;
+
+            foreach (Agent agent in ChargesAndDebris)
+            {
+                // Solutions with front index equals to 'lastFrontIndex' are taken.
+                if (Fronts[j] < lastFrontIndex)
+                {
+                    _chargePoints[startIndex++].SetAt(agent);
+                }
+                j++;
+            }
+
+
+            base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
+
+            for (int i = 0; i < _weightedAgents.Count; i++)
+            {
+                if (_weightedAgents[i].IsTake)
+                {
+                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generate current population. 
+        /// </summary>
+        private void GenerateNextAgents(int IterNum, IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        {
+            if (IterNum <= _parameters.Imax)
+            {
+                FirstMethod(ChargesAndDebris, Fronts);
+            }
+            else
+            {
+                SecondMethod(ChargesAndDebris, Fronts);
+            }
+        }
         protected override void Clear()
         {
 
@@ -218,7 +291,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             int[] allFronts = _nds.NonDominSort(allAgents, item => item.Objs);
 
-            GenerateNextAgents(allAgents.Zip(allFronts, (agent, front) => new KeyValuePair<int, Agent>(front, agent)));
+            GenerateNextAgents(_iter, allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
         }
@@ -312,6 +385,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 1; i < _parameters.Imax; i++)
             {
+                _iter = i;
                 NextStep(Problem);
             }
 
