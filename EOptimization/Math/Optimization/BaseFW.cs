@@ -199,12 +199,13 @@ namespace EOpt.Math.Optimization
 
                 if(Splinter.Point[axisIndex] < LowerBounds[axisIndex])
                 {
-                    Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
-
+                    //Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
+                    Splinter.Point[axisIndex] = LowerBounds[axisIndex];
                 }
                 else if(Splinter.Point[axisIndex] > UpperBounds[axisIndex])
                 {
-                    Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
+                    //Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
+                    Splinter.Point[axisIndex] =   UpperBounds[axisIndex];
                 }
 
                 //if (Splinter.Point[axisIndex] < LowerBounds[axisIndex] || Splinter.Point[axisIndex] > UpperBounds[axisIndex])
@@ -409,17 +410,11 @@ namespace EOpt.Math.Optimization
                 if (Splinter.Point[axisIndex] < LowerBounds[axisIndex])
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
-
                 }
                 else if (Splinter.Point[axisIndex] > UpperBounds[axisIndex])
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
                 }
-
-                //if (Splinter.Point[axisIndex] < LowerBounds[axisIndex] || Splinter.Point[axisIndex] > UpperBounds[axisIndex])
-                //{
-                //    Splinter.Point[axisIndex] = LowerBounds[axisIndex] + Math.Abs(Math.IEEERemainder(Math.Abs(Splinter.Point[axisIndex]), UpperBounds[axisIndex] - LowerBounds[axisIndex]));
-                //}
             }
         }
 

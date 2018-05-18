@@ -20,11 +20,15 @@ namespace EOpt.Math.Optimization.MOOpt
     /// </summary>
     public class MOFWOptimizer : BaseFW<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<FWParams>
     {
-        private double _minHV, _maxHV;
+        private double _maxHV;
 
         private PointND _idealPoint;
 
+        private double[] _hvs;
+
         private Ndsort<double> _nds;
+
+        private int _iterNum;
 
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
@@ -58,7 +62,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                denumerator += _maxHV - ComputePseudoHV(_chargePoints[i].Objs);
+                denumerator += _maxHV - _hvs[i];
             }
 
             if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
@@ -68,7 +72,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                s = _parameters.M * (_maxHV - ComputePseudoHV(_chargePoints[i].Objs) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                s = _parameters.M * (_maxHV - _hvs[i] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
                 base.FindAmountDebrisForCharge(s, i, dimObjs);
             }
@@ -82,7 +86,7 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 tempDiff = Objs[i] - _idealPoint[i];
 
-                if(tempDiff < Constants.VALUE_AVOID_DIV_BY_ZERO)
+                if (tempDiff < Constants.VALUE_AVOID_DIV_BY_ZERO)
                 {
                     tempDiff += Constants.VALUE_AVOID_DIV_BY_ZERO;
                 }
@@ -95,21 +99,16 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private void FindMaxMinPseudoHyperVolume()
         {
-            _minHV = _maxHV = ComputePseudoHV(_chargePoints[0].Objs);
+            _hvs[0] = ComputePseudoHV(_chargePoints[0].Objs);
+            _maxHV = _hvs[0];
 
-            double tempHV;
-
-            for (int i = 1; i < _chargePoints.Count; i++)
+            for (int i = 1; i < _parameters.NP; i++)
             {
-                tempHV = ComputePseudoHV(_chargePoints[i].Objs);
+                _hvs[i] = ComputePseudoHV(_chargePoints[i].Objs);
 
-                if(tempHV < _minHV)
+                if (_hvs[i] > _maxHV)
                 {
-                    _minHV = tempHV;
-                }
-                else if(tempHV > _maxHV)
-                {
-                    _maxHV = tempHV;
+                    _maxHV = _hvs[i];
                 }
             }
         }
@@ -127,7 +126,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int j = 0; j < _parameters.NP; j++)
             {
-                denumerator += ComputePseudoHV(_chargePoints[j].Objs) - _minHV;
+                denumerator += _hvs[j];
             }
 
             if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
@@ -140,18 +139,93 @@ namespace EOpt.Math.Optimization.MOOpt
                 double amplitude = 0;
 
                 // Amplitude of explosion.
-                amplitude = _parameters.Amax * (ComputePseudoHV(_chargePoints[i].Objs) - _minHV + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                amplitude = _parameters.Amax * (_hvs[i] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
         }
 
-        /// <summary>
-        /// Generate current population. 
-        /// </summary>
-        private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+
+        private void FirstMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            int lastFrontIndex = 0, lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max();
+            int actualSizeMatrix = 0, totalTake = 0;
+
+            int lengthFirstFront = Fronts.Count(fr => fr == 0);
+
+            if (lengthFirstFront > _parameters.NP)
+            {
+                actualSizeMatrix = lengthFirstFront;
+                totalTake = _parameters.NP;
+            }
+            else
+            {
+                // The total count minus non-dominated solutions.
+                actualSizeMatrix = Fronts.Length - lengthFirstFront;
+                totalTake = _parameters.NP - lengthFirstFront;
+            }
+
+
+            // Need to compare 'lengthLastFront' agents.
+            base.ResetMatrixAndTrimWeights(actualSizeMatrix);
+
+            int k = 0, index = 0;
+
+            if(lengthFirstFront > _parameters.NP)
+            {
+                foreach (Agent agent in ChargesAndDebris)
+                {
+                    if (Fronts[k] == 0)
+                    {
+                        _weightedAgents[index++].Agent.SetAt(agent);
+                    }
+                    k++;
+                }
+            }
+            else
+            {
+                foreach (Agent agent in ChargesAndDebris)
+                {
+                    if (Fronts[k] != 0)
+                    {
+                        _weightedAgents[index++].Agent.SetAt(agent);
+                    }
+                    k++;
+                }
+            }
+
+            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+
+            int startIndex = 0;
+
+            if (lengthFirstFront <= _parameters.NP)
+            {
+                int j = 0;
+
+                foreach (Agent agent in ChargesAndDebris)
+                {
+                    // Solutions with front index equals to 'lastFrontIndex' are taken.
+                    if (Fronts[j] == 0)
+                    {
+                        _chargePoints[startIndex++].SetAt(agent);
+                    }
+                    j++;
+                }
+            }
+
+            base.TakeAgents(actualSizeMatrix, totalTake);
+
+            for (int i = 0; i < _weightedAgents.Count; i++)
+            {
+                if (_weightedAgents[i].IsTake)
+                {
+                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
+                }
+            }
+        }
+
+        private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        {
+            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max(), lastFrontIndex = 0;
 
             for (int front = 0; front <= maxFront; front++)
             {
@@ -171,29 +245,36 @@ namespace EOpt.Math.Optimization.MOOpt
             // Need to compare 'lengthLastFront' agents.
             base.ResetMatrixAndTrimWeights(lengthLastFront);
 
+            int k = 0, index = 0;
+
+            foreach (Agent agent in ChargesAndDebris)
+            {
+                // Solutions with front index equals to 'lastFrontIndex' are taken.
+                if (Fronts[k] == lastFrontIndex)
+                {
+                    _weightedAgents[index++].Agent.SetAt(agent);
+                }
+
+                k++;
+            }
+
+            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+
             int startIndex = 0;
 
-            { 
-                int index = 0;
-                int i = 0;
+           
+                int j = 0;
 
                 foreach (Agent agent in ChargesAndDebris)
                 {
                     // Solutions with front index equals to 'lastFrontIndex' are taken.
-                    if (Fronts[i] == lastFrontIndex)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(agent);
-                    }
-                    else if(Fronts[i] < lastFrontIndex)
+                    if (Fronts[j]  < lastFrontIndex)
                     {
                         _chargePoints[startIndex++].SetAt(agent);
                     }
-
-                    i++;
+                    j++;
                 }
-            }
-
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+            
 
             base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
 
@@ -203,6 +284,21 @@ namespace EOpt.Math.Optimization.MOOpt
                 {
                     _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Generate current population. 
+        /// </summary>
+        private void GenerateNextAgents(int IterNum, IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        {
+            //if (IterNum <= 0.8F *_parameters.Imax)
+            //{
+            //    FirstMethod(ChargesAndDebris, Fronts);
+            //}
+            //else
+            {
+                SecondMethod(ChargesAndDebris, Fronts);
             }
         }
 
@@ -239,7 +335,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             int[] allFronts = _nds.NonDominSort(allAgents, item => item.Objs);
 
-            GenerateNextAgents(allAgents, allFronts);
+            GenerateNextAgents(_iterNum, allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
         }
@@ -248,13 +344,22 @@ namespace EOpt.Math.Optimization.MOOpt
         {
             base.Init(Parameters, Dim, DimObjs);
 
-            if(_idealPoint == null)
+            if (_idealPoint == null)
             {
                 _idealPoint = new PointND(0.0, DimObjs);
             }
-            else if(_idealPoint.Count != DimObjs)
+            else if (_idealPoint.Count != DimObjs)
             {
                 _idealPoint = new PointND(0.0, DimObjs);
+            }
+
+            if (_hvs == null)
+            {
+                _hvs = new double[Parameters.NP];
+            }
+            else if (_hvs.Length != Parameters.NP)
+            {
+                _hvs = new double[Parameters.NP];
             }
         }
 
@@ -266,7 +371,7 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 for (int j = 0; j < _chargePoints[i].Objs.Count; j++)
                 {
-                    if(_chargePoints[i].Objs[j] < _idealPoint[j])
+                    if (_chargePoints[i].Objs[j] < _idealPoint[j])
                     {
                         _idealPoint[j] = _chargePoints[i].Objs[j];
                     }
@@ -315,6 +420,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             for (int i = 1; i < _parameters.Imax; i++)
             {
+                _iterNum = i;
                 NextStep(Problem);
             }
 
