@@ -20,10 +20,15 @@ namespace EOpt.Math.Optimization.MOOpt
     /// </summary>
     public class MOFWOptimizer : BaseFW<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<FWParams>
     {
-        private PointND _idealPoint, _nadirPoint;
-
         private Ndsort<double> _nds;
+
+        private List<Agent> _chargesCopy;
+
         private int _iter;
+
+        private double _amax;
+
+        public int BorderIter { get; set; }
 
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
@@ -47,27 +52,18 @@ namespace EOpt.Math.Optimization.MOOpt
         /// <summary>
         /// Find amount debris for each point of charge. 
         /// </summary>
-        private void FindAmountDebris()
+        private void FindAmountDebris(int[] Fronts)
         {
             double s = 0;
 
-            double denumerator = 0;
+            int fmax = Fronts.Max() + 1;
 
             int dimObjs = _chargePoints[0].Objs.Count;
 
-            for (int i = 0; i < _parameters.NP; i++)
-            {
-                denumerator += PointND.Distance(_nadirPoint, _chargePoints[i].Objs);
-            }
-
-            if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
-            {
-                denumerator += Constants.VALUE_AVOID_DIV_BY_ZERO;
-            }
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                s = _parameters.M * (PointND.Distance(_nadirPoint, _chargePoints[i].Objs) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                s = _parameters.M * Math.Log(1 + fmax / (Fronts[i] + 1.0)) * (1 - ((double)Fronts.Count(fr => fr == Fronts[i])) / Fronts.Length);
 
                 base.FindAmountDebrisForCharge(s, i, dimObjs);
             }
@@ -80,26 +76,16 @@ namespace EOpt.Math.Optimization.MOOpt
         /// <param name="LowerBounds"> </param>
         /// <param name="UpperBounds"> </param>
         /// <param name="Function">    </param>
-        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, Func<IReadOnlyList<double>, IEnumerable<double>> Function)
+        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, Func<IReadOnlyList<double>, IEnumerable<double>> Function, int[] Fronts)
         {
-            double denumerator = 0;
+            int fmax = Fronts.Max() + 1;
 
-            for (int j = 0; j < _parameters.NP; j++)
-            {
-                denumerator += PointND.Distance(_chargePoints[j].Objs, _idealPoint);
-            }
-
-            if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
-            {
-                denumerator += Constants.VALUE_AVOID_DIV_BY_ZERO;
-            }
+            double amplitude = 0;
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                double amplitude = 0;
-
                 // Amplitude of explosion.
-                amplitude = _parameters.Amax * (PointND.Distance(_chargePoints[i].Objs, _idealPoint) + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                amplitude = _amax * Math.Log(1 + (Fronts[i] + 1.0) / fmax) * Fronts.Count(fr => fr == Fronts[i]) / Fronts.Length;
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
@@ -165,7 +151,7 @@ namespace EOpt.Math.Optimization.MOOpt
                     // Solutions with front index equals to 'lastFrontIndex' are taken.
                     if (Fronts[j] == 0)
                     {
-                        _chargePoints[startIndex++].SetAt(agent);
+                        _chargesCopy[startIndex++].SetAt(agent);
                     }
                     j++;
                 }
@@ -177,7 +163,7 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 if (_weightedAgents[i].IsTake)
                 {
-                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
+                    _chargesCopy[startIndex++].SetAt(_weightedAgents[i].Agent);
                 }
             }
         }
@@ -229,7 +215,7 @@ namespace EOpt.Math.Optimization.MOOpt
                 // Solutions with front index equals to 'lastFrontIndex' are taken.
                 if (Fronts[j] < lastFrontIndex)
                 {
-                    _chargePoints[startIndex++].SetAt(agent);
+                    _chargesCopy[startIndex++].SetAt(agent);
                 }
                 j++;
             }
@@ -241,7 +227,7 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 if (_weightedAgents[i].IsTake)
                 {
-                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
+                    _chargesCopy[startIndex++].SetAt(_weightedAgents[i].Agent);
                 }
             }
         }
@@ -251,7 +237,7 @@ namespace EOpt.Math.Optimization.MOOpt
         /// </summary>
         private void GenerateNextAgents(int IterNum, IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            if (IterNum <= _parameters.Imax)
+            if (IterNum <= BorderIter)
             {
                 FirstMethod(ChargesAndDebris, Fronts);
             }
@@ -259,7 +245,13 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 SecondMethod(ChargesAndDebris, Fronts);
             }
+
+            for (int i = 0; i < _chargesCopy.Count; i++)
+            {
+                _chargePoints[i].SetAt(_chargesCopy[i]);
+            }
         }
+
         protected override void Clear()
         {
 
@@ -279,11 +271,15 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void NextStep(IMOOptProblem Problem)
         {
-            FindIdealAndNadirPoint();
 
-            FindAmountDebris();
+            _amax = _parameters.Amax;// - (_parameters.Amax - 1E-8) / _parameters.Imax * Math.Sqrt((2 * _parameters.Imax - (_iter - 1)) * (_iter -1));
 
-            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, Problem.TargetFunction);
+
+            int[] fronts = _nds.NonDominSort(_chargePoints, item => item.Objs);
+
+            FindAmountDebris(fronts);
+
+            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, Problem.TargetFunction, fronts);
 
             EvalFunctionForDebris(Problem.TargetFunction);
 
@@ -300,51 +296,30 @@ namespace EOpt.Math.Optimization.MOOpt
         {
             base.Init(Parameters, Dim, DimObjs);
 
-            if(_idealPoint == null)
+            if(_chargesCopy == null)
             {
-                _idealPoint = new PointND(0.0, DimObjs);
-            }
-            else if(_idealPoint.Count != DimObjs)
-            {
-                _idealPoint = new PointND(0.0, DimObjs);
-            }
+                _chargesCopy = new List<Agent>(Parameters.NP);
 
-            if (_nadirPoint == null)
-            {
-                _nadirPoint = new PointND(0.0, DimObjs);
-            }
-            else if (_nadirPoint.Count != DimObjs)
-            {
-                _nadirPoint = new PointND(0.0, DimObjs);
-            }
-        }
-
-        private void FindIdealAndNadirPoint()
-        {
-            _idealPoint.SetAt(_chargePoints[0].Objs);
-            _nadirPoint.SetAt(_chargePoints[0].Objs);
-
-            for (int i = 1; i < _parameters.NP; i++)
-            {
-                for (int j = 0; j < _chargePoints[i].Objs.Count; j++)
+                for (int i = 0; i < Parameters.NP; i++)
                 {
-                    if(_chargePoints[i].Objs[j] < _idealPoint[j])
-                    {
-                        _idealPoint[j] = _chargePoints[i].Objs[j];
-                    }
-                    else if (_chargePoints[i].Objs[j] > _nadirPoint[j])
-                    {
-                        _nadirPoint[j] = _chargePoints[i].Objs[j];
-                    }
+                    _chargesCopy.Add(_pool.GetAgent());
+                }
+            }
+            else if(_chargesCopy.Count != Parameters.NP)
+            {
+                _chargesCopy.Capacity = Parameters.NP;
+
+                _chargesCopy.Clear();
+
+                for (int i = 0; i < Parameters.NP; i++)
+                {
+                    _chargesCopy.Add(_pool.GetAgent());
                 }
             }
         }
 
-        public IEnumerable<Agent> ParetoFront
-        {
-            get => _nds.NonDominSort(_chargePoints, ag => ag.Objs).Zip(_chargePoints, (front, agent) => new KeyValuePair<int, Agent>(front, agent)).Where(kv => kv.Key == 0).Select(kv => kv.Value);
 
-        }
+        public IEnumerable<Agent> ParetoFront => _chargePoints;
 
         /// <summary>
         /// Create object which uses default implementation for random generators. 
