@@ -1,4 +1,4 @@
-﻿namespace EOptimizationTests.Math.Optimization
+﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
 
