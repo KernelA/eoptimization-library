@@ -307,9 +307,9 @@ namespace EOpt.Math.Optimization.MOOpt
             }
             else if(_chargesCopy.Count != Parameters.NP)
             {
-                _chargesCopy.Capacity = Parameters.NP;
-
                 _chargesCopy.Clear();
+
+                _chargesCopy.Capacity = Parameters.NP;
 
                 for (int i = 0; i < Parameters.NP; i++)
                 {
