@@ -465,10 +465,7 @@ namespace EOpt.Math
                 throw new ArgumentException(NotEqualDimMessage, nameof(Point));
             }
 
-            for (int i = 0; i < Count; i++)
-            {
-                this[i] = Point[i];
-            }
+            Point._coordinates.CopyTo(this._coordinates, 0);
         }
 
         /// <summary>
