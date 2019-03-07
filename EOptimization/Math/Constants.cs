@@ -42,6 +42,11 @@ namespace EOpt.Math
         /// </summary>
         public static readonly double VALUE_AVOID_DIV_BY_ZERO;
 
+        /// <summary>
+        /// Math.Log(2).
+        /// </summary>
+        public static readonly double LN_2;
+
         static Constants()
         {
             double eps = ComputEps();
@@ -53,6 +58,8 @@ namespace EOpt.Math
             VALUE_AVOID_DIV_BY_ZERO = Math.Pow(10, exponnet / 2);
 
             EPS = eps;
+
+            LN_2 = Math.Log(2);
         }
     }
 }
