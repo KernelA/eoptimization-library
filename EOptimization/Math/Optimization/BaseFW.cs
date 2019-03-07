@@ -12,6 +12,9 @@ namespace EOpt.Math.Optimization
 
     using Math.LA;
 
+    using Priority_Queue;
+
+
     /// <summary>
     /// Base class for the FW method. 
     /// </summary>
@@ -50,35 +53,35 @@ namespace EOpt.Math.Optimization
         /// <summary>
         /// Class for internal computation. 
         /// </summary>
-        protected class WeightOfAgent : IComparable<WeightOfAgent>
+        protected class WeightOfAgent
         {
             public Agent Agent { get; private set; }
 
-            public bool IsTake { get; set; }
-
             public double Weight { get; set; }
+
+            public bool IsTake { get; set; }
 
             public WeightOfAgent(Agent Agent, double Dist)
             {
                 this.Agent = Agent;
                 this.Weight = Dist;
-                this.IsTake = false;
+                IsTake = false;
             }
 
-            public int CompareTo(WeightOfAgent Other)
+            public void Reset()
             {
-                if (Weight < Other.Weight)
-                {
-                    return -1;
-                }
-                else if (Weight > Other.Weight)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
+                Weight = 0.0;
+                IsTake = false;
+            }
+        }
+
+        protected class AgentNode : FastPriorityQueueNode
+        {
+            public int AgentIndex { get; private set; }
+
+            public AgentNode(int Index)
+            {
+                AgentIndex = Index;
             }
         }
 
@@ -184,7 +187,7 @@ namespace EOpt.Math.Optimization
         protected void FirstMethodDeterminationOfPosition(Agent Splinter, int CountOfDimension, double Amplitude, IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds)
         {
             // The indices are choosing randomly.
-            GenerateIndexesOfAxes();
+            GenerateIndicesOfAxes(CountOfDimension);
 
             double h = 0;
 
@@ -245,15 +248,28 @@ namespace EOpt.Math.Optimization
         /// Generate randomly indices of axes. 
         /// </summary>
         /// <returns></returns>
-        protected void GenerateIndexesOfAxes()
+        protected void GenerateIndicesOfAxes(int TotalTake)
         {
-            // Set coordinate numbers.
-            for (int i = 0; i < _coordNumbers.Length; i++)
-            {
-                _coordNumbers[i] = i;
-            }
+            int i = 0;
 
-            Сombinatorics.RandomPermutation(_coordNumbers, SyncRandom.Get());
+            Random rand = SyncRandom.Get();
+
+            foreach(int coordIndex in Enumerable.Range(0, _coordNumbers.Length))
+            {
+                if(coordIndex < TotalTake)
+                {
+                    _coordNumbers[i++] = coordIndex;
+                }
+                else
+                {
+                    int swapIndex = rand.Next(i);
+
+                    if(swapIndex < TotalTake)
+                    {
+                        _coordNumbers[swapIndex] = coordIndex;
+                    }
+                }
+            }
         }
 
         protected virtual void Init(FWParams Parameters, int Dim, int DimObjs)
@@ -351,12 +367,13 @@ namespace EOpt.Math.Optimization
         protected void ResetMatrixAndTrimWeights(int NewSize)
         {
             _matrixOfDistances.ColumnCount = NewSize;
-
             _matrixOfDistances.Fill(0.0);
 
             if(NewSize > _weightedAgents.Count)
             {
                 int countAdd = NewSize - _weightedAgents.Count;
+
+                _weightedAgents.Capacity += countAdd;
 
                 while(countAdd > 0)
                 {
@@ -376,8 +393,7 @@ namespace EOpt.Math.Optimization
 
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
-                _weightedAgents[i].Weight = 0;
-                _weightedAgents[i].IsTake = false;
+                _weightedAgents[i].Reset();
             }
         }
 
@@ -390,7 +406,7 @@ namespace EOpt.Math.Optimization
         /// <param name="UpperBounds">     </param>
         protected void SecondMethodDeterminationOfPosition(Agent Splinter, int CountOfDimension, IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds)
         {
-            GenerateIndexesOfAxes();
+            GenerateIndicesOfAxes(CountOfDimension);
 
             double g = 0;
 
@@ -432,17 +448,31 @@ namespace EOpt.Math.Optimization
         /// <param name="TotalTake"></param>
         protected void TakeAgents(int ActualSize, int TotalTake)
         {
+            SimplePriorityQueue<int, double> _priority = new SimplePriorityQueue<int, double>();
+
+            double weight = 0.0;
+
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
-                _weightedAgents[i].Weight = Math.Pow(_uniformRand.URandVal(0, 1), 1 / _weightedAgents[i].Weight);
+                weight = Math.Pow(_uniformRand.URandVal(0, 1), 1 / _weightedAgents[i].Weight);
+
+                if(_priority.Count < TotalTake)
+                {
+                    _priority.Enqueue(i, weight);
+                }
+                else
+                {
+                    if(weight >= _priority.GetPriority(_priority.First))
+                    {
+                        _priority.Dequeue();
+                        _priority.Enqueue(i, weight);
+                    }
+                }
             }
 
-            // Sort by descending.
-            _weightedAgents.Sort((a, b) => -a.CompareTo(b));
-
-            for (int i = 0; i < TotalTake; i++)
+            while(_priority.Count != 0)
             {
-                _weightedAgents[i].IsTake = true;
+                _weightedAgents[_priority.Dequeue()].IsTake = true;
             }
         }
 

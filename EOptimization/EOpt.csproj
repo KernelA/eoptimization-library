@@ -16,6 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OptimizedPriorityQueue" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Ndomsort">
       <HintPath>..\..\nds\Src\Ndomsort\bin\Release\netstandard1.0\Ndomsort.dll</HintPath>
     </Reference>

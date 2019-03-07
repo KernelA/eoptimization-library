@@ -15,6 +15,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
     using Nds;
 
+
     /// <summary>
     /// Optimization method Fireworks. 
     /// </summary>
@@ -26,9 +27,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private int _iter;
 
-        private double _amax;
-
-        public int BorderIter { get; set; }
+        private int[] _currentFronts;
 
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
@@ -52,18 +51,17 @@ namespace EOpt.Math.Optimization.MOOpt
         /// <summary>
         /// Find amount debris for each point of charge. 
         /// </summary>
-        private void FindAmountDebris(int[] Fronts)
+        private void FindAmountDebris(int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
             double s = 0;
 
-            int fmax = Fronts.Max() + 1;
-
             int dimObjs = _chargePoints[0].Objs.Count;
-
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                s = _parameters.M * Math.Log(1 + fmax / (Fronts[i] + 1.0)) * (1 - ((double)Fronts.Count(fr => fr == Fronts[i])) / Fronts.Length);
+                int countFront = CountFronts[Fronts[i]];
+                // Uses binary logarithm.
+                s = _parameters.M * Math.Log(1 + FMax / (Fronts[i] + 1.0)) / Constants.LN_2 * (1 - ((double)countFront) / Fronts.Length);
 
                 base.FindAmountDebrisForCharge(s, i, dimObjs);
             }
@@ -76,16 +74,14 @@ namespace EOpt.Math.Optimization.MOOpt
         /// <param name="LowerBounds"> </param>
         /// <param name="UpperBounds"> </param>
         /// <param name="Function">    </param>
-        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, Func<IReadOnlyList<double>, IEnumerable<double>> Function, int[] Fronts)
+        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
-            int fmax = Fronts.Max() + 1;
-
             double amplitude = 0;
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                // Amplitude of explosion.
-                amplitude = _amax * Math.Log(1 + (Fronts[i] + 1.0) / fmax) * Fronts.Count(fr => fr == Fronts[i]) / Fronts.Length;
+                // Amplitude of explosion. Uses binary logarithm.
+                amplitude = _parameters.Amax * Math.Log(1 + (Fronts[i] + 1.0) / FMax) / Constants.LN_2 * CountFronts[Fronts[i]] / Fronts.Length;
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
@@ -170,6 +166,14 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
+            
+        }
+
+        /// <summary>
+        /// Generate current population. 
+        /// </summary>
+        private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        {
             int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max(), lastFrontIndex = 0;
 
             for (int front = 0; front <= maxFront; front++)
@@ -190,61 +194,36 @@ namespace EOpt.Math.Optimization.MOOpt
             // Need to compare 'lengthLastFront' agents.
             base.ResetMatrixAndTrimWeights(lengthLastFront);
 
-            int k = 0, index = 0;
+            int k = 0, index = 0, startIndex = 0;
 
             foreach (Agent agent in ChargesAndDebris)
             {
-                // Solutions with front index equals to 'lastFrontIndex' are taken.
                 if (Fronts[k] == lastFrontIndex)
                 {
                     _weightedAgents[index++].Agent.SetAt(agent);
+                }
+                else if (Fronts[k] < lastFrontIndex)
+                {
+                    _chargesCopy[startIndex].SetAt(agent);
+                    _currentFronts[startIndex++] = Fronts[k];
                 }
 
                 k++;
             }
 
             base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
-
-            int startIndex = 0;
-
-
-            int j = 0;
-
-            foreach (Agent agent in ChargesAndDebris)
-            {
-                // Solutions with front index equals to 'lastFrontIndex' are taken.
-                if (Fronts[j] < lastFrontIndex)
-                {
-                    _chargesCopy[startIndex++].SetAt(agent);
-                }
-                j++;
-            }
-
-
             base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
 
             for (int i = 0; i < _weightedAgents.Count; i++)
             {
                 if (_weightedAgents[i].IsTake)
                 {
-                    _chargesCopy[startIndex++].SetAt(_weightedAgents[i].Agent);
+                    _chargesCopy[startIndex].SetAt(_weightedAgents[i].Agent);
+                    // _weightedAgents always have 'lastFronIndex' front index.
+                    _currentFronts[startIndex++] = lastFrontIndex;
                 }
             }
-        }
 
-        /// <summary>
-        /// Generate current population. 
-        /// </summary>
-        private void GenerateNextAgents(int IterNum, IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
-        {
-            if (IterNum <= BorderIter)
-            {
-                FirstMethod(ChargesAndDebris, Fronts);
-            }
-            else
-            {
-                SecondMethod(ChargesAndDebris, Fronts);
-            }
 
             for (int i = 0; i < _chargesCopy.Count; i++)
             {
@@ -271,23 +250,23 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void NextStep(IMOOptProblem Problem)
         {
+            int[] fronts = _nds.NonDominSort(_chargePoints.Select(item => item.Objs));
 
-            _amax = _parameters.Amax;// - (_parameters.Amax - 1E-8) / _parameters.Imax * Math.Sqrt((2 * _parameters.Imax - (_iter - 1)) * (_iter -1));
+            var countFronts = fronts.GroupBy(frontIndex => frontIndex).ToDictionary(item => item.Key, item => item.Count());
 
+            int maxFront = countFronts.Keys.Max() + 1;
 
-            int[] fronts = _nds.NonDominSort(_chargePoints, item => item.Objs);
+            FindAmountDebris(fronts, countFronts, maxFront);
 
-            FindAmountDebris(fronts);
-
-            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, Problem.TargetFunction, fronts);
+            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, fronts, countFronts, maxFront);
 
             EvalFunctionForDebris(Problem.TargetFunction);
 
             var allAgents = _chargePoints.Concat(_debris.SelectMany(coll => coll.Select(agent => agent)));
 
-            int[] allFronts = _nds.NonDominSort(allAgents, item => item.Objs);
+            int[] allFronts = _nds.NonDominSort(allAgents.Select(agent => agent.Objs));
 
-            GenerateNextAgents(_iter, allAgents, allFronts);
+            GenerateNextAgents(allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
         }
@@ -316,6 +295,8 @@ namespace EOpt.Math.Optimization.MOOpt
                     _chargesCopy.Add(_pool.GetAgent());
                 }
             }
+
+            _currentFronts = new int[Parameters.NP]; 
         }
 
 
