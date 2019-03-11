@@ -55,7 +55,10 @@ namespace EOpt.Math
         public PointND(double[] Coordinates)
         {
             if (Coordinates == null)
+            {
                 throw new ArgumentNullException(nameof(Coordinates));
+
+            }
             _coordinates = new double[Coordinates.Length];
 
             Coordinates.CopyTo(_coordinates, 0);
