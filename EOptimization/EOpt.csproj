@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
@@ -13,16 +13,12 @@
     <Company />
     <Authors>Alexander Kryuchkov</Authors>
     <RootNamespace>EOpt</RootNamespace>
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ndomsort" Version="0.0.1.2" />
     <PackageReference Include="OptimizedPriorityQueue" Version="4.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Ndomsort">
-      <HintPath>..\..\nds\Src\Ndomsort\bin\Release\netstandard1.0\Ndomsort.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
