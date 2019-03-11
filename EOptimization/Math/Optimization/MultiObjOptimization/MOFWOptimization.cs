@@ -29,6 +29,8 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private int[] _currentFronts;
 
+        private bool _isUseChachedFronts;
+
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
             for (int i = 0; i < _parameters.NP; i++)
@@ -174,7 +176,10 @@ namespace EOpt.Math.Optimization.MOOpt
         /// </summary>
         private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max(), lastFrontIndex = 0;
+            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max();
+
+            // If 'lastFrontIndex' is equal to 'maxFront + 1' than no need an additional selection.
+            int lastFrontIndex = maxFront + 1;
 
             for (int front = 0; front <= maxFront; front++)
             {
@@ -191,14 +196,19 @@ namespace EOpt.Math.Optimization.MOOpt
                 }
             }
 
-            // Need to compare 'lengthLastFront' agents.
-            base.ResetMatrixAndTrimWeights(lengthLastFront);
+            int needToTake = _parameters.NP - totalTaken;
+
+            if (needToTake > 0)
+            {
+                // Need to compare 'lengthLastFront' agents.
+                base.ResetMatrixAndTrimWeights(lengthLastFront);
+            }
 
             int k = 0, index = 0, startIndex = 0;
 
             foreach (Agent agent in ChargesAndDebris)
             {
-                if (Fronts[k] == lastFrontIndex)
+                if (Fronts[k] == lastFrontIndex && needToTake != 0)
                 {
                     _weightedAgents[index++].Agent.SetAt(agent);
                 }
@@ -211,19 +221,21 @@ namespace EOpt.Math.Optimization.MOOpt
                 k++;
             }
 
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
-            base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
-
-            for (int i = 0; i < _weightedAgents.Count; i++)
+            if (needToTake> 0)
             {
-                if (_weightedAgents[i].IsTake)
+                base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+                base.TakeAgents(lengthLastFront, needToTake);
+
+                for (int i = 0; i < _weightedAgents.Count; i++)
                 {
-                    _chargesCopy[startIndex].SetAt(_weightedAgents[i].Agent);
-                    // _weightedAgents always have 'lastFronIndex' front index.
-                    _currentFronts[startIndex++] = lastFrontIndex;
+                    if (_weightedAgents[i].IsTake)
+                    {
+                        _chargesCopy[startIndex].SetAt(_weightedAgents[i].Agent);
+                        // _weightedAgents always have 'lastFronIndex' as an index of front.
+                        _currentFronts[startIndex++] = lastFrontIndex;
+                    }
                 }
             }
-
 
             for (int i = 0; i < _chargesCopy.Count; i++)
             {
@@ -250,7 +262,17 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void NextStep(IMOOptProblem Problem)
         {
-            int[] fronts = _nds.NonDominSort(_chargePoints.Select(item => item.Objs));
+            int[] fronts = null;
+
+            if (_isUseChachedFronts)
+            {
+                fronts = _currentFronts;
+            }
+            else
+            {
+                fronts = _nds.NonDominSort(_chargePoints.Select(item => item.Objs));
+                _isUseChachedFronts = true;
+            }
 
             var countFronts = fronts.GroupBy(frontIndex => frontIndex).ToDictionary(item => item.Key, item => item.Count());
 
@@ -269,13 +291,14 @@ namespace EOpt.Math.Optimization.MOOpt
             GenerateNextAgents(allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
+
         }
 
         protected override void Init(FWParams Parameters, int Dim, int DimObjs)
         {
             base.Init(Parameters, Dim, DimObjs);
 
-            if(_chargesCopy == null)
+            if (_chargesCopy == null)
             {
                 _chargesCopy = new List<Agent>(Parameters.NP);
 
@@ -284,7 +307,7 @@ namespace EOpt.Math.Optimization.MOOpt
                     _chargesCopy.Add(_pool.GetAgent());
                 }
             }
-            else if(_chargesCopy.Count != Parameters.NP)
+            else if (_chargesCopy.Count != Parameters.NP)
             {
                 _chargesCopy.Clear();
 
@@ -322,6 +345,7 @@ namespace EOpt.Math.Optimization.MOOpt
         public MOFWOptimizer(IContUniformGen UniformGen, INormalGen NormalGen) : base(UniformGen, NormalGen)
         {
             _nds = new Ndsort<double>(CmpDouble.DoubleCompare);
+            _isUseChachedFronts = false;
         }
 
         /// <summary>

@@ -448,7 +448,7 @@ namespace EOpt.Math.Optimization
         /// <param name="TotalTake"></param>
         protected void TakeAgents(int ActualSize, int TotalTake)
         {
-            SimplePriorityQueue<int, double> _priority = new SimplePriorityQueue<int, double>();
+            var _priority = new SimplePriorityQueue<int, double>();
 
             double weight = 0.0;
 
