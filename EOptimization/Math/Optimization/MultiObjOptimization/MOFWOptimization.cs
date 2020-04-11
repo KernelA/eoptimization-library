@@ -68,41 +68,6 @@ namespace EOpt.Math.Optimization.MOOpt
             }
         }
 
-        private double ComputePseudoHV(PointND Objs)
-        {
-            double tempDiff = 0, tempHV = 1;
-
-            for (int i = 0; i < Objs.Count; i++)
-            {
-                tempDiff = Objs[i] - _idealPoint[i];
-
-                if (tempDiff < Constants.VALUE_AVOID_DIV_BY_ZERO)
-                {
-                    tempDiff += Constants.VALUE_AVOID_DIV_BY_ZERO;
-                }
-
-                tempHV *= tempDiff;
-            }
-
-            return tempHV;
-        }
-
-        private void FindMaxMinPseudoHyperVolume()
-        {
-            _hvs[0] = ComputePseudoHV(_chargePoints[0].Objs);
-            _maxHV = _hvs[0];
-
-            for (int i = 1; i < _parameters.NP; i++)
-            {
-                _hvs[i] = ComputePseudoHV(_chargePoints[i].Objs);
-
-                if (_hvs[i] > _maxHV)
-                {
-                    _maxHV = _hvs[i];
-                }
-            }
-        }
-
         /// <summary>
         /// Determine debris position.
         /// </summary>
@@ -320,6 +285,14 @@ namespace EOpt.Math.Optimization.MOOpt
             }
 
             Clear();
+        }
+
+        protected virtual void Clear()
+        {
+            for (int i = 0; i < _debris.Length; i++)
+            {
+                _debris[i].Clear();
+            }
         }
 
         /// <summary>
