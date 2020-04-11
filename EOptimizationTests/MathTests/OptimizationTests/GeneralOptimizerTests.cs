@@ -1,114 +1,35 @@
 ﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Linq;
 
-
-    static class GeneralOptimizerTests
+    internal static class GeneralOptimizerTests
     {
-        public static readonly double[] LeftBound = { -10, -10 };
+        public const int ITER_MAX = 10;
+        public static readonly double[] LowerBounds = { -10, -10 };
 
-        public static readonly double[] RightBound = { 10, 10 };
+        public static readonly double[] UpperBounds = { 10, 10 };
 
-        public const int IterMax = 10;
+        public static double FunctionNaN(IReadOnlyList<double> point) => Math.Sqrt(-1);
 
-        public static double TargetFunction(double[] point)
-        {
-            return point.Sum(coord => coord * coord);
-        }
+        public static double FunctionNegInf(IReadOnlyList<double> points) => Double.NegativeInfinity;
 
-        public static double FunctionNaN(double[] point)
-        {
-            return Math.Sqrt(-1);
-        }
+        public static double FunctionPosInf(IReadOnlyList<double> point) => Double.PositiveInfinity;
 
-        public static double FunctionPosInf(double[] point)
-        {
-            return Double.PositiveInfinity;
-        }
+        public static double TargetFunction(IReadOnlyList<double> point) => point.Sum(coord => coord * coord);
 
-        public static double FunctionNegInf(double[] points)
-        {
-            return Double.NegativeInfinity;
-        }
-
-
-        public static bool TestInavlidFunction<T>(IOptimizer<T> opt, T parameters, Func<double[], double> function)
-        {
-            bool error = true;
-
-            opt.InitializeParameters(parameters);
-
-            try
-            {
-                opt.Minimize(new GeneralParams(function, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
-            }
-            catch (ArithmeticException exc)
-            {
-                error = false;
-            }
-
-            return error;
-        }
-
-        public static bool TestWrongInvoke<T>(IOptimizer<T> opt)
-        {
-            bool error = true;
-
-            try
-            {
-                opt.Minimize(new GeneralParams(GeneralOptimizerTests.TargetFunction, GeneralOptimizerTests.LeftBound, GeneralOptimizerTests.RightBound));
-            }
-            catch (InvalidOperationException exc)
-            {
-                error = false;
-                //Debug.Indent();
-                //Debug.WriteLine(exc.Message);
-            }
-
-            return error;
-        }
-
-        public static bool TestWrongParams<T>(IOptimizer<T> opt) where T : class
-        {
-            bool error = true;
-
-            try
-            {
-                opt.InitializeParameters(null);
-            }
-            catch (ArgumentNullException exc)
-            {
-                error = false;
-                //Debug.Indent();
-                //Debug.WriteLine(exc.Message);
-            }
-
-            return error;
-        }
-
-        public static bool TestOptimizer<T>(IOptimizer<T> Opt, T Parameters, GeneralParams GenParams)
-        {
-            Opt.InitializeParameters(Parameters);
-                      
-            Opt.Minimize(GenParams);
-
-            return Opt.Solution == null && Opt.Solution.Dimension != 3;
-        }
-
-        public static bool TestCancel<T>(IOptimizer<T> Opt, T Parameters, GeneralParams GenParams)
+        public static bool TestCancel<T>(IOOOptimizer<T> Opt, T Parameters)
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
             CancellationToken token = tokenSource.Token;
 
-            Opt.InitializeParameters(Parameters);
+            OOOptimizationProblem problem = new OOOptimizationProblem(TargetFunction, LowerBounds, UpperBounds);
 
-            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Minimize(GenParams, token); }, token);
+            Task task = Task.Factory.StartNew(() => { Thread.Sleep(3000); Opt.Minimize(Parameters, problem, token); }, token);
 
             tokenSource.Cancel();
 
@@ -116,13 +37,53 @@
             {
                 task.Wait();
             }
-            catch(AggregateException)
+            catch (AggregateException)
             {
-                
             }
 
             return !task.IsCanceled;
         }
 
+        public static void TestInavlidFunction<T>(IOOOptimizer<T> opt, T parameters, InvalidFunc TypeFunc)
+        {
+            OOOptimizationProblem problem = null;
+
+            switch (TypeFunc)
+            {
+                case InvalidFunc.NaNFunc:
+                    {
+                        problem = new OOOptimizationProblem(FunctionNaN, LowerBounds, UpperBounds);
+                        break;
+                    }
+                case InvalidFunc.NegInfFunc:
+                    {
+                        problem = new OOOptimizationProblem(FunctionNegInf, LowerBounds, UpperBounds);
+                        break;
+                    }
+                case InvalidFunc.PosInfFunc:
+                    {
+                        problem = new OOOptimizationProblem(FunctionPosInf, LowerBounds, UpperBounds);
+                        break;
+                    }
+            }
+
+            opt.Minimize(parameters, problem);
+        }
+
+        public static bool TestOptimizer<T>(IOOOptimizer<T> Opt, T Parameters)
+        {
+            Opt.Minimize(Parameters, new OOOptimizationProblem(TargetFunction, LowerBounds, UpperBounds));
+
+            return Opt.Solution == null;
+        }
+
+        public static void TestWrongParams<T>(IOOOptimizer<T> opt) where T : struct
+        {
+            T parameters = default(T);
+
+            opt.Minimize(parameters, new OOOptimizationProblem(TargetFunction, LowerBounds, UpperBounds));
+        }
     }
+
+    public enum InvalidFunc { NaNFunc, PosInfFunc, NegInfFunc };
 }

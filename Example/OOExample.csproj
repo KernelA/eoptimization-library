@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EOptimization\EOptimization.csproj" />
+    <ProjectReference Include="..\EOptimization\EOpt.csproj" />
   </ItemGroup>
 
 </Project>

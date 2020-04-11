@@ -1,5 +1,5 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it. PVS-Studio Static
+// Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Random
 {
     using System;
@@ -7,28 +7,19 @@ namespace EOpt.Math.Random
     /// <summary>
     /// Normal distribution.
     /// </summary>
-    public class NormalDistribution : INormalGenerator
+    public class NormalDist : INormalGen
     {
-
-        private double mean, stdDev, uniformRand1, uniformRand2, r, cachedValue;
-
-        private bool isCachedValue;
-
-        private Random rand;
+        private bool _isCachedValue;
+        private double _mean, _stdDev, _uniformRand1, _uniformRand2, _r, _cachedValue;
+        private Random _rand;
 
         /// <summary>
         /// Mean value.
         /// </summary>
         public double Mean
         {
-            get
-            {
-                return mean;
-            }
-            set
-            {
-                mean = value;
-            }
+            get => _mean;
+            set => _mean = value;
         }
 
         /// <summary>
@@ -37,86 +28,82 @@ namespace EOpt.Math.Random
         /// <exception cref="ArgumentException"></exception>
         public double StdDev
         {
-            get
-            {
-                return stdDev;
-            }
+            get => _stdDev;
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentException($"{nameof(StdDev)} must be > 0.", nameof(StdDev));
+                }
 
-                stdDev = value;
+                _stdDev = value;
             }
         }
-
 
         /// <summary>
         /// Create normal distribution with mean is equal 0 and standard deviation is equal 1.
         /// </summary>
-        public NormalDistribution() : this(0, 1)
+        public NormalDist() : this(0, 1)
         {
-
         }
 
         /// <summary>
-        /// Create normal distribution with mean is equal <paramref name="Mean"/> and standard deviation is equal <paramref name="StdDev"/>.
+        /// Create normal distribution with mean is equal <paramref name="Mean"/> and standard
+        /// deviation is equal <paramref name="StdDev"/>.
         /// </summary>
-        /// <param name="Mean">Mean value.</param>
-        /// <param name="StdDev">Standard deviation.</param>
+        /// <param name="Mean">   Mean value. </param>
+        /// <param name="StdDev"> Standard deviation. </param>
         /// <exception cref="ArgumentException"></exception>
-        public NormalDistribution(double Mean, double StdDev)
+        public NormalDist(double Mean, double StdDev)
         {
-            rand = SyncRandom.Get();
+            _rand = SyncRandom.Get();
 
-            uniformRand1 = 0;
-            cachedValue = 0;
-            r = 0;
-            uniformRand2 = 0;
-            isCachedValue = false;
+            _uniformRand1 = 0;
+            _cachedValue = 0;
+            _r = 0;
+            _uniformRand2 = 0;
+            _isCachedValue = false;
             this.Mean = Mean;
             this.StdDev = StdDev;
-
         }
 
         /// <summary>
-        /// Random value from normal distribution with mean is equal <paramref name="Mean"/> and standard deviation is equal <paramref name="StdDev"/>.
+        /// Random value from normal distribution with mean is equal <paramref name="Mean"/> and
+        /// standard deviation is equal <paramref name="StdDev"/>.
         /// </summary>
-        /// <remarks>Using Marsaglia polar method.</remarks>
-        /// <param name="Mean">Mean.</param>
-        /// <param name="StdDev">Standard deviation.</param>
+        /// <remarks> Using Marsaglia polar method. </remarks>
+        /// <param name="Mean">   Mean. </param>
+        /// <param name="StdDev"> Standard deviation. </param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">If <paramref name="StdDev"/> &lt;=0</exception>
+        /// <exception cref="ArgumentException"> If <paramref name="StdDev"/> &lt;=0 </exception>
         public double NRandVal(double Mean, double StdDev)
         {
             if (StdDev <= 0)
-                throw new ArgumentException($"{nameof(StdDev)} must be > 0.", nameof(StdDev));
-
-            if(isCachedValue)
             {
-                uniformRand1 = cachedValue;
-                isCachedValue = false;
+                throw new ArgumentException($"{nameof(StdDev)} (value is {StdDev}) must be > 0.", nameof(StdDev));
+            }
+
+            if (_isCachedValue)
+            {
+                _uniformRand1 = _cachedValue;
+                _isCachedValue = false;
             }
             else
             {
                 do
                 {
-                    uniformRand1 = 2.0 * rand.NextDouble() - 1.0;
-                    uniformRand2 = 2.0 * rand.NextDouble() - 1.0;
-                    r = uniformRand1 * uniformRand1 + uniformRand2 * uniformRand2;
+                    _uniformRand1 = 2.0 * _rand.NextDouble() - 1.0;
+                    _uniformRand2 = 2.0 * _rand.NextDouble() - 1.0;
+                    _r = _uniformRand1 * _uniformRand1 + _uniformRand2 * _uniformRand2;
                 }
-                while (r >= 1.0 || r == 0);
+                while (_r >= 1.0 || _r == 0);
 
-                isCachedValue = true;
+                _isCachedValue = true;
 
-                cachedValue = uniformRand2;
-
+                _cachedValue = _uniformRand2;
             }
 
-
-            return Mean + StdDev * (uniformRand1 * Math.Sqrt(-2 * Math.Log(r) / r));
+            return Mean + StdDev * (_uniformRand1 * Math.Sqrt(-2 * Math.Log(_r) / _r));
         }
-
-
     }
 }
