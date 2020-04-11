@@ -16,10 +16,59 @@ namespace EOpt.Math.Optimization.OOOpt
     using Math.Random;
 
     /// <summary>
-    /// Optimization method BBBC. 
+    /// Optimization method BBBC.
     /// </summary>
-    public class BBBCOptimizer : BBBBC<double, IOOOptProblem>, IOOOptimizer<BBBCParams>
+    public class BBBCOptimizer : IBaseOptimizer<BBBCParams, IOOOptProblem>, IOOOptimizer<BBBCParams>
     {
+        private List<Agent> _agents;
+
+        private INormalGen _normalRand;
+
+        private BBBCParams _parameters;
+
+        private IContUniformGen _uniformRand;
+
+        private KahanSum _denumKahanSum;
+
+        /// <summary>
+        /// Parameters for method.
+        /// </summary>
+        public BBBCParams Parameters => _parameters;
+
+        private void Clear()
+        {
+            _agents.Clear();
+        }
+
+        /// <summary>
+        /// Create the object which uses default implementation for random generators.
+        /// </summary>
+        public BBBCOptimizer() : this(new ContUniformDist(), new NormalDist())
+        {
+        }
+
+        /// <summary>
+        /// Create the object which uses custom implementation for random generators.
+        /// </summary>
+        /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
+        /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="NormalGen"/> or <paramref name="UniformGen"/> is null.
+        /// </exception>
+        public BBBCOptimizer(IContUniformGen UniformGen, INormalGen NormalGen)
+        {
+            if (NormalGen == null)
+            {
+                throw new ArgumentNullException(nameof(NormalGen));
+            }
+
+            _uniformRand = UniformGen ?? throw new ArgumentNullException(nameof(UniformGen));
+
+            _normalRand = NormalGen;
+
+            _denumKahanSum = new KahanSum();
+        }
+
         private PointND _centerOfMass;
 
         private int _indexBestSol;
@@ -31,6 +80,26 @@ namespace EOpt.Math.Optimization.OOOpt
             for (int i = 0; i < _agents.Count; i++)
             {
                 _agents[i].Eval(Func);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="DimObjs">    </param>
+        private void InitAgents(IOOOptProblem Problem, int DimObjs)
+        {
+            int dimension = Problem.LowerBounds.Count;
+
+            for (int i = 0; i < _parameters.NP; i++)
+            {
+                PointND point = new PointND(0.0, dimension);
+
+                for (int j = 0; j < dimension; j++)
+                {
+                    point[j] = _uniformRand.URandVal(Problem.LowerBounds[j], Problem.UpperBounds[j]);
+                }
+
+                _agents.Add(new Agent(point, new PointND(0.0, DimObjs)));
             }
         }
 
@@ -55,7 +124,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
             _centerOfMass.MultiplyByInplace(0);
 
-            base._denumKahanSum.SumResest();
+            _denumKahanSum.SumResest();
 
             for (int i = 0; i < _parameters.NP; i++)
             {
@@ -68,7 +137,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
                 mass = 1 / mass;
 
-                base._denumKahanSum.Add(mass);
+                _denumKahanSum.Add(mass);
 
                 for (int coordNum = 0; coordNum < _centerOfMass.Count; coordNum++)
                 {
@@ -76,7 +145,7 @@ namespace EOpt.Math.Optimization.OOOpt
                 }
             }
 
-            _centerOfMass.MultiplyByInplace(1 / base._denumKahanSum.Sum);
+            _centerOfMass.MultiplyByInplace(1 / _denumKahanSum.Sum);
         }
 
         private void GenNextAgents(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int IterNum)
@@ -96,23 +165,42 @@ namespace EOpt.Math.Optimization.OOOpt
             }
         }
 
-        protected override void FirstStep(IOOOptProblem Problem)
+        private void FirstStep(IOOOptProblem Problem)
         {
             if (Problem == null)
             {
                 throw new ArgumentNullException(nameof(Problem));
             }
 
-            base.InitAgents(Problem, 1);
+            InitAgents(Problem, 1);
 
             EvalFunction(Problem.TargetFunction);
 
             FindBestSolution();
         }
 
-        protected override void Init(BBBCParams Parameters, IOOOptProblem Problem, int DimObjs)
+        private void Init(BBBCParams Parameters, IOOOptProblem Problem, int DimObjs)
         {
-            base.Init(Parameters, Problem, DimObjs);
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
+            }
+
+            if (!Parameters.IsParamsInit)
+            {
+                throw new ArgumentException("The parameters were created by the default constructor and have invalid value\nYou need to create parameters with a custom constructor.", nameof(Parameters));
+            }
+
+            _parameters = Parameters;
+
+            if (_agents == null)
+            {
+                _agents = new List<Agent>(_parameters.NP);
+            }
+            else
+            {
+                _agents.Capacity = _parameters.NP;
+            }
 
             int dim = Problem.LowerBounds.Count;
 
@@ -126,7 +214,7 @@ namespace EOpt.Math.Optimization.OOOpt
             }
         }
 
-        protected override void NextStep(IOOOptProblem Problem, int Iter)
+        private void NextStep(IOOOptProblem Problem, int Iter)
         {
             FindCenterOfMass();
 
@@ -138,31 +226,12 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         public Agent Solution => _solution;
 
         /// <summary>
-        /// Create the object which uses default implementation for random generators. 
-        /// </summary>
-        public BBBCOptimizer() : this(new ContUniformDist(), new NormalDist())
-        {
-        }
-
-        /// <summary>
-        /// Create the object which uses custom implementation for random generators. 
-        /// </summary>
-        /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
-        /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="NormalGen"/> or <paramref name="UniformGen"/> is null.
-        /// </exception>
-        public BBBCOptimizer(IContUniformGen UniformGen, INormalGen NormalGen) : base(UniformGen, NormalGen)
-        {
-        }
-
-        /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
@@ -171,7 +240,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="InvalidValueFunctionException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem)
+        public void Minimize(BBBCParams Parameters, IOOOptProblem Problem)
         {
             Init(Parameters, Problem, 1);
 
@@ -186,7 +255,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
@@ -197,7 +266,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, CancellationToken CancelToken)
+        public void Minimize(BBBCParams Parameters, IOOOptProblem Problem, CancellationToken CancelToken)
         {
             Init(Parameters, Problem, 1);
 
@@ -213,11 +282,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress})"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress})"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
-        /// <param name="Reporter">  
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is <see cref="Progress"/>.
         /// </param>
         /// <exception cref="ArgumentException"> If parameters do not set. </exception>
@@ -227,7 +296,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// <exception cref="InvalidValueFunctionException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
-        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter)
+        public void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter)
         {
             if (Reporter == null)
             {
@@ -253,11 +322,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
-        /// <param name="Reporter">   
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is <see cref="Progress"/>.
         /// </param>
         /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
@@ -269,7 +338,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
-        public override void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
+        public void Minimize(BBBCParams Parameters, IOOOptProblem Problem, IProgress<Progress> Reporter, CancellationToken CancelToken)
         {
             if (Reporter == null)
             {
@@ -287,7 +356,6 @@ namespace EOpt.Math.Optimization.OOOpt
             for (int i = 2; i <= _parameters.Imax; i++)
             {
                 CancelToken.ThrowIfCancellationRequested();
-
                 NextStep(Problem, i);
                 progress.Current = i;
                 Reporter.Report(progress);

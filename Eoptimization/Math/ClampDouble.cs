@@ -5,7 +5,7 @@ namespace EOpt.Math
     using Random;
 
     /// <summary>
-    /// Clipping methods. 
+    /// Clipping methods.
     /// </summary>
     public static class ClampDouble
     {

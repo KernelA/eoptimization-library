@@ -11,7 +11,6 @@ namespace Example
     {
         private double[] _lowerBounds, _upperBounds;
 
-
         public IReadOnlyList<double> LowerBounds => _lowerBounds;
 
         public IReadOnlyList<double> UpperBounds => _upperBounds;
@@ -19,7 +18,7 @@ namespace Example
         public RastriginProblem()
         {
             _lowerBounds = new double[2] { -5.12, -5.12 };
-            _upperBounds = new double[2] {5.12, 5.12 };
+            _upperBounds = new double[2] { 5.12, 5.12 };
         }
 
         public double TargetFunction(IReadOnlyList<double> Point)
@@ -28,11 +27,11 @@ namespace Example
               (Point[1] * Point[1] - 10 * Math.Cos(2 * Math.PI * Point[1]));
         }
     }
+
     internal class Program
     {
         private static void Main(string[] args)
         {
-            
             IOOOptimizer<BBBCParams> bbbc = new BBBCOptimizer();
             IOOOptimizer<FWParams> fw = new FWOptimizer();
             IOOOptimizer<GEMParams> gem = new GEMOptimizer();
@@ -40,7 +39,6 @@ namespace Example
             BBBCParams param1 = new BBBCParams(20, 100, 0.4, 0.5);
             FWParams param2 = new FWParams(20, 100, 20, 10, 20, 40);
             GEMParams param3 = new GEMParams(1, 100, 50, 2 * Math.Sqrt(2), 100);
-
 
             IOOOptProblem param = new RastriginProblem();
 

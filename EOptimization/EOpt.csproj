@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyVersion>1.1.0.1</AssemblyVersion>
-    <FileVersion>1.1.0.1</FileVersion>
-    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.1</FileVersion>
+    <Version>1.1.1.1</Version>
     <RepositoryUrl>https://github.com/KernelA/eoptimization-library</RepositoryUrl>
     <PackageLicenseUrl>https://github.com/KernelA/eoptimization-library/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/KernelA/eoptimization-library</PackageProjectUrl>
@@ -13,12 +13,16 @@
     <Company />
     <Authors>Alexander Kryuchkov</Authors>
     <RootNamespace>EOpt</RootNamespace>
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Ndomsort">
-      <HintPath>..\..\nds\Src\Ndomsort\bin\Release\netstandard1.0\Ndomsort.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Ndomsort" Version="0.0.1.2" />
+    <PackageReference Include="OptimizedPriorityQueue" Version="4.2.0" />
   </ItemGroup>
 
 </Project>

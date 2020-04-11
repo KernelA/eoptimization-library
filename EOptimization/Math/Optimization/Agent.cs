@@ -3,16 +3,15 @@
 namespace EOpt.Math.Optimization
 {
     using System;
-    using System.Collections.Generic;
 
     using EOpt.Exceptions;
-    using EOpt.Help;
-
-    using Optimization.OOOpt;
 
     using TMOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, System.Collections.Generic.IEnumerable<double>>;
     using TOOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, double>;
 
+    /// <summary>
+    /// Agent which represent possible solution of single or multiobjective optimization problem
+    /// </summary>
     public class Agent : IEquatable<Agent>
     {
         private PointND _point, _objs;
@@ -22,6 +21,7 @@ namespace EOpt.Math.Optimization
         public PointND Objs => _objs;
 
         /// <summary>
+        ///
         /// </summary>
         public PointND Point => _point;
 
@@ -74,7 +74,7 @@ namespace EOpt.Math.Optimization
 
                 if (typeValue != DoubleTypeValue.Valid)
                 {
-                    throw new InvalidValueFunctionException($"An invalid value ({typeValue.ToString()}) of the {position}th function at point.\n{_point.ToString()}", _point);
+                    throw new InvalidValueFunctionException($"An invalid value ({typeValue.ToString()}) of the {position}th function at point", _point);
                 }
 
                 _objs[position] = value;
@@ -93,7 +93,7 @@ namespace EOpt.Math.Optimization
 
             if (typeValue != DoubleTypeValue.Valid)
             {
-                throw new InvalidValueFunctionException($"An invalid value ({typeValue.ToString()}) of the function at point.\n{_point.ToString()}", _point);
+                throw new InvalidValueFunctionException($"An invalid value ({typeValue.ToString()}) of the function at point.", _point);
             }
 
             _objs[0] = value;

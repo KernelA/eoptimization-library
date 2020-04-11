@@ -2,10 +2,13 @@
 // Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Optimization
 {
-    using System;
     using System.Collections.Generic;
-    using System.Text;
 
+    /// <summary>
+    /// General interface for box constrained optimization problems.
+    /// </summary>
+    /// <typeparam name="TDecision"></typeparam>
+    /// <typeparam name="TObj"></typeparam>
     public interface IConstrOptProblem<TDecision, TObj>
     {
         IReadOnlyList<TDecision> LowerBounds { get; }

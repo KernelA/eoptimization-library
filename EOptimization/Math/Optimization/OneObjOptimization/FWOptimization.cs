@@ -14,7 +14,7 @@ namespace EOpt.Math.Optimization.OOOpt
     using Optimization;
 
     /// <summary>
-    /// Optimization method Fireworks. 
+    /// Optimization method Fireworks.
     /// </summary>
     public class FWOptimizer : BaseFW<double, IOOOptProblem>, IOOOptimizer<FWParams>
     {
@@ -44,7 +44,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Find amount debris for each point of charge. 
+        /// Find amount debris for each point of charge.
         /// </summary>
         private void FindAmountDebris()
         {
@@ -66,12 +66,12 @@ namespace EOpt.Math.Optimization.OOOpt
             {
                 s = _parameters.M * (_fmax - _chargePoints[i].Objs[0] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
-                base.FindAmountDebrisForCharge(s, i, 1);
+                base.FindAmountDebrisForCharge(s, i);
             }
         }
 
         /// <summary>
-        /// Find best solution among debris and charges. 
+        /// Find best solution among debris and charges.
         /// </summary>
         private void FindBestSolution()
         {
@@ -129,7 +129,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Determine debris position. 
+        /// Determine debris position.
         /// </summary>
         /// <param name="LowerBounds"></param>
         /// <param name="UpperBounds"></param>
@@ -159,10 +159,10 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Generate current population. 
+        /// Generate current population.
         /// </summary>
         private void GenerateNextAgents()
-        {        
+        {
             // The total count minus solution.
             int actualSizeMatrix = _chargePoints.Count - 1;
 
@@ -208,7 +208,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
             int totalToTake = _parameters.NP - 1;
 
-            base.TakeAgents(actualSizeMatrix, totalToTake);
+            base.TakeAgents(totalToTake);
 
             _chargePoints[0].SetAt(_solution);
 
@@ -279,19 +279,19 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         public Agent Solution => _solution;
 
         /// <summary>
-        /// Create object which uses default implementation for random generators. 
+        /// Create object which uses default implementation for random generators.
         /// </summary>
         public FWOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
@@ -303,7 +303,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
@@ -327,7 +327,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
@@ -354,11 +354,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
-        /// <param name="Reporter">  
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>
@@ -395,11 +395,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
-        /// <param name="Reporter">   
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>

@@ -4,19 +4,19 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Base optimization problem. 
+    /// Base optimization problem.
     /// </summary>
     internal abstract class BaseOptimizationProblem
     {
         private double[] _lowerBounds, _upperBounds;
 
         /// <summary>
-        /// Lower bounds. 
+        /// Lower bounds.
         /// </summary>
         public IReadOnlyList<double> LowerBounds => _lowerBounds;
 
         /// <summary>
-        /// Upper bounds. 
+        /// Upper bounds.
         /// </summary>
         public IReadOnlyList<double> UpperBounds => _upperBounds;
 

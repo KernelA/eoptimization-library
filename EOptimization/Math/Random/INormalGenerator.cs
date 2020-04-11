@@ -3,7 +3,7 @@
 namespace EOpt.Math.Random
 {
     /// <summary>
-    /// Interface for a random generator of the normal distribution. 
+    /// Interface for a random generator of the normal distribution.
     /// </summary>
     public interface INormalGen
     {

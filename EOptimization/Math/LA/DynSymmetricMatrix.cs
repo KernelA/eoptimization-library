@@ -11,26 +11,26 @@ namespace EOpt.Math.LA
     /// </summary>
     public class DynSymmetricMatrix
     {
-        private const string InvalidSizeMessage = "Row or column count must be greater than 0.";
+        private const string INVALID_SIZE_MESSAGE = "Row or column count must be greater than 0.";
 
-        private const string NotSymmetricMatrixMessage = "Matrix must be symmetric.";
+        private const string NOT_SYMMETRIC_MATRIX_MESSAGE = "Matrix must be symmetric.";
 
-        private const string SqrMatrixMessage = "Matrix must be square.";
+        private const string SQR_MATRIX_MESSAGE = "Matrix must be square.";
 
         private List<double> _elements;
-       
+
         private int _size;
 
         /// <summary>
         /// <para>
-        ///  Transformation two-dimension index to one-dimension for determine position element in the array. 
+        ///  Transformation two-dimension index to one-dimension for determine position element in the array.
         /// </para>
         /// <para>
-        /// Matrix. (* - it is element of the matrix). 
+        /// Matrix. (* - it is element of the matrix).
         ///   0 1 2 3 (indices)
-        /// 0 * 
-        /// 1 * * 
-        /// 2 * * * 
+        /// 0 *
+        /// 1 * *
+        /// 2 * * *
         /// 3 * * * *
         /// Linearization: [*] [* *] [* * *] [* * * *] (0, 0) transform to 0; (1, 0) transform to 1;
         /// (1, 1) transform to 2; (2, 2) transform to 5; (i, j) transform to i * (i + 1) / 2 + j.
@@ -55,14 +55,16 @@ namespace EOpt.Math.LA
             set
             {
                 if (value < 1)
-                    throw new ArgumentException(InvalidSizeMessage);
+                {
+                    throw new ArgumentException(INVALID_SIZE_MESSAGE);
+                }
 
-                if(value < ColumnCount)
+                if (value < ColumnCount)
                 {
                     int countToDel = ((value + 1 + ColumnCount) * (ColumnCount - value)) / 2;
                     _elements.RemoveRange(GetIndexInArray(value, 0), countToDel);
                 }
-                else if(value > ColumnCount)
+                else if (value > ColumnCount)
                 {
                     int countToAdd = ((ColumnCount + 1 + value) * (value - ColumnCount)) / 2;
                     _elements.AddRange(Enumerable.Repeat(0.0, countToAdd));
@@ -72,7 +74,6 @@ namespace EOpt.Math.LA
             }
         }
 
-
         /// <summary>
         /// Get row count of matrix. The row count is equal to column count.
         /// </summary>
@@ -80,10 +81,7 @@ namespace EOpt.Math.LA
         {
             get => _size;
 
-            set
-            {
-                ColumnCount = value;
-            }
+            set => ColumnCount = value;
         }
 
         /// <summary>
@@ -118,7 +116,9 @@ namespace EOpt.Math.LA
         public DynSymmetricMatrix(int Size, double DefaultValue)
         {
             if (Size < 1)
-                throw new ArgumentException(InvalidSizeMessage, nameof(Size));
+            {
+                throw new ArgumentException(INVALID_SIZE_MESSAGE, nameof(Size));
+            }
 
             _size = Size;
 
@@ -128,7 +128,7 @@ namespace EOpt.Math.LA
         }
 
         /// <summary>
-        /// Create symmetric matrix from array <paramref name="Elements"/>. 
+        /// Create symmetric matrix from array <paramref name="Elements"/>.
         /// </summary>
         /// <param name="Elements"></param>
         /// <exception cref="ArgumentException">
@@ -142,7 +142,9 @@ namespace EOpt.Math.LA
                 throw new ArgumentNullException(nameof(Elements));
             }
             if (Elements.GetLength(0) != Elements.GetLength(1))
-                throw new ArgumentException(SqrMatrixMessage, nameof(Elements));
+            {
+                throw new ArgumentException(SQR_MATRIX_MESSAGE, nameof(Elements));
+            }
 
             _size = Elements.GetLength(0);
 
@@ -151,7 +153,9 @@ namespace EOpt.Math.LA
                 for (int j = 0; j < i; j++)
                 {
                     if (Elements[i, j] != Elements[j, i])
-                        throw new ArgumentException(NotSymmetricMatrixMessage, nameof(Elements));
+                    {
+                        throw new ArgumentException(NOT_SYMMETRIC_MATRIX_MESSAGE, nameof(Elements));
+                    }
                 }
             }
 
@@ -169,7 +173,7 @@ namespace EOpt.Math.LA
         }
 
         /// <summary>
-        /// Get or set value of element of the matrix. 
+        /// Get or set value of element of the matrix.
         /// </summary>
         /// <param name="RowIndex">   </param>
         /// <param name="ColumnIndex"></param>
@@ -189,23 +193,29 @@ namespace EOpt.Math.LA
             {
                 // If the element is above main diagonal then returned equal symmetric element.
                 if (RowIndex < ColumnIndex)
+                {
                     return _elements[GetIndexInArray(ColumnIndex, RowIndex)];
+                }
                 else
+                {
                     return _elements[GetIndexInArray(RowIndex, ColumnIndex)];
+                }
             }
             set
             {
                 if (RowIndex < ColumnIndex)
+                {
                     _elements[GetIndexInArray(ColumnIndex, RowIndex)] = value;
+                }
                 else
+                {
                     _elements[GetIndexInArray(RowIndex, ColumnIndex)] = value;
+                }
             }
         }
 
-
-
         /// <summary>
-        /// Copy matrix into two-dimensional array. 
+        /// Copy matrix into two-dimensional array.
         /// </summary>
         /// <returns></returns>
         public double[,] ToArray()

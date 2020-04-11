@@ -1,11 +1,10 @@
-﻿namespace EOptimizationTests.Math.Optimization
+﻿namespace EOpt.Math.Optimization.Tests
 {
     using System;
 
     using EOpt.Exceptions;
     using EOpt.Math.Optimization;
     using EOpt.Math.Optimization.OOOpt;
-    using EOpt.Math.Optimization.Tests;
 
     using Xunit;
 

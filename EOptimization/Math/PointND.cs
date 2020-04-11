@@ -9,19 +9,19 @@ namespace EOpt.Math
     using System.Text;
 
     /// <summary>
-    /// Class is representing a point in N dimension space. 
+    /// Class is representing a point in N dimension space.
     /// </summary>
     public class PointND : IEquatable<PointND>, IReadOnlyList<double>
     {
         private const string NotEqualDimMessage = "The number of coordinates is unequal.";
 
         /// <summary>
-        /// Coordinates of point. 
+        /// Coordinates of point.
         /// </summary>
         private double[] _coordinates;
 
         /// <summary>
-        /// Number of coordinates. 
+        /// Number of coordinates.
         /// </summary>
         public int Count => _coordinates.Length;
 
@@ -46,7 +46,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Create point from array <paramref name="Coordinates"/>. 
+        /// Create point from array <paramref name="Coordinates"/>.
         /// </summary>
         /// <param name="Coordinates"> Array of coordinates. </param>
         /// <exception cref="ArgumentNullException">
@@ -55,14 +55,16 @@ namespace EOpt.Math
         public PointND(double[] Coordinates)
         {
             if (Coordinates == null)
+            {
                 throw new ArgumentNullException(nameof(Coordinates));
+            }
             _coordinates = new double[Coordinates.Length];
 
             Coordinates.CopyTo(_coordinates, 0);
         }
 
         /// <summary>
-        /// Get <paramref name="i"/>-th coordinate. 
+        /// Get <paramref name="i"/>-th coordinate.
         /// </summary>
         /// <param name="i"> Index of coordinate. </param>
         /// <returns></returns>
@@ -74,7 +76,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// A distance between two points. 
+        /// A distance between two points.
         /// </summary>
         /// <param name="Point1"></param>
         /// <param name="Point2"></param>
@@ -184,7 +186,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// All coordinates multiply by -1. 
+        /// All coordinates multiply by -1.
         /// </summary>
         /// <param name="Point"></param>
         /// <returns></returns>
@@ -207,7 +209,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Multiplication by <paramref name="Value"/>. 
+        /// Multiplication by <paramref name="Value"/>.
         /// </summary>
         /// <param name="Point"></param>
         /// <param name="Value"></param>
@@ -231,7 +233,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Multiplication by <paramref name="Value"/>. 
+        /// Multiplication by <paramref name="Value"/>.
         /// </summary>
         /// <param name="Point"></param>
         /// <param name="Value"></param>
@@ -285,7 +287,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// To all coordinates of point add coordinates of <paramref name="Point"/>. This is making inplace. 
+        /// To all coordinates of point add coordinates of <paramref name="Point"/>. This is making inplace.
         /// </summary>
         /// <param name="Point"></param>
         /// <exception cref="ArgumentNullException"> If <paramref name="Point"/> is null. </exception>
@@ -309,7 +311,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Add a <paramref name="Value"/> to the all coordinates. This is making inplace. 
+        /// Add a <paramref name="Value"/> to the all coordinates. This is making inplace.
         /// </summary>
         /// <param name="Value"></param>
         public void AddInplace(double Value)
@@ -321,7 +323,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Create a deep copy. 
+        /// Create a deep copy.
         /// </summary>
         /// <returns></returns>
         public PointND DeepCopy() => new PointND(_coordinates);
@@ -364,7 +366,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Get enumerator. 
+        /// Get enumerator.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<double> GetEnumerator() => _coordinates.AsEnumerable().GetEnumerator();
@@ -377,7 +379,7 @@ namespace EOpt.Math
         public override int GetHashCode() => _coordinates.GetHashCode();
 
         /// <summary>
-        /// All coordinates multiply by <paramref name="Value"/>. This is making inplace. 
+        /// All coordinates multiply by <paramref name="Value"/>. This is making inplace.
         /// </summary>
         /// <param name="Value"></param>
         public void MultiplyByInplace(double Value)
@@ -389,7 +391,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// LP norm. 
+        /// LP norm.
         /// </summary>
         /// <param name="P"> Parameter of the norm. </param>
         /// <returns></returns>
@@ -448,7 +450,7 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Copy coordinates from <paramref name="Point"/>. 
+        /// Copy coordinates from <paramref name="Point"/>.
         /// </summary>
         /// <param name="Point"></param>
         /// <exception cref="ArgumentNullException"> If <paramref name="Point"/> is null. </exception>
@@ -465,10 +467,7 @@ namespace EOpt.Math
                 throw new ArgumentException(NotEqualDimMessage, nameof(Point));
             }
 
-            for (int i = 0; i < Count; i++)
-            {
-                this[i] = Point[i];
-            }
+            Point._coordinates.CopyTo(this._coordinates, 0);
         }
 
         /// <summary>

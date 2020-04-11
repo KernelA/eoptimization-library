@@ -16,19 +16,19 @@ namespace EOpt.Math.Optimization.MOOpt
     using Nds;
 
     /// <summary>
-    /// Optimization method Fireworks. 
+    /// Optimization method Fireworks.
     /// </summary>
     public class MOFWOptimizer : BaseFW<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<FWParams>
     {
-        private double _maxHV;
-
-        private PointND _idealPoint;
-
-        private double[] _hvs;
-
         private Ndsort<double> _nds;
 
-        private int _iterNum;
+        private List<Agent> _chargesCopy;
+
+        private int[] _currentFronts;
+
+        private int _iter;
+
+        private bool _isUseChachedFronts;
 
         private void EvalFunctionForCharges(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
         {
@@ -42,7 +42,7 @@ namespace EOpt.Math.Optimization.MOOpt
         {
             for (int i = 0; i < _debris.Length; i++)
             {
-                foreach (var splinter in _debris[i])
+                foreach (Agent splinter in _debris[i])
                 {
                     splinter.Eval(Function);
                 }
@@ -50,31 +50,21 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// Find amount debris for each point of charge. 
+        /// Find amount debris for each point of charge.
         /// </summary>
-        private void FindAmountDebris()
+        private void FindAmountDebris(int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
             double s = 0;
-
-            double denumerator = 0;
 
             int dimObjs = _chargePoints[0].Objs.Count;
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                denumerator += _maxHV - _hvs[i];
-            }
+                int countFront = CountFronts[Fronts[i]];
+                // Uses binary logarithm.
+                s = _parameters.M * Math.Log(1 + FMax / (Fronts[i] + 1.0)) / Constants.LN_2 * (1 - ((double)countFront) / Fronts.Length);
 
-            if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
-            {
-                denumerator += Constants.VALUE_AVOID_DIV_BY_ZERO;
-            }
-
-            for (int i = 0; i < _parameters.NP; i++)
-            {
-                s = _parameters.M * (_maxHV - _hvs[i] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
-
-                base.FindAmountDebrisForCharge(s, i, dimObjs);
+                base.FindAmountDebrisForCharge(s, i);
             }
         }
 
@@ -114,118 +104,30 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// Determine debris position. 
+        /// Determine debris position.
         /// </summary>
-        /// <param name="ChargeFronts"></param>
-        /// <param name="LowerBounds"> </param>
-        /// <param name="UpperBounds"> </param>
-        /// <param name="Function">    </param>
-        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, Func<IReadOnlyList<double>, IEnumerable<double>> Function)
+        private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
-            double denumerator = 0;
-
-            for (int j = 0; j < _parameters.NP; j++)
-            {
-                denumerator += _hvs[j];
-            }
-
-            if (denumerator < Constants.VALUE_AVOID_DIV_BY_ZERO)
-            {
-                denumerator += Constants.VALUE_AVOID_DIV_BY_ZERO;
-            }
+            double amplitude = 0;
 
             for (int i = 0; i < _parameters.NP; i++)
             {
-                double amplitude = 0;
-
-                // Amplitude of explosion.
-                amplitude = _parameters.Amax * (_hvs[i] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
+                // Amplitude of explosion. Uses binary logarithm.
+                amplitude = _parameters.Amax * Math.Log(1 + (Fronts[i] + 1.0) / FMax) / Constants.LN_2 * CountFronts[Fronts[i]] / Fronts.Length;
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
         }
 
-
-        private void FirstMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
+        /// <summary>
+        /// Generate current population.
+        /// </summary>
+        private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            int actualSizeMatrix = 0, totalTake = 0;
+            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max();
 
-            int lengthFirstFront = Fronts.Count(fr => fr == 0);
-
-            if (lengthFirstFront > _parameters.NP)
-            {
-                actualSizeMatrix = lengthFirstFront;
-                totalTake = _parameters.NP;
-            }
-            else
-            {
-                // The total count minus non-dominated solutions.
-                actualSizeMatrix = Fronts.Length - lengthFirstFront;
-                totalTake = _parameters.NP - lengthFirstFront;
-            }
-
-
-            // Need to compare 'lengthLastFront' agents.
-            base.ResetMatrixAndTrimWeights(actualSizeMatrix);
-
-            int k = 0, index = 0;
-
-            if(lengthFirstFront > _parameters.NP)
-            {
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    if (Fronts[k] == 0)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(agent);
-                    }
-                    k++;
-                }
-            }
-            else
-            {
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    if (Fronts[k] != 0)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(agent);
-                    }
-                    k++;
-                }
-            }
-
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
-
-            int startIndex = 0;
-
-            if (lengthFirstFront <= _parameters.NP)
-            {
-                int j = 0;
-
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    // Solutions with front index equals to 'lastFrontIndex' are taken.
-                    if (Fronts[j] == 0)
-                    {
-                        _chargePoints[startIndex++].SetAt(agent);
-                    }
-                    j++;
-                }
-            }
-
-            base.TakeAgents(actualSizeMatrix, totalTake);
-
-            for (int i = 0; i < _weightedAgents.Count; i++)
-            {
-                if (_weightedAgents[i].IsTake)
-                {
-                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
-                }
-            }
-        }
-
-        private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
-        {
-            int lengthLastFront = 0, totalTaken = 0, maxFront = Fronts.Max(), lastFrontIndex = 0;
+            // If 'lastFrontIndex' is equal to 'maxFront + 1' than no need an additional selection.
+            int lastFrontIndex = maxFront + 1;
 
             for (int front = 0; front <= maxFront; front++)
             {
@@ -242,69 +144,51 @@ namespace EOpt.Math.Optimization.MOOpt
                 }
             }
 
-            // Need to compare 'lengthLastFront' agents.
-            base.ResetMatrixAndTrimWeights(lengthLastFront);
+            int needToTake = _parameters.NP - totalTaken;
 
-            int k = 0, index = 0;
+            if (needToTake > 0)
+            {
+                // Need to compare 'lengthLastFront' agents.
+                base.ResetMatrixAndTrimWeights(lengthLastFront);
+            }
+
+            int k = 0, index = 0, startIndex = 0;
 
             foreach (Agent agent in ChargesAndDebris)
             {
-                // Solutions with front index equals to 'lastFrontIndex' are taken.
-                if (Fronts[k] == lastFrontIndex)
+                if (Fronts[k] == lastFrontIndex && needToTake != 0)
                 {
                     _weightedAgents[index++].Agent.SetAt(agent);
+                }
+                else if (Fronts[k] < lastFrontIndex)
+                {
+                    _chargesCopy[startIndex].SetAt(agent);
+                    _currentFronts[startIndex++] = Fronts[k];
                 }
 
                 k++;
             }
 
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+            if (needToTake > 0)
+            {
+                base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
+                base.TakeAgents(needToTake);
 
-            int startIndex = 0;
-
-           
-                int j = 0;
-
-                foreach (Agent agent in ChargesAndDebris)
+                for (int i = 0; i < _weightedAgents.Count; i++)
                 {
-                    // Solutions with front index equals to 'lastFrontIndex' are taken.
-                    if (Fronts[j]  < lastFrontIndex)
+                    if (_weightedAgents[i].IsTake)
                     {
-                        _chargePoints[startIndex++].SetAt(agent);
+                        _chargesCopy[startIndex].SetAt(_weightedAgents[i].Agent);
+                        // _weightedAgents always have 'lastFronIndex' as an index of front.
+                        _currentFronts[startIndex++] = lastFrontIndex;
                     }
-                    j++;
-                }
-            
-
-            base.TakeAgents(lengthLastFront, _parameters.NP - totalTaken);
-
-            for (int i = 0; i < _weightedAgents.Count; i++)
-            {
-                if (_weightedAgents[i].IsTake)
-                {
-                    _chargePoints[startIndex++].SetAt(_weightedAgents[i].Agent);
                 }
             }
-        }
 
-        /// <summary>
-        /// Generate current population. 
-        /// </summary>
-        private void GenerateNextAgents(int IterNum, IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
-        {
-            //if (IterNum <= 0.8F *_parameters.Imax)
-            //{
-            //    FirstMethod(ChargesAndDebris, Fronts);
-            //}
-            //else
+            for (int i = 0; i < _chargesCopy.Count; i++)
             {
-                SecondMethod(ChargesAndDebris, Fronts);
+                _chargePoints[i].SetAt(_chargesCopy[i]);
             }
-        }
-
-        protected override void Clear()
-        {
-
         }
 
         protected override void FirstStep(IMOOptProblem Problem)
@@ -321,21 +205,33 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void NextStep(IMOOptProblem Problem)
         {
-            FindIdealPoint();
+            int[] fronts = null;
 
-            FindMaxMinPseudoHyperVolume();
+            if (_isUseChachedFronts)
+            {
+                fronts = _currentFronts;
+            }
+            else
+            {
+                fronts = _nds.NonDominSort(_chargePoints.Select(item => item.Objs));
+                _isUseChachedFronts = true;
+            }
 
-            FindAmountDebris();
+            var countFronts = fronts.GroupBy(frontIndex => frontIndex).ToDictionary(item => item.Key, item => item.Count());
 
-            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, Problem.TargetFunction);
+            int maxFront = countFronts.Keys.Max() + 1;
+
+            FindAmountDebris(fronts, countFronts, maxFront);
+
+            GenerateDebris(Problem.LowerBounds, Problem.UpperBounds, fronts, countFronts, maxFront);
 
             EvalFunctionForDebris(Problem.TargetFunction);
 
             var allAgents = _chargePoints.Concat(_debris.SelectMany(coll => coll.Select(agent => agent)));
 
-            int[] allFronts = _nds.NonDominSort(allAgents, item => item.Objs);
+            int[] allFronts = _nds.NonDominSort(allAgents.Select(agent => agent.Objs));
 
-            GenerateNextAgents(_iterNum, allAgents, allFronts);
+            GenerateNextAgents(allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
         }
@@ -344,52 +240,44 @@ namespace EOpt.Math.Optimization.MOOpt
         {
             base.Init(Parameters, Dim, DimObjs);
 
-            if (_idealPoint == null)
+            if (_chargesCopy == null)
             {
-                _idealPoint = new PointND(0.0, DimObjs);
-            }
-            else if (_idealPoint.Count != DimObjs)
-            {
-                _idealPoint = new PointND(0.0, DimObjs);
-            }
+                _chargesCopy = new List<Agent>(Parameters.NP);
 
-            if (_hvs == null)
-            {
-                _hvs = new double[Parameters.NP];
-            }
-            else if (_hvs.Length != Parameters.NP)
-            {
-                _hvs = new double[Parameters.NP];
-            }
-        }
-
-        private void FindIdealPoint()
-        {
-            _idealPoint.SetAt(_chargePoints[0].Objs);
-
-            for (int i = 1; i < _parameters.NP; i++)
-            {
-                for (int j = 0; j < _chargePoints[i].Objs.Count; j++)
+                for (int i = 0; i < Parameters.NP; i++)
                 {
-                    if (_chargePoints[i].Objs[j] < _idealPoint[j])
-                    {
-                        _idealPoint[j] = _chargePoints[i].Objs[j];
-                    }
+                    _chargesCopy.Add(_pool.GetAgent());
                 }
             }
+            else if (_chargesCopy.Count != Parameters.NP)
+            {
+                _chargesCopy.Clear();
+
+                _chargesCopy.Capacity = Parameters.NP;
+
+                for (int i = 0; i < Parameters.NP; i++)
+                {
+                    _chargesCopy.Add(_pool.GetAgent());
+                }
+            }
+
+            _currentFronts = new int[Parameters.NP];
         }
 
+        /// <summary>
+        /// Solution of multiobjective problem
+        /// </summary>
         public IEnumerable<Agent> ParetoFront => _chargePoints;
 
         /// <summary>
-        /// Create object which uses default implementation for random generators. 
+        /// Create object which uses default implementation for random generators.
         /// </summary>
         public MOFWOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen">
         /// Object, which implements <see cref="IContUniformGen"/> interface.
@@ -401,26 +289,33 @@ namespace EOpt.Math.Optimization.MOOpt
         public MOFWOptimizer(IContUniformGen UniformGen, INormalGen NormalGen) : base(UniformGen, NormalGen)
         {
             _nds = new Ndsort<double>(CmpDouble.DoubleCompare);
+            _isUseChachedFronts = false;
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters"> General parameters. <see cref="FWParams"/>. </param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
-        /// <exception cref="ArgumentNullException"> If <paramref name="GenParams"/> is null. </exception>
+        /// <exception cref="ArgumentNullException"> If <paramref name="Problem"/> is null. </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         public override void Minimize(FWParams Parameters, IMOOptProblem Problem)
         {
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
+            }
+
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
 
             FirstStep(Problem);
 
             for (int i = 1; i < _parameters.Imax; i++)
             {
-                _iterNum = i;
+                _iter = i;
                 NextStep(Problem);
             }
 
@@ -428,18 +323,24 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams">   General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
-        /// <exception cref="ArgumentNullException"> If <paramref name="GenParams"/> is null. </exception>
+        /// <exception cref="ArgumentNullException"> If <paramref name="Problem"/> is null. </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
         public override void Minimize(FWParams Parameters, IMOOptProblem Problem, CancellationToken CancelToken)
         {
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
+            }
+
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
 
             FirstStep(Problem);
@@ -454,12 +355,13 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
-        /// <param name="Reporter"> 
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
-        /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="Progress"/>./>
         /// </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
         /// <exception cref="ArgumentNullException">
@@ -473,6 +375,11 @@ namespace EOpt.Math.Optimization.MOOpt
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
+            }
+
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
             }
 
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
@@ -494,17 +401,18 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
-        /// <param name="Reporter"> 
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
-        /// <see cref="Progress"/>.
-        /// <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/><param name="CancelToken"> <see cref="CancellationToken"/></param>
+        /// <see cref="Progress"/>./>
         /// </param>
+        /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
         /// <exception cref="ArgumentNullException">
-        /// If <paramref name="GenParams"/> or <paramref name="Reporter"/> is null.
+        /// If <paramref name="Problem"/> or <paramref name="Reporter"/> is null.
         /// </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
@@ -515,6 +423,11 @@ namespace EOpt.Math.Optimization.MOOpt
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
+            }
+
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
             }
 
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);

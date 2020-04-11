@@ -6,8 +6,6 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    using EOpt.Math.Optimization.OOOpt;
-
     internal static class GeneralOptimizerTests
     {
         public const int ITER_MAX = 10;
