@@ -199,7 +199,6 @@ namespace EOpt.Math.Optimization.OOOpt
             }
             else
             {
-                _agents.Clear();
                 _agents.Capacity = _parameters.NP;
             }
 
