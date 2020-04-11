@@ -9,7 +9,7 @@ namespace EOpt
 
     public class AgentPool
     {
-        private int _maxSize;
+        private readonly int _maxSize;
 
         private Stack<Agent> _pool;
 
@@ -31,8 +31,16 @@ namespace EOpt
             }
         }
 
+        /// <summary>
+        /// maximum size of pool
+        /// </summary>
         public int MaxSize => _maxSize;
 
+        /// <summary>
+        /// Create pool
+        /// </summary>
+        /// <param name="MaxSize"></param>
+        /// <param name="Creator"></param>
         public AgentPool(int MaxSize, IAgentCreator Creator)
         {
             _creator = Creator;
@@ -40,6 +48,10 @@ namespace EOpt
             _pool = new Stack<Agent>(MaxSize);
         }
 
+        /// <summary>
+        /// Get free agent from pool.
+        /// </summary>
+        /// <returns></returns>
         public Agent GetAgent()
         {
             if (_pool.Count != 0)
@@ -52,6 +64,10 @@ namespace EOpt
             }
         }
 
+        /// <summary>
+        /// Add agent to pool.
+        /// </summary>
+        /// <param name="Agent"></param>
         public void AddAgent(Agent Agent)
         {
             for (int i = 0; i < _pool.Count; i++)
@@ -67,6 +83,9 @@ namespace EOpt
             }
         }
 
+        /// <summary>
+        /// Clear pool.
+        /// </summary>
         public void Clear()
         {
             _pool.Clear();

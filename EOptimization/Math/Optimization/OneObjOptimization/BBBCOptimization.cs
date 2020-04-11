@@ -35,7 +35,7 @@ namespace EOpt.Math.Optimization.OOOpt
         /// </summary>
         public BBBCParams Parameters => _parameters;
 
-        protected void Clear()
+        private void Clear()
         {
             _agents.Clear();
         }

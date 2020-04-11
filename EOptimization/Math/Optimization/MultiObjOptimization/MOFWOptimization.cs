@@ -24,9 +24,9 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private List<Agent> _chargesCopy;
 
-        private int _iter;
-
         private int[] _currentFronts;
+
+        private int _iter;
 
         private bool _isUseChachedFronts;
 
@@ -42,7 +42,7 @@ namespace EOpt.Math.Optimization.MOOpt
         {
             for (int i = 0; i < _debris.Length; i++)
             {
-                foreach (var splinter in _debris[i])
+                foreach (Agent splinter in _debris[i])
                 {
                     splinter.Eval(Function);
                 }
@@ -64,17 +64,13 @@ namespace EOpt.Math.Optimization.MOOpt
                 // Uses binary logarithm.
                 s = _parameters.M * Math.Log(1 + FMax / (Fronts[i] + 1.0)) / Constants.LN_2 * (1 - ((double)countFront) / Fronts.Length);
 
-                base.FindAmountDebrisForCharge(s, i, dimObjs);
+                base.FindAmountDebrisForCharge(s, i);
             }
         }
 
         /// <summary>
         /// Determine debris position.
         /// </summary>
-        /// <param name="ChargeFronts"></param>
-        /// <param name="LowerBounds"> </param>
-        /// <param name="UpperBounds"> </param>
-        /// <param name="Function">    </param>
         private void GenerateDebris(IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds, int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
             double amplitude = 0;
@@ -86,86 +82,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
                 base.GenerateDebrisForCharge(LowerBounds, UpperBounds, amplitude, i);
             }
-        }
-
-        private void FirstMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
-        {
-            int actualSizeMatrix = 0, totalTake = 0;
-
-            int lengthFirstFront = Fronts.Count(fr => fr == 0);
-
-            if (lengthFirstFront > _parameters.NP)
-            {
-                actualSizeMatrix = lengthFirstFront;
-                totalTake = _parameters.NP;
-            }
-            else
-            {
-                // The total count minus non-dominated solutions.
-                actualSizeMatrix = Fronts.Length - lengthFirstFront;
-                totalTake = _parameters.NP - lengthFirstFront;
-            }
-
-            // Need to compare 'lengthLastFront' agents.
-            base.ResetMatrixAndTrimWeights(actualSizeMatrix);
-
-            int k = 0, index = 0;
-
-            if (lengthFirstFront > _parameters.NP)
-            {
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    if (Fronts[k] == 0)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(agent);
-                    }
-                    k++;
-                }
-            }
-            else
-            {
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    if (Fronts[k] != 0)
-                    {
-                        _weightedAgents[index++].Agent.SetAt(agent);
-                    }
-                    k++;
-                }
-            }
-
-            base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
-
-            int startIndex = 0;
-
-            if (lengthFirstFront <= _parameters.NP)
-            {
-                int j = 0;
-
-                foreach (Agent agent in ChargesAndDebris)
-                {
-                    // Solutions with front index equals to 'lastFrontIndex' are taken.
-                    if (Fronts[j] == 0)
-                    {
-                        _chargesCopy[startIndex++].SetAt(agent);
-                    }
-                    j++;
-                }
-            }
-
-            base.TakeAgents(actualSizeMatrix, totalTake);
-
-            for (int i = 0; i < _weightedAgents.Count; i++)
-            {
-                if (_weightedAgents[i].IsTake)
-                {
-                    _chargesCopy[startIndex++].SetAt(_weightedAgents[i].Agent);
-                }
-            }
-        }
-
-        private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
-        {
         }
 
         /// <summary>
@@ -221,7 +137,7 @@ namespace EOpt.Math.Optimization.MOOpt
             if (needToTake > 0)
             {
                 base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
-                base.TakeAgents(lengthLastFront, needToTake);
+                base.TakeAgents(needToTake);
 
                 for (int i = 0; i < _weightedAgents.Count; i++)
                 {
@@ -238,10 +154,6 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 _chargePoints[i].SetAt(_chargesCopy[i]);
             }
-        }
-
-        protected override void Clear()
-        {
         }
 
         protected override void FirstStep(IMOOptProblem Problem)
@@ -317,6 +229,9 @@ namespace EOpt.Math.Optimization.MOOpt
             _currentFronts = new int[Parameters.NP];
         }
 
+        /// <summary>
+        /// Solution of multiobjective problem
+        /// </summary>
         public IEnumerable<Agent> ParetoFront => _chargePoints;
 
         /// <summary>
@@ -343,16 +258,22 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams)"/>
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters"> General parameters. <see cref="FWParams"/>. </param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
-        /// <exception cref="ArgumentNullException"> If <paramref name="GenParams"/> is null. </exception>
+        /// <exception cref="ArgumentNullException"> If <paramref name="Problem"/> is null. </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         public override void Minimize(FWParams Parameters, IMOOptProblem Problem)
         {
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
+            }
+
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
 
             FirstStep(Problem);
@@ -367,18 +288,24 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/>
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams">   General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
-        /// <exception cref="ArgumentNullException"> If <paramref name="GenParams"/> is null. </exception>
+        /// <exception cref="ArgumentNullException"> If <paramref name="Problem"/> is null. </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
         /// </exception>
         /// <exception cref="OperationCanceledException"></exception>
         public override void Minimize(FWParams Parameters, IMOOptProblem Problem, CancellationToken CancelToken)
         {
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
+            }
+
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
 
             FirstStep(Problem);
@@ -393,12 +320,13 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
-        /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="Progress"/>./>
         /// </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
         /// <exception cref="ArgumentNullException">
@@ -412,6 +340,11 @@ namespace EOpt.Math.Optimization.MOOpt
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
+            }
+
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
             }
 
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);
@@ -433,17 +366,18 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress}, CancellationToken)"/>
         /// </summary>
-        /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
+        /// <param name="Parameters">   General parameters.</param>
+        /// <param name="Problem">Multiobjective problem</param>
         /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
-        /// <see cref="Progress"/>.
-        /// <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/><param name="CancelToken"> <see cref="CancellationToken"/></param>
+        /// <see cref="Progress"/>./>
         /// </param>
+        /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
         /// <exception cref="ArgumentNullException">
-        /// If <paramref name="GenParams"/> or <paramref name="Reporter"/> is null.
+        /// If <paramref name="Problem"/> or <paramref name="Reporter"/> is null.
         /// </exception>
         /// <exception cref="ArithmeticException">
         /// If the function has value is NaN, PositiveInfinity or NegativeInfinity.
@@ -454,6 +388,11 @@ namespace EOpt.Math.Optimization.MOOpt
             if (Reporter == null)
             {
                 throw new ArgumentNullException(nameof(Reporter));
+            }
+
+            if (Problem == null)
+            {
+                throw new ArgumentNullException(nameof(Problem));
             }
 
             Init(Parameters, Problem.LowerBounds.Count, Problem.CountObjs);

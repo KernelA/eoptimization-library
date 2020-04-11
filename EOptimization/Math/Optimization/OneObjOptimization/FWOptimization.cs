@@ -66,7 +66,7 @@ namespace EOpt.Math.Optimization.OOOpt
             {
                 s = _parameters.M * (_fmax - _chargePoints[i].Objs[0] + Constants.VALUE_AVOID_DIV_BY_ZERO) / denumerator;
 
-                base.FindAmountDebrisForCharge(s, i, 1);
+                base.FindAmountDebrisForCharge(s, i);
             }
         }
 
@@ -208,7 +208,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
             int totalToTake = _parameters.NP - 1;
 
-            base.TakeAgents(actualSizeMatrix, totalToTake);
+            base.TakeAgents(totalToTake);
 
             _chargePoints[0].SetAt(_solution);
 

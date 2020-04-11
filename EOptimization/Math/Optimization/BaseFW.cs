@@ -17,7 +17,8 @@ namespace EOpt.Math.Optimization
     /// <summary>
     /// Base class for the FW method.
     /// </summary>
-    /// <typeparam name="TProblem"></typeparam>
+    /// <typeparam name="TProblem">Type of problem</typeparam>
+    /// <typeparam name="TObj">Type of objective</typeparam>
     public abstract class BaseFW<TObj, TProblem> : IBaseOptimizer<FWParams, TProblem> where TProblem : IConstrOptProblem<double, TObj>
     {
         /// <summary>
@@ -50,7 +51,7 @@ namespace EOpt.Math.Optimization
         protected AgentPool _pool;
 
         /// <summary>
-        /// Class for internal computation.
+        /// The structure is storing an agent and its probability of choosing.
         /// </summary>
         protected class WeightOfAgent
         {
@@ -74,6 +75,9 @@ namespace EOpt.Math.Optimization
             }
         }
 
+        /// <summary>
+        /// Helper class for using  FastPriorityQueue
+        /// </summary>
         protected class AgentNode : FastPriorityQueueNode
         {
             public int AgentIndex { get; private set; }
@@ -138,7 +142,7 @@ namespace EOpt.Math.Optimization
             }
         }
 
-        protected void FindAmountDebrisForCharge(double S, int WhichCharge, int DimObjs)
+        protected void FindAmountDebrisForCharge(double S, int WhichCharge)
         {
             int countDebris = (int)Math.Truncate(S);
 
@@ -206,11 +210,6 @@ namespace EOpt.Math.Optimization
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
                 }
-
-                //if (Splinter.Point[axisIndex] < LowerBounds[axisIndex] || Splinter.Point[axisIndex] > UpperBounds[axisIndex])
-                //{
-                //    Splinter.Point[axisIndex] = LowerBounds[axisIndex] + Math.Abs(Math.IEEERemainder(Math.Abs(Splinter.Point[axisIndex]), UpperBounds[axisIndex] - LowerBounds[axisIndex]));
-                //}
             }
         }
 
@@ -269,12 +268,18 @@ namespace EOpt.Math.Optimization
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="Parameters"></param>
+        /// <param name="Dim"></param>
+        /// <param name="DimObjs"></param>
+        /// <exception cref="ArgumentException">If <paramref name="Parameters"/> is not initialized.</exception>
         protected virtual void Init(FWParams Parameters, int Dim, int DimObjs)
         {
             if (!Parameters.IsParamsInit)
             {
-                throw new ArgumentException("The parameters were created by the default constructor and have invalid values.\n" +
-                    "You need to create parameters with a custom constructor.", nameof(Parameters));
+                throw new ArgumentException("The parameters were created by the default constructor and have invalid values. You need to create parameters with a custom constructor.", nameof(Parameters));
             }
 
             _parameters = Parameters;
@@ -315,12 +320,6 @@ namespace EOpt.Math.Optimization
             _weightedAgents = new List<WeightOfAgent>(newSizeMatrix);
 
             _pool = new AgentPool(_parameters.NP * _maxDebrisCount / 2, new AgenCreator(Dim, DimObjs));
-
-            //for (int i = 0; i < _weights.Count; i++)
-            //{
-            //    // The structure is storing an agent and its probability of choosing.
-            //    _weights[i] = new WeightOfAgent(new Agent(Dim, DimObjs), 0.0);
-            //}
 
             if (_matrixOfDistances == null)
             {
@@ -436,10 +435,8 @@ namespace EOpt.Math.Optimization
         /// <remarks>
         /// The original algorithm described in the Efraimidis, P.S., & Spirakis, P.G. (2007). Weighted Random Sampling (2005; Efraimidis, Spirakis).
         /// </remarks>
-        /// <param name="Weights"></param>
-        /// <param name="ActualSize"></param>
         /// <param name="TotalTake"></param>
-        protected void TakeAgents(int ActualSize, int TotalTake)
+        protected void TakeAgents(int TotalTake)
         {
             var _priority = new SimplePriorityQueue<int, double>();
 

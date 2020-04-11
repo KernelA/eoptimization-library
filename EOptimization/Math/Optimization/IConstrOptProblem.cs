@@ -4,6 +4,11 @@ namespace EOpt.Math.Optimization
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// General interface for box constrained optimization problems.
+    /// </summary>
+    /// <typeparam name="TDecision"></typeparam>
+    /// <typeparam name="TObj"></typeparam>
     public interface IConstrOptProblem<TDecision, TObj>
     {
         IReadOnlyList<TDecision> LowerBounds { get; }

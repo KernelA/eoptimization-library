@@ -2,6 +2,9 @@
 // Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Optimization.OOOpt
 {
+    /// <summary>
+    /// Interface for single-objective optimization problem
+    /// </summary>
     public interface IOOOptProblem : IConstrOptProblem<double, double>
     {
     }

@@ -29,13 +29,11 @@ namespace EOpt.Math
         /// <param name="RandGen">   </param>
         public static void RandomPermutation<T>(IList<T> Collection, System.Random RandGen)
         {
-            int j = 0;
-
             T temp;
 
             for (int i = 0; i < Collection.Count; i++)
             {
-                j = RandGen.Next(i + 1);
+                int j = RandGen.Next(i + 1);
                 temp = Collection[i];
                 Collection[i] = Collection[j];
                 Collection[j] = temp;
