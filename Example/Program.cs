@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-
-using EOpt.Math.Optimization;
-using EOpt.Math.Optimization.OOOpt;
-
-namespace Example
+﻿namespace Example
 {
+    using System;
+    using System.Collections.Generic;
+
+    using EOpt.Math.Optimization;
+    using EOpt.Math.Optimization.OOOpt;
+
     /// See http://www.sfu.ca/~ssurjano/rastr.html
     internal class RastriginProblem : IOOOptProblem
     {
@@ -36,7 +36,7 @@ namespace Example
             IOOOptimizer<FWParams> fw = new FWOptimizer();
             IOOOptimizer<GEMParams> gem = new GEMOptimizer();
 
-            BBBCParams param1 = new BBBCParams(20, 100, 0.4, 0.5);
+            BBBCParams param1 = new BBBCParams(20, 200, 0.4, 0.5);
             FWParams param2 = new FWParams(20, 100, 20, 10, 20, 40);
             GEMParams param3 = new GEMParams(1, 100, 50, 2 * Math.Sqrt(2), 100);
 

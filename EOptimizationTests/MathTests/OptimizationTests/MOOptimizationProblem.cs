@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using EOpt.Math.Optimization.MOOpt;
 
@@ -11,9 +12,7 @@
     {
         private List<TTargetFunction> _targetFunction;
 
-        public IReadOnlyList<TTargetFunction> TargetFunction => _targetFunction;
-
-        public int CountObjs => throw new NotImplementedException();
+        public int CountObjs => _targetFunction.Count;
 
         public MOOptimizationProblem(IEnumerable<TTargetFunction> TargetFunction, IReadOnlyCollection<double> LowerBounds, IReadOnlyCollection<double> UpperBounds) :
             base(LowerBounds, UpperBounds)
@@ -34,11 +33,14 @@
                 position++;
             }
 
-            _targetFunction = new List<Func<IReadOnlyList<double>, double>>(TargetFunction);
+            _targetFunction = new List<TTargetFunction>(TargetFunction);
         }
 
-        public double ObjFunction(IReadOnlyList<double> Point, int NumObj) => throw new NotImplementedException();
+        public IEnumerable<double> TargetFunction(IReadOnlyList<double> Point)
+        {
+            return _targetFunction.Select(func => func(Point));
+        }
 
-        IEnumerable<double> IConstrOptProblem<double, IEnumerable<double>>.TargetFunction(IReadOnlyList<double> Point) => throw new NotImplementedException();
+        public double ObjFunction(IReadOnlyList<double> Point, int NumObj) => _targetFunction[NumObj](Point);
     }
 }
