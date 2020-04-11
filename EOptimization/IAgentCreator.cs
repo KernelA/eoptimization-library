@@ -2,8 +2,6 @@
 // Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt
 {
-    using System.Collections.Generic;
-
     using Math.Optimization;
 
     public interface IAgentCreator

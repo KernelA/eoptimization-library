@@ -2,12 +2,7 @@
 // Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Optimization.OOOpt
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     public interface IOOOptProblem : IConstrOptProblem<double, double>
     {
-
     }
 }

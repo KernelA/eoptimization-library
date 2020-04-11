@@ -5,14 +5,14 @@ namespace EOpt.Help
     using System;
 
     /// <summary>
-    /// Information about progress of computation. 
+    /// Information about progress of computation.
     /// </summary>
     public class Progress
     {
         private int _current;
 
         /// <summary>
-        /// A current value of progress. 
+        /// A current value of progress.
         /// </summary>
 		public int Current
         {
@@ -30,17 +30,17 @@ namespace EOpt.Help
         }
 
         /// <summary>
-        /// An end value of progress. 
+        /// An end value of progress.
         /// </summary>
 		public int End { get; }
 
         /// <summary>
-        /// Method of optimization. 
+        /// Method of optimization.
         /// </summary>
 		public object OptimizationMethod { get; }
 
         /// <summary>
-        /// An initial value of progress. 
+        /// An initial value of progress.
         /// </summary>
         public int Start { get; }
 

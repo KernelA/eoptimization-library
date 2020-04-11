@@ -3,12 +3,8 @@
 namespace EOpt.Math.Optimization
 {
     using System;
-    using System.Collections.Generic;
 
     using EOpt.Exceptions;
-    using EOpt.Help;
-
-    using Optimization.OOOpt;
 
     using TMOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, System.Collections.Generic.IEnumerable<double>>;
     using TOOTargetFunction = System.Func<System.Collections.Generic.IReadOnlyList<double>, double>;

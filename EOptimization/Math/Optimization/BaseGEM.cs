@@ -7,16 +7,16 @@ namespace EOpt.Math.Optimization
     using System.Linq;
     using System.Threading;
 
+    using EOpt.Exceptions;
     using EOpt.Help;
     using EOpt.Math.Random;
-    using EOpt.Exceptions;
 
-    public abstract class BaseGEM<TObjs, TProblem> :  IBaseOptimizer<GEMParams, TProblem> where TProblem : IConstrOptProblem<double, TObjs>
+    public abstract class BaseGEM<TObjs, TProblem> : IBaseOptimizer<GEMParams, TProblem> where TProblem : IConstrOptProblem<double, TObjs>
     {
         protected PointND _dosd, _dgrs, _drnd;
 
         /// <summary>
-        /// Grenades. 
+        /// Grenades.
         /// </summary>
         protected List<Agent> _grenades;
 
@@ -31,7 +31,7 @@ namespace EOpt.Math.Optimization
         protected Func<IReadOnlyList<double>, TObjs> _targetFuncWithTransformedCoords;
 
         /// <summary>
-        /// Shrapnels. 
+        /// Shrapnels.
         /// </summary>
         protected LinkedList<Agent>[] _shrapnels;
 
@@ -41,8 +41,6 @@ namespace EOpt.Math.Optimization
 
         protected IContUniformGen _uniformRand;
         protected Agent _xcur, _xosd, _xrnd;
-
-
 
         protected virtual void Clear()
         {
@@ -55,7 +53,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Search a best position to grenade. 
+        /// Search a best position to grenade.
         /// </summary>
         /// <param name="WhichGrenade"></param>
         protected void FindBestPosition(int WhichGrenade, Func<Agent, Agent, bool> IsLessByObjs)
@@ -118,11 +116,11 @@ namespace EOpt.Math.Optimization
         protected abstract void EvalTempAgent(Agent Temp);
 
         /// <summary>
-        /// Searching OSD and Xosd position. 
+        /// Searching OSD and Xosd position.
         /// </summary>
         /// <param name="WhichGrenade"></param>
         /// <param name="NumIter">     </param>
-        protected void FindOSD(int WhichGrenade, int NumIter, int Dimension, int DimObjs, Func<Agent, Agent, bool> IsLessByObjs) 
+        protected void FindOSD(int WhichGrenade, int NumIter, int Dimension, int DimObjs, Func<Agent, Agent, bool> IsLessByObjs)
         {
             LinkedList<Agent> ortogonalArray = new LinkedList<Agent>();
 
@@ -229,20 +227,19 @@ namespace EOpt.Math.Optimization
             // Vector dosd.
             _dosd = _xosd == null ? null : _xosd.Point - _grenades[WhichGrenade].Point;
 
-
             // Normalization vector.
             if (_dosd != null)
             {
                 double norm = _dosd.Norm();
 
-                if(CmpDouble.AlmostEqual(norm, 0.0, 2))
+                if (CmpDouble.AlmostEqual(norm, 0.0, 2))
                 {
                     _dosd = null;
                 }
                 else
                 {
                     _dosd.MultiplyByInplace(1 / norm);
-                }              
+                }
             }
         }
 
@@ -265,7 +262,7 @@ namespace EOpt.Math.Optimization
             double p = Math.Max(1.0 / Dimension,
                  Math.Log10(_radiusGrenade / _radiusExplosion) / Math.Log10(_parameters.Pts));
 
-            if(CheckDouble.GetTypeValue(p) != DoubleTypeValue.Valid)
+            if (CheckDouble.GetTypeValue(p) != DoubleTypeValue.Valid)
             {
                 throw new InvalidValueFunctionException("sdd", new PointND(0.0, 2));
             }
@@ -349,7 +346,6 @@ namespace EOpt.Math.Optimization
                     }
                 }
 
-
                 double dist = 0.0;
 
                 // Calculate distance to grenades.
@@ -368,7 +364,6 @@ namespace EOpt.Math.Optimization
                     }
                 }
 
-                
                 if (isShrapnelAdd)
                 {
                     _shrapnels[WhichGrenade].AddLast(new Agent(tempPoint, new PointND(0.0, DimObjs)));
@@ -442,7 +437,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Create grenades. 
+        /// Create grenades.
         /// </summary>
         /// <param name="LowerBounds"></param>
         /// <param name="UpperBounds"></param>
@@ -477,7 +472,7 @@ namespace EOpt.Math.Optimization
         protected abstract void NextStep(TProblem Problem, int Iter);
 
         /// <summary>
-        /// Coordinates transformation: [-1; 1] -&gt; [LowerBounds[i]; UpperBounds[i]]. 
+        /// Coordinates transformation: [-1; 1] -&gt; [LowerBounds[i]; UpperBounds[i]].
         /// </summary>
         /// <param name="X"> Input coordinates. </param>
         protected void TransformCoord(double[] X, IReadOnlyList<double> LowerBounds, IReadOnlyList<double> UpperBounds)
@@ -489,7 +484,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Update parameters. 
+        /// Update parameters.
         /// </summary>
         /// <param name="NumIter"></param>
         protected void UpdateParams(int NumIter, int Dimension)
@@ -504,14 +499,14 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         public BaseGEM() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>

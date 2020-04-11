@@ -5,7 +5,7 @@ namespace EOpt.Math
     using System;
 
     /// <summary>
-    /// Class for global constants. 
+    /// Class for global constants.
     /// </summary>
     public static class Constants
     {
@@ -28,17 +28,17 @@ namespace EOpt.Math
         }
 
         /// <summary>
-        /// Machine's epsilon for double. 
+        /// Machine's epsilon for double.
         /// </summary>
         public static readonly double EPS;
 
         /// <summary>
-        /// Exponent of machine epsilon. 
+        /// Exponent of machine epsilon.
         /// </summary>
         public static readonly int EPS_EXPONENT;
 
         /// <summary>
-        /// Number, which add for avoiding division by zero. 
+        /// Number, which add for avoiding division by zero.
         /// </summary>
         public static readonly double VALUE_AVOID_DIV_BY_ZERO;
 

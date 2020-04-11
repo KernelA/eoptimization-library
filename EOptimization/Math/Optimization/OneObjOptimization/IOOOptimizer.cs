@@ -5,12 +5,12 @@ namespace EOpt.Math.Optimization
     using EOpt.Math.Optimization.OOOpt;
 
     /// <summary>
-    /// Interface for optimization methods. 
+    /// Interface for optimization methods.
     /// </summary>
     public interface IOOOptimizer<TParams> : IBaseOptimizer<TParams, IOOOptProblem>
     {
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         Agent Solution { get; }
     }

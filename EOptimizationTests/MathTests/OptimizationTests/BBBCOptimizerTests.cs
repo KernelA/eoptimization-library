@@ -5,7 +5,6 @@
     using EOpt.Exceptions;
     using EOpt.Math.Optimization;
     using EOpt.Math.Optimization.OOOpt;
-    using EOpt.Math.Optimization.Tests;
 
     using Xunit;
 

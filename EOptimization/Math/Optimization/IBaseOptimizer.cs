@@ -14,14 +14,14 @@ namespace EOpt.Math.Optimization
     public interface IBaseOptimizer<TParams, TProblem>
     {
         /// <summary>
-        /// Finding solution of the constrained optimization problem. 
+        /// Finding solution of the constrained optimization problem.
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
         void Minimize(TParams Parameters, TProblem Problem);
 
         /// <summary>
-        /// Finding solution of the constrained optimization problem. 
+        /// Finding solution of the constrained optimization problem.
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>

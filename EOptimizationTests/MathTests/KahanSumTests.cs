@@ -48,6 +48,5 @@
 
             Assert.Equal(3.0, sum.Sum);
         }
-
     }
 }

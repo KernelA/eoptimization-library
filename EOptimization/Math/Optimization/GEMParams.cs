@@ -5,103 +5,103 @@ namespace EOpt.Math.Optimization
     using System;
 
     /// <summary>
-    /// Parameters for GEM method. 
+    /// Parameters for GEM method.
     /// </summary>
     public struct GEMParams
     {
         /// <summary>
-        /// The number of desired minimums. 
+        /// The number of desired minimums.
         /// </summary>
         public int DesiredMin { get; private set; }
 
         /// <summary>
-        /// The number of iteration. 
+        /// The number of iteration.
         /// </summary>
         public int Imax { get; private set; }
 
         /// <summary>
-        /// The initial radius of the grenade territory. 
+        /// The initial radius of the grenade territory.
         /// </summary>
         public double InitRadiusGrenade { get; private set; }
 
         /// <summary>
-        /// A value indicates, if parameters are set or not. 
+        /// A value indicates, if parameters are set or not.
         /// </summary>
         public bool IsParamsInit { get; }
 
         /// <summary>
-        /// Maximum value of exponent for reduce the radius of explosion. 
+        /// Maximum value of exponent for reduce the radius of explosion.
         /// </summary>
         public double Mmax { get; private set; }
 
         /// <summary>
-        /// Minimum value of exponent for reduce the radius of explosion. 
+        /// Minimum value of exponent for reduce the radius of explosion.
         /// </summary>
         public double Mmin { get; private set; }
 
         /// <summary>
-        /// Number of grenades on each iteration. 
+        /// Number of grenades on each iteration.
         /// </summary>
         public int NGrenade { get; private set; }
 
         /// <summary>
-        /// Number of shrapnel for each grenade. 
+        /// Number of shrapnel for each grenade.
         /// </summary>
         public int NShrapnel { get; private set; }
 
         /// <summary>
-        /// The exponent for determine weight optimal search direction m_osd. 
+        /// The exponent for determine weight optimal search direction m_osd.
         /// </summary>
         public double Psin { get; private set; }
 
         /// <summary>
-        /// Probability of collision. 
+        /// Probability of collision.
         /// </summary>
         public double Pts { get; private set; }
 
         /// <summary>
-        /// The coefficient of radius reduction. 
+        /// The coefficient of radius reduction.
         /// </summary>
         public double RadiusReduct { get; private set; }
 
         /// <summary>
-        /// Parameters for GEM. 
+        /// Parameters for GEM.
         /// </summary>
-        /// <param name="NGrenade">            
+        /// <param name="NGrenade">
         /// Number of grenades on each iteration. <paramref name="NGrenade"/> &gt;= 1.
         /// </param>
-        /// <param name="NShrapnel">           
+        /// <param name="NShrapnel">
         /// Number of shrapnel for each grenade. <paramref name="NShrapnel"/> &gt;= 1.
         /// </param>
-        /// <param name="Imax">                
+        /// <param name="Imax">
         /// The number of iteration. <paramref name="Imax"/> &gt;= 1.
         /// </param>
-        /// <param name="InitRadiusGrenade">   
+        /// <param name="InitRadiusGrenade">
         /// The initial radius of the grenade territory. Maximum value is equal 2 * sqrt(n), where
         /// n-dimension space. <paramref name="InitRadiusGrenade"/> &gt; 0.
         /// </param>
-        /// <param name="RadiusReduct">        
+        /// <param name="RadiusReduct">
         /// The coefficient of radius reduction. <paramref name="RadiusReduct"/> &gt; 1.
         /// </param>
         /// <param name="ProbabilityCollision">
         /// Probability of collision. <paramref name="NGrenade"/> in (0;1).
         /// </param>
-        /// <param name="Mmax">                
+        /// <param name="Mmax">
         /// <para>
         /// Maximum value of exponent for reduce the radius of explosion. <paramref name="Mmax"/> in (0;1].
         /// </para>
         /// <para> <paramref name="Mmax"/> &gt; <paramref name="Mmin"/>. </para>
         /// </param>
-        /// <param name="Mmin">                
+        /// <param name="Mmin">
         /// <para>
         /// Minimum value of exponent for reduce the radius of explosion. <paramref name="Mmin"/> in [0;1).
         /// </para>
         /// <para> <paramref name="Mmin"/> &lt; <paramref name="Mmax"/>. </para>
         /// </param>
-        /// <param name="DesiredMinimum">      
+        /// <param name="DesiredMinimum">
         /// The number of desired minimums. <paramref name="DesiredMinimum"/> &gt;= 1.
         /// </param>
-        /// <param name="Psin">                
+        /// <param name="Psin">
         /// The exponent for determine weight optimal search direction m_osd. <paramref name="Psin"/>
         /// &gt; 0.
         /// </param>

@@ -36,7 +36,6 @@ namespace EOpt.Math
             return Math.Abs(Value1 - Value2) < Math.Pow(10, Exponent) * Constants.EPS * (1.0 + Math.Max(Math.Abs(Value1), Math.Abs(Value2)));
         }
 
-
         /// <summary>
         /// Usual comparison of double. It needed for the non-dominated sorting.
         /// </summary>
@@ -45,11 +44,11 @@ namespace EOpt.Math
         /// <returns></returns>
         internal static int DoubleCompare(double Value1, double Value2)
         {
-            if(Value1 < Value2)
+            if (Value1 < Value2)
             {
                 return -1;
             }
-            else if(Value1 > Value2)
+            else if (Value1 > Value2)
             {
                 return 1;
             }

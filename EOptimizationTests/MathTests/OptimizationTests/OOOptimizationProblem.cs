@@ -6,14 +6,14 @@
     using EOpt.Math.Optimization.OOOpt;
 
     /// <summary>
-    /// An optimization problem with an one target function. 
+    /// An optimization problem with an one target function.
     /// </summary>
     internal class OOOptimizationProblem : BaseOptimizationProblem, IOOOptProblem
     {
         private Func<IReadOnlyList<double>, double> _targetFunction;
 
         /// <summary>
-        /// A target function. 
+        /// A target function.
         /// </summary>
         public Func<IReadOnlyList<double>, double> TargetFunction => _targetFunction;
 

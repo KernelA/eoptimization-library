@@ -3,8 +3,6 @@
 namespace EOpt.Math.Optimization.MOOpt
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     public struct MOFWParams
     {
@@ -17,50 +15,48 @@ namespace EOpt.Math.Optimization.MOOpt
         public int NewStrategyIter { get; private set; }
 
         /// <summary>
-        /// Minimum number of debris for each charge. 
+        /// Minimum number of debris for each charge.
         /// </summary>
         public int Smin => _parameters.Smin;
 
         /// <summary>
-        /// The maximum amplitude of explosion. 
+        /// The maximum amplitude of explosion.
         /// </summary>
         public double Amax => _parameters.Amax;
 
         /// <summary>
-        /// Maximum number of debris for each charge. 
+        /// Maximum number of debris for each charge.
         /// </summary>
         public int Smax => _parameters.Smax;
 
         /// <summary>
-        /// The number of iteration. 
+        /// The number of iteration.
         /// </summary>
         public int Imax => -_parameters.Imax;
 
         /// <summary>
-        /// A value indicates, if parameters are set or not. 
+        /// A value indicates, if parameters are set or not.
         /// </summary>
         public bool IsParamsInit => _isParamsInit && _parameters.IsParamsInit;
 
-
-
         /// <summary>
-        /// Parameter affecting the number of debris. 
+        /// Parameter affecting the number of debris.
         /// </summary>
         public double M => _parameters.M;
 
         /// <summary>
-        /// Number of charges on each iteration. 
+        /// Number of charges on each iteration.
         /// </summary>
         public int NP => _parameters.NP;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Parameters"></param>
         /// <param name="NewStrategyIter"></param>
         public MOFWParams(FWParams Parameters, int NewStrategyIter)
         {
-            if(NewStrategyIter < 0 || NewStrategyIter > Parameters.Imax)
+            if (NewStrategyIter < 0 || NewStrategyIter > Parameters.Imax)
             {
                 throw new ArgumentException($"{nameof(NewStrategyIter)} is invalid.", nameof(NewStrategyIter));
             }

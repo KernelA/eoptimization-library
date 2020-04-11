@@ -16,7 +16,7 @@ namespace EOpt.Math.Optimization.OOOpt
     using Math.Random;
 
     /// <summary>
-    /// Optimization method BBBC. 
+    /// Optimization method BBBC.
     /// </summary>
     public class BBBCOptimizer : BBBBC<double, IOOOptProblem>, IOOOptimizer<BBBCParams>
     {
@@ -138,19 +138,19 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         public Agent Solution => _solution;
 
         /// <summary>
-        /// Create the object which uses default implementation for random generators. 
+        /// Create the object which uses default implementation for random generators.
         /// </summary>
         public BBBCOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create the object which uses custom implementation for random generators. 
+        /// Create the object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
@@ -162,7 +162,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
@@ -186,7 +186,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
@@ -213,11 +213,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress})"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, IProgress{Progress})"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
-        /// <param name="Reporter">  
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is <see cref="Progress"/>.
         /// </param>
         /// <exception cref="ArgumentException"> If parameters do not set. </exception>
@@ -253,11 +253,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/> 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
-        /// <param name="Reporter">   
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is <see cref="Progress"/>.
         /// </param>
         /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>

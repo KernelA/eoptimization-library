@@ -5,7 +5,7 @@ namespace EOpt.Math.Random
     using System;
 
     /// <summary>
-    /// A continuous uniform distribution. 
+    /// A continuous uniform distribution.
     /// </summary>
     public class ContUniformDist : IContUniformGen
     {
@@ -14,7 +14,7 @@ namespace EOpt.Math.Random
         private Random _rand;
 
         /// <summary>
-        /// The left boundary of the distribution range. 
+        /// The left boundary of the distribution range.
         /// </summary>
         /// <exception cref="ArgumentException"> If value &gt; UpperBound. </exception>
         public double LowBound
@@ -32,7 +32,7 @@ namespace EOpt.Math.Random
         }
 
         /// <summary>
-        /// The right boundary of the distribution range. 
+        /// The right boundary of the distribution range.
         /// </summary>
         public double UpperBound
         {
@@ -50,14 +50,14 @@ namespace EOpt.Math.Random
         }
 
         /// <summary>
-        /// Create continuous uniform distribution on [0; 1]. 
+        /// Create continuous uniform distribution on [0; 1].
         /// </summary>
         public ContUniformDist() : this(0, 1)
         {
         }
 
         /// <summary>
-        /// Create continuous uniform distribution on [ <paramref name="LowBound"/>; <paramref name="UpperBound"/>]. 
+        /// Create continuous uniform distribution on [ <paramref name="LowBound"/>; <paramref name="UpperBound"/>].
         /// </summary>
         /// <param name="LowBound">   The lower boundary of the distribution range. </param>
         /// <param name="UpperBound"> The upper boundary of the distribution range. </param>
@@ -76,7 +76,7 @@ namespace EOpt.Math.Random
         }
 
         /// <summary>
-        /// Random value from continuous uniform distribution on [ <paramref name="LowBound"/>; <paramref name="UpperBound"/>]. 
+        /// Random value from continuous uniform distribution on [ <paramref name="LowBound"/>; <paramref name="UpperBound"/>].
         /// </summary>
         /// <param name="LowBound">   The lower boundary of the distribution range. </param>
         /// <param name="UpperBound"> The upper boundary of the distribution range. </param>

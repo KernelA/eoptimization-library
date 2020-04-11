@@ -2,9 +2,7 @@
 // Code Analyzer for C, C++ and C#: http://www.viva64.com
 namespace EOpt.Math.Optimization.MOOpt
 {
-    using System;
     using System.Collections.Generic;
-    using System.Text;
 
     public interface IMOOptProblem : IConstrOptProblem<double, IEnumerable<double>>
     {

@@ -8,11 +8,10 @@ namespace EOpt.Math.Optimization.MOOpt
 
     using EOpt.Help;
     using EOpt.Math;
-    using EOpt.Math.Random;
     using EOpt.Math.LA;
+    using EOpt.Math.Random;
 
     using Nds;
-
 
     public class MOBBBCOptimizer : BBBBC<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<BBBCParams>
     {
@@ -25,7 +24,6 @@ namespace EOpt.Math.Optimization.MOOpt
         private DynSymmetricMatrix _distances;
 
         private int _nearestAgentsCount;
-
 
         private class IdxDistance : IComparable<IdxDistance>
         {
@@ -43,7 +41,6 @@ namespace EOpt.Math.Optimization.MOOpt
             {
                 return Distance.CompareTo(Other.Distance);
             }
-
         }
 
         private void EvalFunction(Func<IReadOnlyList<double>, IEnumerable<double>> Function)
@@ -56,7 +53,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void Clear()
         {
-
         }
 
         private void FindCenterOfMass(IEnumerable<int> IndicesCurrentFront)
@@ -116,7 +112,7 @@ namespace EOpt.Math.Optimization.MOOpt
 
             foreach (int front in frontIndicesDict.Keys)
             {
-                if(allIndices.Count <= 0.3 * _parameters.NP)
+                if (allIndices.Count <= 0.3 * _parameters.NP)
                 {
                     for (int i = 0; i < frontIndicesDict[front].Count; i++)
                     {
@@ -208,7 +204,6 @@ namespace EOpt.Math.Optimization.MOOpt
             _distances = new DynSymmetricMatrix(Parameters.NP);
         }
 
-
         protected override void InitAgents(IMOOptProblem Problem, int DimObjs)
         {
             int dimPoint = Problem.LowerBounds.Count;
@@ -234,14 +229,14 @@ namespace EOpt.Math.Optimization.MOOpt
         public IEnumerable<Agent> ParetoFront => base._agents;
 
         /// <summary>
-        /// Create the object which uses default implementation for random generators. 
+        /// Create the object which uses default implementation for random generators.
         /// </summary>
         public MOBBBCOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create the object which uses custom implementation for random generators. 
+        /// Create the object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
@@ -274,7 +269,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private void ComputeDistances()
         {
-
             for (int i = 0; i < _parameters.NP; i++)
             {
                 for (int j = i + 1; j < _parameters.NP; j++)

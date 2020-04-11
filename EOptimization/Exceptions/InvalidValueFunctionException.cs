@@ -6,21 +6,20 @@ namespace EOpt.Exceptions
 
     using Math;
 
-
     /// <summary>
-    /// The exception presents an invalid value of the function. 
+    /// The exception presents an invalid value of the function.
     /// </summary>
     public class InvalidValueFunctionException : ArithmeticException
     {
         private PointND _point;
 
         /// <summary>
-        /// Get a point, where function has an invalid value. 
+        /// Get a point, where function has an invalid value.
         /// </summary>
         public PointND AtPoint => _point;
 
         /// <summary>
-        /// The exception that is thrown for errors in a calculation of function. 
+        /// The exception that is thrown for errors in a calculation of function.
         /// </summary>
         /// <param name="Message"> A message of exception. </param>
         /// <param name="Point"> A point, where function has an invalid value. </param>
@@ -31,7 +30,7 @@ namespace EOpt.Exceptions
         }
 
         /// <summary>
-        /// The exception that is thrown for errors in a calculation of function. 
+        /// The exception that is thrown for errors in a calculation of function.
         /// </summary>
         /// <param name="Message"> A message of exception. </param>
         /// <param name="Point"> A point, where function has an invalid value. </param>

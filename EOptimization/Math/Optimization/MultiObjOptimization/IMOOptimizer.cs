@@ -5,13 +5,13 @@ namespace EOpt.Math.Optimization.MOOpt
     using System.Collections.Generic;
 
     /// <summary>
-    /// Interface for multiobjective optimization methods. 
+    /// Interface for multiobjective optimization methods.
     /// </summary>
     /// <typeparam name="TParams"></typeparam>
     public interface IMOOptimizer<TParams> : IBaseOptimizer<TParams, IMOOptProblem>
     {
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         IEnumerable<Agent> ParetoFront { get; }
     }

@@ -15,9 +15,8 @@ namespace EOpt.Math.Optimization.MOOpt
 
     using Nds;
 
-
     /// <summary>
-    /// Optimization method Fireworks. 
+    /// Optimization method Fireworks.
     /// </summary>
     public class MOFWOptimizer : BaseFW<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<FWParams>
     {
@@ -51,7 +50,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// Find amount debris for each point of charge. 
+        /// Find amount debris for each point of charge.
         /// </summary>
         private void FindAmountDebris(int[] Fronts, IDictionary<int, int> CountFronts, int FMax)
         {
@@ -70,7 +69,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// Determine debris position. 
+        /// Determine debris position.
         /// </summary>
         /// <param name="ChargeFronts"></param>
         /// <param name="LowerBounds"> </param>
@@ -106,7 +105,6 @@ namespace EOpt.Math.Optimization.MOOpt
                 actualSizeMatrix = Fronts.Length - lengthFirstFront;
                 totalTake = _parameters.NP - lengthFirstFront;
             }
-
 
             // Need to compare 'lengthLastFront' agents.
             base.ResetMatrixAndTrimWeights(actualSizeMatrix);
@@ -168,11 +166,10 @@ namespace EOpt.Math.Optimization.MOOpt
 
         private void SecondMethod(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
-            
         }
 
         /// <summary>
-        /// Generate current population. 
+        /// Generate current population.
         /// </summary>
         private void GenerateNextAgents(IEnumerable<Agent> ChargesAndDebris, int[] Fronts)
         {
@@ -221,7 +218,7 @@ namespace EOpt.Math.Optimization.MOOpt
                 k++;
             }
 
-            if (needToTake> 0)
+            if (needToTake > 0)
             {
                 base.CalculateDistances((a, b) => PointND.Distance(a.Objs, b.Objs));
                 base.TakeAgents(lengthLastFront, needToTake);
@@ -245,7 +242,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void Clear()
         {
-
         }
 
         protected override void FirstStep(IMOOptProblem Problem)
@@ -291,7 +287,6 @@ namespace EOpt.Math.Optimization.MOOpt
             GenerateNextAgents(allAgents, allFronts);
 
             EvalFunctionForCharges(Problem.TargetFunction);
-
         }
 
         protected override void Init(FWParams Parameters, int Dim, int DimObjs)
@@ -319,21 +314,20 @@ namespace EOpt.Math.Optimization.MOOpt
                 }
             }
 
-            _currentFronts = new int[Parameters.NP]; 
+            _currentFronts = new int[Parameters.NP];
         }
-
 
         public IEnumerable<Agent> ParetoFront => _chargePoints;
 
         /// <summary>
-        /// Create object which uses default implementation for random generators. 
+        /// Create object which uses default implementation for random generators.
         /// </summary>
         public MOFWOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen">
         /// Object, which implements <see cref="IContUniformGen"/> interface.
@@ -349,7 +343,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams)"/>
         /// </summary>
         /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
         /// <exception cref="InvalidOperationException"> If parameters do not set. </exception>
@@ -373,7 +367,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, CancellationToken)"/>
         /// </summary>
         /// <param name="GenParams">   General parameters. <see cref="GeneralParams"/>. </param>
         /// <param name="CancelToken"> <see cref="CancellationToken"/> </param>
@@ -399,10 +393,10 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
-        /// <param name="Reporter"> 
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </param>
@@ -439,10 +433,10 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/>
         /// </summary>
         /// <param name="GenParams"> General parameters. <see cref="GeneralParams"/>. </param>
-        /// <param name="Reporter"> 
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>.
         /// <seealso cref="IOOOptimizer{T}.Minimize(GeneralParams, IProgress{Progress})"/><param name="CancelToken"> <see cref="CancellationToken"/></param>

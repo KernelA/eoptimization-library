@@ -5,7 +5,7 @@ namespace EOpt.Math.Random
     using System;
 
     /// <summary>
-    /// Normal distribution. 
+    /// Normal distribution.
     /// </summary>
     public class NormalDist : INormalGen
     {
@@ -14,7 +14,7 @@ namespace EOpt.Math.Random
         private Random _rand;
 
         /// <summary>
-        /// Mean value. 
+        /// Mean value.
         /// </summary>
         public double Mean
         {
@@ -23,7 +23,7 @@ namespace EOpt.Math.Random
         }
 
         /// <summary>
-        /// Standard deviation. 
+        /// Standard deviation.
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
         public double StdDev
@@ -41,7 +41,7 @@ namespace EOpt.Math.Random
         }
 
         /// <summary>
-        /// Create normal distribution with mean is equal 0 and standard deviation is equal 1. 
+        /// Create normal distribution with mean is equal 0 and standard deviation is equal 1.
         /// </summary>
         public NormalDist() : this(0, 1)
         {

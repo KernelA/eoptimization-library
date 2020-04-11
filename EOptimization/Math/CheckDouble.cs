@@ -4,12 +4,13 @@ namespace EOpt.Math
 {
     using System;
 
-    enum DoubleTypeValue { NaN, PosInf, NegInf, Valid };
+    internal enum DoubleTypeValue
+    { NaN, PosInf, NegInf, Valid };
 
     internal static class CheckDouble
     {
         /// <summary>
-        /// Get type  value of the <paramref name="Value"/>. 
+        /// Get type  value of the <paramref name="Value"/>.
         /// </summary>
         /// <param name="Value"></param>
         /// <returns>

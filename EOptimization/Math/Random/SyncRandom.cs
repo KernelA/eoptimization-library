@@ -5,7 +5,7 @@ namespace EOpt.Math.Random
     using System;
 
     /// <summary>
-    /// Random generator for multithreaded application. Each thread get own instance of Random. 
+    /// Random generator for multithreaded application. Each thread get own instance of Random.
     /// </summary>
     public static class SyncRandom
     {
@@ -16,7 +16,7 @@ namespace EOpt.Math.Random
         private static Random _localRnd;
 
         /// <summary>
-        /// Get Random instance. Each thread get own instance of Random. 
+        /// Get Random instance. Each thread get own instance of Random.
         /// </summary>
         /// <returns></returns>
         public static Random Get()

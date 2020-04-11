@@ -3,7 +3,6 @@
 namespace EOpt.Math.Optimization.OOOpt
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
 
     using Help;
@@ -11,16 +10,14 @@ namespace EOpt.Math.Optimization.OOOpt
     using Math.Random;
 
     /// <summary>
-    /// Optimization method GEM. 
+    /// Optimization method GEM.
     /// </summary>
     public class GEMOptimizer : BaseGEM<double, IOOOptProblem>, IOOOptimizer<GEMParams>
     {
         private Agent _solution;
 
-       
-
         /// <summary>
-        /// Sort by ascending. 
+        /// Sort by ascending.
         /// </summary>
         private void ArrangeGrenades()
         {
@@ -28,7 +25,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Calculate target function for the grenades. 
+        /// Calculate target function for the grenades.
         /// </summary>
         private void EvalFunctionForGrenades()
         {
@@ -39,7 +36,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Calculate target function for the shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>. 
+        /// Calculate target function for the shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>.
         /// </summary>
         private void EvalFunctionForShrapnels(int WhichGrenade)
         {
@@ -50,7 +47,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Find best solution. 
+        /// Find best solution.
         /// </summary>
         private void FindSolution(IOOOptProblem Problem)
         {
@@ -84,7 +81,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// Determine shrapnels position. 
+        /// Determine shrapnels position.
         /// </summary>
         /// <param name="WhichGrenade"></param>
         /// <param name="NumIter">     </param>
@@ -98,8 +95,6 @@ namespace EOpt.Math.Optimization.OOOpt
 
             base.GenerateShrapnelesForGrenade(WhichGrenade, NumIter, Problem.LowerBounds.Count, 1);
         }
-
-
 
         protected override void FirstStep(IOOOptProblem Problem)
         {
@@ -138,7 +133,6 @@ namespace EOpt.Math.Optimization.OOOpt
             Temp.Eval(_targetFuncWithTransformedCoords);
         }
 
-
         protected override void NextStep(IOOOptProblem Problem, int Iter)
         {
             ArrangeGrenades();
@@ -149,7 +143,7 @@ namespace EOpt.Math.Optimization.OOOpt
 
                 EvalFunctionForShrapnels(j);
 
-                FindBestPosition(j, (a,b) => a.Objs[0] < b.Objs[0]);
+                FindBestPosition(j, (a, b) => a.Objs[0] < b.Objs[0]);
             }
 
             base.UpdateParams(Iter, Problem.LowerBounds.Count);
@@ -158,19 +152,19 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         public Agent Solution => _solution;
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         public GEMOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
@@ -182,7 +176,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
@@ -206,7 +200,7 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
@@ -232,11 +226,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
-        /// <param name="Reporter">  
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>
@@ -273,11 +267,11 @@ namespace EOpt.Math.Optimization.OOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
-        /// <param name="Reporter">   
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>

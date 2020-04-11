@@ -3,10 +3,9 @@
 namespace EOpt
 {
     using System;
+    using System.Collections.Generic;
 
     using EOpt.Math.Optimization;
-    using System.Collections;
-    using System.Collections.Generic;
 
     public class AgentPool
     {
@@ -43,7 +42,7 @@ namespace EOpt
 
         public Agent GetAgent()
         {
-            if(_pool.Count != 0)
+            if (_pool.Count != 0)
             {
                 return _pool.Pop();
             }
@@ -57,12 +56,12 @@ namespace EOpt
         {
             for (int i = 0; i < _pool.Count; i++)
             {
-                if(Agent == _pool.Peek())
+                if (Agent == _pool.Peek())
                 {
                     throw new InvalidOperationException("Pool object ref equals.");
                 }
             }
-            if(_pool.Count < _maxSize)
+            if (_pool.Count < _maxSize)
             {
                 _pool.Push(Agent);
             }

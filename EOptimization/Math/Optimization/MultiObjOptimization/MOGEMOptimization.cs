@@ -3,8 +3,8 @@
 namespace EOpt.Math.Optimization.MOOpt
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     using Help;
@@ -14,7 +14,7 @@ namespace EOpt.Math.Optimization.MOOpt
     using Nds;
 
     /// <summary>
-    /// Optimization method GEM. 
+    /// Optimization method GEM.
     /// </summary>
     public class MOGEMOptimizer : BaseGEM<IEnumerable<double>, IMOOptProblem>, IMOOptimizer<GEMParams>
     {
@@ -44,7 +44,7 @@ namespace EOpt.Math.Optimization.MOOpt
         public int NDCount => _ndcount;
 
         /// <summary>
-        /// Calculate target function for the grenades. 
+        /// Calculate target function for the grenades.
         /// </summary>
         private void EvalFunctionForGrenades()
         {
@@ -55,12 +55,12 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// Calculate target function for the shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>. 
+        /// Calculate target function for the shrapnels. Shrapnels from grenade under number <paramref name="WhichGrenade"/>.
         /// </summary>
         private void EvalFunctionForShrapnels(int WhichGrenade)
         {
             foreach (Agent shrapnel in _shrapnels[WhichGrenade])
-            {   
+            {
                 shrapnel.Eval(base._targetFuncWithTransformedCoords);
             }
         }
@@ -70,9 +70,8 @@ namespace EOpt.Math.Optimization.MOOpt
             Temp.Eval(_targetFuncWithTransformedCoords);
         }
 
-
         /// <summary>
-        /// Determine shrapnels position. 
+        /// Determine shrapnels position.
         /// </summary>
         /// <param name="WhichGrenade"></param>
         /// <param name="NumIter">     </param>
@@ -86,8 +85,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
             base.GenerateShrapnelesForGrenade(WhichGrenade, NumIter, Problem.LowerBounds.Count, Problem.CountObjs);
         }
-
-
 
         protected override void FirstStep(IMOOptProblem Problem)
         {
@@ -123,7 +120,6 @@ namespace EOpt.Math.Optimization.MOOpt
 
             _ndcount = grenFronts.Count(a => a == 0);
 
-
             for (int i = 0; i < grenFronts.Length; i++)
             {
                 _idxFronts[i].Front = grenFronts[i];
@@ -150,19 +146,19 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// The solution of the constrained optimization problem. 
+        /// The solution of the constrained optimization problem.
         /// </summary>
         public IEnumerable<Agent> ParetoFront => _grenades;
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         public MOGEMOptimizer() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create object which uses custom implementation for random generators. 
+        /// Create object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen"> Object, which implements <see cref="IContUniformGen"/> interface. </param>
         /// <param name="NormalGen">  Object, which implements <see cref="INormalGen"/> interface. </param>
@@ -175,7 +171,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
@@ -199,7 +195,7 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
@@ -226,15 +222,14 @@ namespace EOpt.Math.Optimization.MOOpt
 
         protected override void Clear()
         {
-
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters"> Parameters for method. </param>
         /// <param name="Problem">    An optimization problem. </param>
-        /// <param name="Reporter">  
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>
@@ -271,11 +266,11 @@ namespace EOpt.Math.Optimization.MOOpt
         }
 
         /// <summary>
-        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/> 
+        /// <see cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, CancellationToken)"/>
         /// </summary>
         /// <param name="Parameters">  Parameters for method. </param>
         /// <param name="Problem">     An optimization problem. </param>
-        /// <param name="Reporter">   
+        /// <param name="Reporter">
         /// Object which implement interface <see cref="IProgress{T}"/>, where T is
         /// <see cref="Progress"/>. <seealso cref="IOOOptimizer{T}.Minimize(T, OOOptimizationProblem, IProgress{Progress})"/>
         /// </param>

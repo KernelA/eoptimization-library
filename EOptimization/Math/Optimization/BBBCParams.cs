@@ -5,12 +5,12 @@ namespace EOpt.Math.Optimization
     using System;
 
     /// <summary>
-    /// Parameters for BBBC method. 
+    /// Parameters for BBBC method.
     /// </summary>
     public struct BBBCParams
     {
         /// <summary>
-        /// Alpha - restricts the search area for each points. 
+        /// Alpha - restricts the search area for each points.
         /// </summary>
         public double Alpha { get; private set; }
 
@@ -21,31 +21,31 @@ namespace EOpt.Math.Optimization
         public double Beta { get; private set; }
 
         /// <summary>
-        /// The number of iteration. 
+        /// The number of iteration.
         /// </summary>
         public int Imax { get; private set; }
 
         /// <summary>
-        /// A value indicates, if parameters are set or not. 
+        /// A value indicates, if parameters are set or not.
         /// </summary>
         public bool IsParamsInit { get; }
 
         /// <summary>
-        /// Number of points for searching on each iteration. 
+        /// Number of points for searching on each iteration.
         /// </summary>
         public int NP { get; private set; }
 
         /// <summary>
-        /// Parameters for BBBC method. 
+        /// Parameters for BBBC method.
         /// </summary>
-        /// <param name="NP">   
+        /// <param name="NP">
         /// Number of points for searching on each iteration. <paramref name="NP"/> &gt; 0.
         /// </param>
         /// <param name="Imax">  The number of iteration. <paramref name="Imax"/> &gt; 0. </param>
         /// <param name="Alpha">
         /// Restricts the search area for each points. <paramref name="Alpha"/> &gt; 0.
         /// </param>
-        /// <param name="Beta"> 
+        /// <param name="Beta">
         /// Parameter that determines the effect of the "center of mass" and the best current
         /// solution. <paramref name="Beta"/> in [0;1]
         /// </param>

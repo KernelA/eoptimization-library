@@ -4,8 +4,8 @@ namespace EOpt.Math.Optimization
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
     using System.Linq;
+    using System.Threading;
 
     using EOpt.Help;
     using EOpt.Math.Random;
@@ -14,15 +14,14 @@ namespace EOpt.Math.Optimization
 
     using Priority_Queue;
 
-
     /// <summary>
-    /// Base class for the FW method. 
+    /// Base class for the FW method.
     /// </summary>
     /// <typeparam name="TProblem"></typeparam>
     public abstract class BaseFW<TObj, TProblem> : IBaseOptimizer<FWParams, TProblem> where TProblem : IConstrOptProblem<double, TObj>
     {
         /// <summary>
-        /// Charges. 
+        /// Charges.
         /// </summary>
         protected List<Agent> _chargePoints;
 
@@ -30,7 +29,7 @@ namespace EOpt.Math.Optimization
         protected int[] _coordNumbers;
 
         /// <summary>
-        /// Debris for charges. 
+        /// Debris for charges.
         /// </summary>
         protected LinkedList<Agent>[] _debris;
 
@@ -51,7 +50,7 @@ namespace EOpt.Math.Optimization
         protected AgentPool _pool;
 
         /// <summary>
-        /// Class for internal computation. 
+        /// Class for internal computation.
         /// </summary>
         protected class WeightOfAgent
         {
@@ -84,7 +83,6 @@ namespace EOpt.Math.Optimization
                 AgentIndex = Index;
             }
         }
-
 
         protected void CalculateDistances(Func<Agent, Agent, double> Distance)
         {
@@ -177,7 +175,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// First method for determination of position of the debris. 
+        /// First method for determination of position of the debris.
         /// </summary>
         /// <param name="Splinter">        </param>
         /// <param name="CountOfDimension"></param>
@@ -200,12 +198,11 @@ namespace EOpt.Math.Optimization
 
                 Splinter.Point[axisIndex] += h;
 
-                if(Splinter.Point[axisIndex] < LowerBounds[axisIndex])
+                if (Splinter.Point[axisIndex] < LowerBounds[axisIndex])
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
-
                 }
-                else if(Splinter.Point[axisIndex] > UpperBounds[axisIndex])
+                else if (Splinter.Point[axisIndex] > UpperBounds[axisIndex])
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]), UpperBounds[axisIndex]);
                 }
@@ -245,7 +242,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Generate randomly indices of axes. 
+        /// Generate randomly indices of axes.
         /// </summary>
         /// <returns></returns>
         protected void GenerateIndicesOfAxes(int TotalTake)
@@ -254,9 +251,9 @@ namespace EOpt.Math.Optimization
 
             Random rand = SyncRandom.Get();
 
-            foreach(int coordIndex in Enumerable.Range(0, _coordNumbers.Length))
+            foreach (int coordIndex in Enumerable.Range(0, _coordNumbers.Length))
             {
-                if(coordIndex < TotalTake)
+                if (coordIndex < TotalTake)
                 {
                     _coordNumbers[i++] = coordIndex;
                 }
@@ -264,7 +261,7 @@ namespace EOpt.Math.Optimization
                 {
                     int swapIndex = rand.Next(i);
 
-                    if(swapIndex < TotalTake)
+                    if (swapIndex < TotalTake)
                     {
                         _coordNumbers[swapIndex] = coordIndex;
                     }
@@ -317,7 +314,6 @@ namespace EOpt.Math.Optimization
 
             _weightedAgents = new List<WeightOfAgent>(newSizeMatrix);
 
-
             _pool = new AgentPool(_parameters.NP * _maxDebrisCount / 2, new AgenCreator(Dim, DimObjs));
 
             //for (int i = 0; i < _weights.Count; i++)
@@ -369,19 +365,19 @@ namespace EOpt.Math.Optimization
             _matrixOfDistances.ColumnCount = NewSize;
             _matrixOfDistances.Fill(0.0);
 
-            if(NewSize > _weightedAgents.Count)
+            if (NewSize > _weightedAgents.Count)
             {
                 int countAdd = NewSize - _weightedAgents.Count;
 
                 _weightedAgents.Capacity += countAdd;
 
-                while(countAdd > 0)
+                while (countAdd > 0)
                 {
                     _weightedAgents.Add(new WeightOfAgent(_pool.GetAgent(), 0.0));
                     countAdd--;
                 }
             }
-            else if(_weightedAgents.Count > NewSize)
+            else if (_weightedAgents.Count > NewSize)
             {
                 for (int i = NewSize; i < _weightedAgents.Count; i++)
                 {
@@ -398,7 +394,7 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// Second method for determination of position of the debris. 
+        /// Second method for determination of position of the debris.
         /// </summary>
         /// <param name="Splinter">        </param>
         /// <param name="CountOfDimension"></param>
@@ -421,11 +417,9 @@ namespace EOpt.Math.Optimization
 
                 Splinter.Point[axisIndex] *= g;
 
-
                 if (Splinter.Point[axisIndex] < LowerBounds[axisIndex])
                 {
                     Splinter.Point[axisIndex] = _uniformRand.URandVal(LowerBounds[axisIndex], 0.5 * (LowerBounds[axisIndex] + UpperBounds[axisIndex]));
-
                 }
                 else if (Splinter.Point[axisIndex] > UpperBounds[axisIndex])
                 {
@@ -433,7 +427,6 @@ namespace EOpt.Math.Optimization
                 }
             }
         }
-
 
         /// <summary>
         /// <para>
@@ -456,13 +449,13 @@ namespace EOpt.Math.Optimization
             {
                 weight = Math.Pow(_uniformRand.URandVal(0, 1), 1 / _weightedAgents[i].Weight);
 
-                if(_priority.Count < TotalTake)
+                if (_priority.Count < TotalTake)
                 {
                     _priority.Enqueue(i, weight);
                 }
                 else
                 {
-                    if(weight >= _priority.GetPriority(_priority.First))
+                    if (weight >= _priority.GetPriority(_priority.First))
                     {
                         _priority.Dequeue();
                         _priority.Enqueue(i, weight);
@@ -470,26 +463,26 @@ namespace EOpt.Math.Optimization
                 }
             }
 
-            while(_priority.Count != 0)
+            while (_priority.Count != 0)
             {
                 _weightedAgents[_priority.Dequeue()].IsTake = true;
             }
         }
 
         /// <summary>
-        /// Parameters for method. 
+        /// Parameters for method.
         /// </summary>
         public FWParams Parameters => _parameters;
 
         /// <summary>
-        /// Create the object which uses default implementation for random generators. 
+        /// Create the object which uses default implementation for random generators.
         /// </summary>
         public BaseFW() : this(new ContUniformDist(), new NormalDist())
         {
         }
 
         /// <summary>
-        /// Create the object which uses custom implementation for random generators. 
+        /// Create the object which uses custom implementation for random generators.
         /// </summary>
         /// <param name="UniformGen">
         /// Object, which implements <see cref="IContUniformGen"/> interface.
@@ -519,14 +512,14 @@ namespace EOpt.Math.Optimization
         }
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>. 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>.
         /// </summary>
         /// <param name="Parameters"></param>
         /// <param name="Problem">   </param>
         public abstract void Minimize(FWParams Parameters, TProblem Problem);
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>. 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>.
         /// </summary>
         /// <param name="Parameters"> </param>
         /// <param name="Problem">    </param>
@@ -534,7 +527,7 @@ namespace EOpt.Math.Optimization
         public abstract void Minimize(FWParams Parameters, TProblem Problem, CancellationToken CancelToken);
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>. 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>.
         /// </summary>
         /// <param name="Parameters"></param>
         /// <param name="Problem">   </param>
@@ -542,7 +535,7 @@ namespace EOpt.Math.Optimization
         public abstract void Minimize(FWParams Parameters, TProblem Problem, IProgress<Progress> Reporter);
 
         /// <summary>
-        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>. 
+        /// <see cref="IBaseOptimizer{TParams, TProblem}.Minimize(TParams, TProblem)"/>.
         /// </summary>
         /// <param name="Parameters"> </param>
         /// <param name="Problem">    </param>
